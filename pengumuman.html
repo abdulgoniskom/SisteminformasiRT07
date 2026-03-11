@@ -1,70 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pengumuman RT</title>
+<title>Pengumuman RT 07</title>
+
 <style>
-body{font-family:Arial;margin:0;background:#eef2f7;}
-.sidebar{width:160px;background:#2c3e50;color:white;height:100vh;position:fixed;left:0;top:0;}
-.sidebar h2{text-align:center;padding:12px;font-size:16px;}
-.sidebar a{display:block;color:white;padding:10px;text-decoration:none;font-size:14px;}
-.sidebar a:hover{background:#34495e;}
-.main{margin-left:160px;}
-header{background:#2f80ed;color:white;padding:15px;text-align:center;}
-.container{padding:20px;max-width:900px;margin:auto;}
-.card{background:white;padding:15px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-.card h3{margin:0 0 5px 0;}
-.date{font-size:12px;color:#888;margin-bottom:5px;}
-button{background:#2f80ed;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
-button:hover{background:#1f6fd1;}
-.formInput{display:none;margin-top:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-input,textarea{width:100%;padding:8px;margin:5px 0;}
+body{
+  font-family: Arial;
+  margin: 0;
+  background: #eef2f7;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:160px;
+  background:#2c3e50;
+  color:white;
+  height:100vh;
+  position:fixed;
+  left:0;
+  top:0;
+}
+.sidebar h2{
+  text-align:center;
+  padding:12px;
+  font-size:16px;
+}
+.sidebar a{
+  display:block;
+  color:white;
+  padding:10px;
+  text-decoration:none;
+  font-size:14px;
+}
+.sidebar a:hover{
+  background:#34495e;
+}
+
+/* MAIN */
+.main{
+  margin-left:160px;
+}
+
+/* HEADER */
+header{
+  background:#2f80ed;
+  color:white;
+  padding:15px;
+  text-align:center;
+}
+
+/* CONTENT */
+.container{
+  padding:20px;
+  max-width:900px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.card h3{
+  margin:0 0 5px 0;
+}
+.date{
+  font-size:12px;
+  color:#888;
+  margin-bottom:5px;
+}
+
+button{
+  background:#2f80ed;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:5px;
+  cursor:pointer;
+}
+button:hover{
+  background:#1f6fd1;
+}
+
+.formInput{
+  display:none;
+  margin-top:20px;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+input,textarea{
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+}
 </style>
 </head>
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
-<h2>RT 07 RW 09</h2>
-<a href="index.html">Dashboard</a>
-<a href="kas.html">Kas RT</a>
-<a href="warga.html">Data Warga</a>
-<a href="pengumuman.html">Pengumuman</a>
-<a href="kalender.html">Kalender</a>
-<a href="arsip.html">Arsip</a>
+  <h2>RT 07 RW 09</h2>
+  <a href="index.html">Dashboard</a>
+  <a href="kas.html">Kas RT</a>
+  <a href="warga.html">Data Warga</a>
+  <a href="pengumuman.html">Pengumuman</a>
+  <a href="kalender.html">Kalender</a>
+  <a href="arsip.html">Arsip</a>
 </div>
 
+<!-- MAIN -->
 <div class="main">
-<header>
-<h2>Pengumuman RT 07</h2>
-</header>
+  <header>
+    <h2>Pengumuman RT 07</h2>
+  </header>
 
-<div class="container">
+  <div class="container">
 
-<div id="listPengumuman"></div>
+    <!-- Daftar Pengumuman -->
+    <div id="listPengumuman"></div>
 
-<div style="text-align:right">
-<button onclick="login()">Login Admin</button>
-</div>
+    <!-- Tombol Login Admin -->
+    <div style="text-align:right; margin-bottom:10px;">
+      <button onclick="login()">Login Admin</button>
+    </div>
 
-<div class="formInput" id="formInput">
-<h3>Tambah Pengumuman</h3>
-<input type="date" id="tanggal">
-<input type="text" id="judul" placeholder="Judul pengumuman">
-<textarea id="isi" placeholder="Isi pengumuman"></textarea>
-<button onclick="simpan()">Simpan</button>
-</div>
+    <!-- Form Tambah Pengumuman -->
+    <div class="formInput" id="formInput">
+      <h3>Tambah Pengumuman</h3>
+      <input type="date" id="tanggal">
+      <input type="text" id="judul" placeholder="Judul pengumuman">
+      <textarea id="isi" placeholder="Isi pengumuman"></textarea>
+      <button onclick="simpan()">Simpan</button>
+    </div>
 
-</div>
+  </div>
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbxa33vG0aeWx2qukZoe0wAqt5D20BKcefxecJnrK0jDjGNMJE-92W8mGI_1rVm4zAM/exec"; // Ganti dengan URL deploy Apps Script
+// ====== API GOOGLE SHEET ======
+const API="https://script.google.com/macros/s/AKfycbwaupMXgqyxzqonOchIaw-SLhtR2IqZOsUgMIvGErRfShTG8m0l0To1L6QrDanUSp4/exec";
+let dataPengumuman=[];
 
-/* LOGIN ADMIN */
+// ====== LOGIN ADMIN ======
 function login(){
-  let u = prompt("Username");
-  let p = prompt("Password");
+  let u=prompt("Username");
+  let p=prompt("Password");
+
   if(u=="admin" && p=="12345"){
     document.getElementById("formInput").style.display="block";
   }else{
@@ -72,46 +160,60 @@ function login(){
   }
 }
 
-/* LOAD DATA */
+// ====== LOAD DATA ======
 function loadData(){
-  fetch(API+"?sheet=Pengumuman")
-  .then(res=>res.json())
-  .then(data=>{
+  fetch(API + "?sheet=Pengumuman")
+  .then(res => res.json())
+  .then(data => {
+    dataPengumuman = data.reverse();
     let html = "";
-    data.reverse().forEach(d=>{
-      let tgl = new Date(d.tanggal).toLocaleDateString("id-ID");
-      html+=`
-      <div class="card">
-        <h3>${d.judul}</h3>
-        <div class="date">${tgl}</div>
-        <p>${d.isi}</p>
-      </div>`;
+    dataPengumuman.forEach(d => {
+      // Pastikan tanggal valid
+      let tgl = d.tanggal ? new Date(d.tanggal) : new Date();
+      let tglString = tgl.toLocaleDateString("id-ID");
+      html += `
+        <div class="card">
+          <h3>${d.judul}</h3>
+          <div class="date">${tglString}</div>
+          <p>${d.isi}</p>
+        </div>
+      `;
     });
     document.getElementById("listPengumuman").innerHTML = html;
   })
-  .catch(err=>console.log(err));
+  .catch(err => console.log("Error:", err));
 }
 
-/* SIMPAN DATA */
+// ====== SIMPAN DATA ======
 function simpan(){
+  let tanggal = document.getElementById("tanggal").value;
+  let judul = document.getElementById("judul").value.trim();
+  let isi = document.getElementById("isi").value.trim();
+
+  if(!tanggal || !judul || !isi){
+    alert("Semua kolom harus diisi!");
+    return;
+  }
+
   let form = new FormData();
   form.append("sheet","Pengumuman");
-  form.append("tanggal", document.getElementById("tanggal").value);
-  form.append("judul", document.getElementById("judul").value);
-  form.append("isi", document.getElementById("isi").value);
+  form.append("tanggal", tanggal);
+  form.append("judul", judul);
+  form.append("isi", isi);
 
-  fetch(API, {method:"POST", body:form})
-  .then(res=>res.text())
-  .then(res=>{
+  fetch(API, { method:"POST", body: form })
+  .then(res => res.text())
+  .then(res => {
     alert("Pengumuman berhasil disimpan");
-    document.getElementById("tanggal").value="";
-    document.getElementById("judul").value="";
-    document.getElementById("isi").value="";
+    document.getElementById("tanggal").value = "";
+    document.getElementById("judul").value = "";
+    document.getElementById("isi").value = "";
     loadData();
-  });
+  })
+  .catch(err => console.log("Error simpan:", err));
 }
 
-/* LOAD AWAL */
+// ====== LOAD DATA AWAL ======
 loadData();
 </script>
 
