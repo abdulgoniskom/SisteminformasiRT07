@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Kalender Kegiatan RT</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#eef2f7;
+margin:0;
+}
+
+header{
+background:#2f80ed;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+.calendar{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.calendar-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+button{
+padding:8px 12px;
+border:none;
+background:#2f80ed;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#2f80ed;
+color:white;
+padding:10px;
+}
+
+td{
+height:80px;
+text-align:center;
+vertical-align:top;
+border:1px solid #ddd;
+position:relative;
+}
+
+.event{
+background:#27ae60;
+color:white;
+font-size:11px;
+padding:2px 4px;
+border-radius:4px;
+display:block;
+margin-top:3px;
+}
+
+.today{
+background:#fff5cc;
+}
+
+.formInput{
+margin-top:20px;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h2>Kalender Kegiatan RT 07</h2>
+</header>
+
+<div class="container">
+
+<div class="calendar">
+
+<div class="calendar-header">
+
+<button onclick="prevMonth()">◀</button>
+
+<h3 id="bulanTahun"></h3>
+
+<button onclick="nextMonth()">▶</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Ming</th>
+<th>Sen</th>
+<th>Sel</th>
+<th>Rab</th>
+<th>Kam</th>
+<th>Jum</th>
+<th>Sab</th>
+</tr>
+
+</thead>
+
+<tbody id="kalender"></tbody>
+
+</table>
+
+</div>
+
+<div style="text-align:right;margin-top:10px">
+<button onclick="login()">Login Admin</button>
+</div>
+
+<div class="formInput" id="formInput">
+
+<h3>Tambah Kegiatan</h3>
+
+<input type="date" id="tanggal">
+
+<input type="text" id="kegiatan" placeholder="Nama kegiatan">
+
+<button onclick="simpan()">Simpan</button>
+
+</div>
+
+</div>
+
+<script>
+
+const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec?sheet=Kalender";
+
+let date=new Date();
+
+let events=[];
+
+/* LOGIN ADMIN */
+
+function login(){
+
+let u=prompt("Username");
+let p=prompt("Password");
+
+if(u=="admin" && p=="12345"){
+
+document.getElementById("formInput").style.display="block";
+
+}else{
+
+alert("Login gagal");
+
+}
+
+}
+
+
+/* LOAD EVENT */
+
+function loadEvents(){
+
+fetch(API)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+events=data;
+
+renderCalendar();
+
+});
+
+}
+
+
+/* RENDER CALENDAR */
+
+function renderCalendar(){
+
+let year=date.getFullYear();
+let month=date.getMonth();
+
+let firstDay=new Date(year,month,1).getDay();
+let lastDate=new Date(year,month+1,0).getDate();
+
+document.getElementById("bulanTahun").innerText=
+date.toLocaleString("id-ID",{month:"long",year:"numeric"});
+
+let html="";
+
+let day=1;
+
+for(let i=0;i<6;i++){
+
+html+="<tr>";
+
+for(let j=0;j<7;j++){
+
+if(i===0 && j<firstDay){
+
+html+="<td></td>";
+
+}else if(day>lastDate){
+
+html+="<td></td>";
+
+}else{
+
+let fullDate=year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+
+let eventHtml="";
+
+events.forEach(e=>{
+
+if(e.tanggal==fullDate){
+
+eventHtml+=`<span class="event">${e.kegiatan}</span>`;
+
+}
+
+});
+
+html+=`<td>
+
+<strong>${day}</strong>
+
+${eventHtml}
+
+</td>`;
+
+day++;
+
+}
+
+}
+
+html+="</tr>";
+
+}
+
+document.getElementById("kalender").innerHTML=html;
+
+}
+
+
+/* BULAN SEBELUMNYA */
+
+function prevMonth(){
+
+date.setMonth(date.getMonth()-1);
+
+renderCalendar();
+
+}
+
+/* BULAN BERIKUTNYA */
+
+function nextMonth(){
+
+date.setMonth(date.getMonth()+1);
+
+renderCalendar();
+
+}
+
+
+/* SIMPAN KEGIATAN */
+
+function simpan(){
+
+let form=new FormData();
+
+form.append("sheet","Kalender");
+form.append("tanggal",document.getElementById("tanggal").value);
+form.append("kegiatan",document.getElementById("kegiatan").value);
+
+fetch("https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec",
+{method:"POST",body:form})
+
+.then(r=>r.text())
+
+.then(res=>{
+
+alert("Kegiatan tersimpan");
+
+loadEvents();
+
+});
+
+}
+
+loadEvents();
+
+</script>
+
+</body>
+</html>
