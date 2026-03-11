@@ -169,115 +169,58 @@ margin:5px 0;
 </div>
 
 <script>
+const API = "https://script.google.com/macros/s/AKfycbzgVH251a-7C1lWqrw1oBj9rTU76jLAVc3mpxBIzm6GwGQ7gnHB_FaLacerRga476A/exec"; // ganti dengan URL Web App mu
 
-/* API GOOGLE SCRIPT */
-
-const API="https://script.google.com/macros/s/AKfycby6o4Pp0qX1pcAeJUT4A9J-jVHpUenV3DsuY1mrPRqylfOIS8ATKik-v4FLiX9odzw/exec";
-
-let dataPengumuman=[];
-
-/* LOGIN ADMIN */
-
-function login(){
-
-let u=prompt("Username");
-let p=prompt("Password");
-
-if(u=="admin" && p=="12345"){
-
-document.getElementById("formInput").style.display="block";
-
-}else{
-
-alert("Login gagal");
-
+function loadData() {
+  fetch(API + "?sheet=Pengumuman")
+    .then(res => res.json())
+    .then(data => {
+      let html = "";
+      data.reverse().forEach(d => {
+        let tgl = new Date(d.tanggal).toLocaleDateString("id-ID");
+        html += `<div class="card">
+                  <h3>${d.judul}</h3>
+                  <div class="date">${tgl}</div>
+                  <p>${d.isi}</p>
+                </div>`;
+      });
+      document.getElementById("listPengumuman").innerHTML = html;
+    })
+    .catch(err => console.log(err));
 }
 
+function login() {
+  let u = prompt("Username");
+  let p = prompt("Password");
+  if (u === "admin" && p === "12345") {
+    document.getElementById("formInput").style.display = "block";
+  } else {
+    alert("Login gagal");
+  }
 }
 
-/* LOAD DATA */
+function simpan() {
+  let form = new FormData();
+  form.append("sheet", "Pengumuman");
+  form.append("tanggal", document.getElementById("tanggal").value);
+  form.append("judul", document.getElementById("judul").value);
+  form.append("isi", document.getElementById("isi").value);
 
-function loadData(){
-
-fetch(API)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-dataPengumuman=data.reverse();
-
-let html="";
-
-dataPengumuman.forEach(d=>{
-
-let tgl=new Date(d.tanggal).toLocaleDateString("id-ID");
-
-html+=`
-
-<div class="card">
-
-<h3>${d.judul}</h3>
-
-<div class="date">${tgl}</div>
-
-<p>${d.isi}</p>
-
-</div>
-
-`;
-
-});
-
-document.getElementById("listPengumuman").innerHTML=html;
-
-})
-
-.catch(err=>{
-
-console.log("Error:",err);
-
-});
-
+  fetch(API, { method: "POST", body: form })
+    .then(res => res.text())
+    .then(res => {
+      if(res=="success"){
+        alert("Pengumuman berhasil disimpan");
+        document.getElementById("judul").value = "";
+        document.getElementById("isi").value = "";
+        loadData();
+      } else {
+        alert("Gagal menyimpan pengumuman");
+      }
+    });
 }
-
-/* SIMPAN DATA */
-
-function simpan(){
-
-let form=new FormData();
-
-form.append("sheet","Pengumuman");
-form.append("tanggal",document.getElementById("tanggal").value);
-form.append("judul",document.getElementById("judul").value);
-form.append("isi",document.getElementById("isi").value);
-
-fetch("https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec",
-{
-method:"POST",
-body:form
-})
-
-.then(res=>res.text())
-
-.then(res=>{
-
-alert("Pengumuman berhasil disimpan");
-
-document.getElementById("judul").value="";
-document.getElementById("isi").value="";
 
 loadData();
-
-});
-
-}
-
-/* LOAD AWAL */
-
-loadData();
-
 </script>
-
 </body>
 </html>
