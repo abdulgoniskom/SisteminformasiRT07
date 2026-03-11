@@ -72,10 +72,12 @@ padding:30px;
 display:flex;
 gap:20px;
 margin-bottom:30px;
+flex-wrap:wrap;
 }
 
 .card{
 flex:1;
+min-width:200px;
 background:white;
 padding:20px;
 border-radius:10px;
@@ -129,7 +131,7 @@ box-shadow:0 2px 8px rgba(0,0,0,0.1);
 
 <header>
 
-<h2>Dashboard Sistem Informasi RT 07 RW 09 Bumi Indah Citty</h2>
+<h2>Dashboard Sistem Informasi RT 07 RW 09 Bumi Indah City</h2>
 
 <div>
 Ketua RT : Bapak Muhammad Zainudin
@@ -142,23 +144,23 @@ Ketua RT : Bapak Muhammad Zainudin
 <div class="cards">
 
 <div class="card">
-<h3>Total Kas</h3>
-<p>Rp 12.500.000</p>
+<h3>Total Kas RT</h3>
+<p id="totalKasRT">Rp 0</p>
+</div>
+
+<div class="card">
+<h3>Kas Agustusan</h3>
+<p id="kasAgustusan">Rp 0</p>
 </div>
 
 <div class="card">
 <h3>Pengeluaran Bulan Ini</h3>
-<p>Rp 2.000.000</p>
+<p id="pengeluaranBulan">Rp 0</p>
 </div>
 
 <div class="card">
 <h3>Jumlah Warga</h3>
 <p>95 Orang</p>
-</div>
-
-<div class="card">
-<h3>Jumlah KK</h3>
-<p>50 KK</p>
 </div>
 
 </div>
@@ -178,6 +180,105 @@ Ketua RT : Bapak Muhammad Zainudin
 <script>
 
 const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
+
+let chart;
+
+/* FORMAT RUPIAH */
+
+function rupiah(angka){
+return "Rp "+Number(angka).toLocaleString("id-ID");
+}
+
+
+/* TOTAL KAS RT */
+
+function loadKasRT(){
+
+fetch(API+"?sheet=Kas_RT")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let masuk=0;
+let keluar=0;
+
+data.forEach(d=>{
+masuk+=Number(d.masuk);
+keluar+=Number(d.keluar);
+});
+
+let saldo=masuk-keluar;
+
+document.getElementById("totalKasRT").innerText=rupiah(saldo);
+
+});
+
+}
+
+
+/* KAS AGUSTUSAN */
+
+function loadKasAgustusan(){
+
+fetch(API+"?sheet=Kas_Agustusan")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let masuk=0;
+let keluar=0;
+
+data.forEach(d=>{
+masuk+=Number(d.masuk);
+keluar+=Number(d.keluar);
+});
+
+let saldo=masuk-keluar;
+
+document.getElementById("kasAgustusan").innerText=rupiah(saldo);
+
+});
+
+}
+
+
+/* PENGELUARAN BULAN INI */
+
+function loadPengeluaranBulan(){
+
+fetch(API+"?sheet=Kas_RT")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let bulanIni=new Date().getMonth();
+let tahunIni=new Date().getFullYear();
+
+let total=0;
+
+data.forEach(d=>{
+
+let tgl=new Date(d.tanggal);
+
+if(tgl.getMonth()==bulanIni && tgl.getFullYear()==tahunIni){
+
+total+=Number(d.keluar);
+
+}
+
+});
+
+document.getElementById("pengeluaranBulan").innerText=rupiah(total);
+
+});
+
+}
+
+
+/* GRAFIK DASHBOARD */
 
 function loadGrafikDashboard(){
 
@@ -200,9 +301,10 @@ bulanKeluar[bulan]+=Number(d.keluar);
 
 });
 
-const ctx=document.getElementById("kasChart");
+if(chart) chart.destroy();
 
-new Chart(ctx,{
+chart=new Chart(document.getElementById("kasChart"),{
+
 type:'bar',
 
 data:{
@@ -241,7 +343,23 @@ text:'Grafik Kas RT per Bulan'
 
 }
 
+
+/* LOAD SEMUA DATA */
+
+function loadDashboard(){
+
+loadKasRT();
+loadKasAgustusan();
+loadPengeluaranBulan();
 loadGrafikDashboard();
+
+}
+
+loadDashboard();
+
+/* AUTO REFRESH */
+
+setInterval(loadDashboard,5000);
 
 </script>
 
