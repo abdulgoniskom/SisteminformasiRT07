@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sistem Informasi RT</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+margin:0;
+}
+
+header{
+background:#2c3e50;
+color:white;
+padding:15px;
+}
+
+nav{
+background:#34495e;
+padding:10px;
+}
+
+nav a{
+color:white;
+margin-right:15px;
+text-decoration:none;
+font-weight:bold;
+}
+
+.container{
+padding:20px;
+}
+
+.cards{
+display:flex;
+gap:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+width:200px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h2>Sistem Informasi RT 05</h2>
+</header>
+
+<nav>
+
+<a href="index.html">Dashboard</a>
+<a href="kas.html">Kas RT</a>
+<a href="warga.html">Data Warga</a>
+<a href="pengumuman.html">Pengumuman</a>
+<a href="kalender.html">Kalender</a>
+<a href="arsip.html">Arsip</a>
+
+<a href="login.html" style="float:right">Login Admin</a>
+
+</nav>
+
+<div class="container">
+
+<div class="cards">
+
+<div class="card">
+<h3>Total Kas</h3>
+<p>Rp 12.500.000</p>
+</div>
+
+<div class="card">
+<h3>Pengeluaran Bulan Ini</h3>
+<p>Rp 2.000.000</p>
+</div>
+
+<div class="card">
+<h3>Jumlah Warga</h3>
+<p>85 Orang</p>
+</div>
+
+</div>
+
+<h3>Grafik Kas RT</h3>
+
+<canvas id="kasChart"></canvas>
+
+</div>
+
+<script>
+
+const ctx = document.getElementById('kasChart');
+
+new Chart(ctx,{
+type:'bar',
+data:{
+labels:['Jan','Feb','Mar','Apr','Mei','Jun'],
+datasets:[
+{
+label:'Pemasukan',
+data:[2000000,1500000,3000000,2500000,2000000,1800000]
+},
+{
+label:'Pengeluaran',
+data:[500000,700000,400000,600000,800000,500000]
+}
+]
+}
+});
+
+</script>
+
+</body>
+</html>
