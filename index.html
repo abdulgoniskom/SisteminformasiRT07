@@ -2,51 +2,103 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sistem Informasi RT</title>
+<title>Sistem Informasi RT 07</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
-body{
-font-family:Arial;
-background:#f4f6f9;
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:#f1f4f9;
+display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:220px;
+background:#2c3e50;
+height:100vh;
+color:white;
+position:fixed;
+}
+
+.sidebar h2{
+text-align:center;
+padding:20px;
+border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar a{
+display:block;
+color:white;
+padding:15px;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+/* MAIN CONTENT */
+
+.main{
+margin-left:220px;
+width:100%;
 }
 
 header{
-background:#2c3e50;
-color:white;
-padding:15px;
-}
-
-nav{
-background:#34495e;
-padding:10px;
-}
-
-nav a{
-color:white;
-margin-right:15px;
-text-decoration:none;
-font-weight:bold;
+background:white;
+padding:15px 30px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+display:flex;
+justify-content:space-between;
 }
 
 .container{
-padding:20px;
+padding:30px;
 }
+
+/* CARDS */
 
 .cards{
 display:flex;
 gap:20px;
+margin-bottom:30px;
 }
 
 .card{
+flex:1;
 background:white;
 padding:20px;
 border-radius:10px;
-box-shadow:0 2px 5px rgba(0,0,0,0.2);
-width:200px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card h3{
+color:#777;
+margin-bottom:10px;
+}
+
+.card p{
+font-size:22px;
+font-weight:bold;
+}
+
+/* CHART */
+
+.chart-box{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 
 </style>
@@ -55,22 +107,35 @@ width:200px;
 
 <body>
 
-<header>
-<h2>Sistem Informasi RT 07 RW 09 Bumi Indah Citty</h2>
-</header>
+<!-- SIDEBAR -->
 
-<nav>
+<div class="sidebar">
 
-<a href="index.html">Dashboard</a>
+<h2>RT 07 RW 09</h2>
+
+<a href="#">Dashboard</a>
 <a href="kas.html">Kas RT</a>
 <a href="warga.html">Data Warga</a>
 <a href="pengumuman.html">Pengumuman</a>
 <a href="kalender.html">Kalender</a>
 <a href="arsip.html">Arsip</a>
+<a href="login.html">Login Admin</a>
 
-<a href="login.html" style="float:right">Login Admin</a>
+</div>
 
-</nav>
+<!-- MAIN -->
+
+<div class="main">
+
+<header>
+
+<h2>Dashboard Sistem Informasi RT 07 RW 09 Bumi Indah Citty</h2>
+
+<div>
+Ketua RT : Bapak Muhammad Zainudin
+</div>
+
+</header>
 
 <div class="container">
 
@@ -88,10 +153,17 @@ width:200px;
 
 <div class="card">
 <h3>Jumlah Warga</h3>
-<p>85 Orang</p>
+<p>95 Orang</p>
+</div>
+
+<div class="card">
+<h3>Jumlah KK</h3>
+<p>50 KK</p>
 </div>
 
 </div>
+
+<div class="chart-box">
 
 <h3>Grafik Kas RT</h3>
 
@@ -99,9 +171,13 @@ width:200px;
 
 </div>
 
+</div>
+
+</div>
+
 <script>
 
-const ctx = document.getElementById('kasChart');
+const ctx=document.getElementById('kasChart');
 
 new Chart(ctx,{
 type:'bar',
@@ -110,13 +186,23 @@ labels:['Jan','Feb','Mar','Apr','Mei','Jun'],
 datasets:[
 {
 label:'Pemasukan',
-data:[2000000,1500000,3000000,2500000,2000000,1800000]
+data:[2000000,1500000,3000000,2500000,2000000,1800000],
+backgroundColor:'#27ae60'
 },
 {
 label:'Pengeluaran',
-data:[500000,700000,400000,600000,800000,500000]
+data:[500000,700000,400000,600000,800000,500000],
+backgroundColor:'#e74c3c'
 }
 ]
+},
+options:{
+responsive:true,
+plugins:{
+legend:{
+position:'top'
+}
+}
 }
 });
 
