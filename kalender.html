@@ -89,13 +89,56 @@ border-radius:10px;
 box-shadow:0 2px 8px rgba(0,0,0,0.1);
 display:none;
 }
+.sidebar{
+width:220px;
+background:#2c3e50;
+color:white;
+height:100vh;
+position:fixed;
+left:0;
+top:0;
+}
 
+.sidebar h2{
+text-align:center;
+padding:20px;
+border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar a{
+display:block;
+color:white;
+padding:15px;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+.main{
+margin-left:220px;
+}
 </style>
 
 </head>
 
 <body>
 
+<div class="sidebar">
+
+<h2>RT 07 RW 09</h2>
+
+<a href="index.html">Dashboard</a>
+<a href="kas.html">Kas RT</a>
+<a href="warga.html">Data Warga</a>
+<a href="pengumuman.html">Pengumuman</a>
+<a href="kalender.html">Kalender</a>
+<a href="arsip.html">Arsip</a>
+
+</div>
+
+<div class="main">
 <header>
 <h2>Kalender Kegiatan RT 07</h2>
 </header>
@@ -320,6 +363,6 @@ loadEvents();
 loadEvents();
 
 </script>
-
+</div>
 </body>
 </html>
