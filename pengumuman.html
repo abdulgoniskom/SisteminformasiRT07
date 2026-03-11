@@ -5,25 +5,127 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pengumuman RT</title>
 <style>
-body{font-family:Arial;margin:0;background:#eef2f7;}
-.sidebar{width:160px;background:#2c3e50;color:white;height:100vh;position:fixed;left:0;top:0;}
-.sidebar h2{text-align:center;padding:12px;font-size:16px;}
-.sidebar a{display:block;color:white;padding:10px;text-decoration:none;font-size:14px;}
-.sidebar a:hover{background:#34495e;}
-.main{margin-left:160px;}
-header{background:#2f80ed;color:white;padding:15px;text-align:center;}
-.container{padding:20px;max-width:900px;margin:auto;}
-.card{background:white;padding:15px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-.card h3{margin:0 0 5px 0;}
-.date{font-size:12px;color:#888;margin-bottom:5px;}
-button{background:#2f80ed;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
-button:hover{background:#1f6fd1;}
-.formInput{display:none;margin-top:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-input,textarea{width:100%;padding:8px;margin:5px 0;}
+body{
+  font-family:Arial;
+  margin:0;
+  background:#eef2f7;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:160px;
+  background:#2c3e50;
+  color:white;
+  height:100vh;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:width 0.3s;
+}
+.sidebar h2{
+  text-align:center;
+  padding:12px;
+  font-size:16px;
+}
+.sidebar a{
+  display:block;
+  color:white;
+  padding:10px;
+  text-decoration:none;
+  font-size:14px;
+}
+.sidebar a:hover{
+  background:#34495e;
+}
+
+/* MAIN */
+.main{
+  margin-left:160px;
+  transition:margin-left 0.3s;
+}
+
+/* HEADER */
+header{
+  background:#2f80ed;
+  color:white;
+  padding:15px;
+  text-align:center;
+}
+
+/* CONTENT */
+.container{
+  padding:20px;
+  max-width:900px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card h3{
+  margin:0 0 5px 0;
+}
+
+.date{
+  font-size:12px;
+  color:#888;
+  margin-bottom:5px;
+}
+
+button{
+  background:#2f80ed;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:5px;
+  cursor:pointer;
+}
+button:hover{
+  background:#1f6fd1;
+}
+
+.formInput{
+  display:none;
+  margin-top:20px;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+input,textarea{
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+}
+
+/* RESPONSIVE MOBILE */
+@media (max-width:768px){
+  .sidebar{
+    width:120px;
+  }
+  .main{
+    margin-left:120px;
+  }
+  .sidebar h2{
+    font-size:14px;
+    padding:10px;
+  }
+  .sidebar a{
+    font-size:12px;
+    padding:8px;
+  }
+}
 </style>
 </head>
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
 <h2>RT 07 RW 09</h2>
 <a href="index.html">Dashboard</a>
@@ -34,6 +136,7 @@ input,textarea{width:100%;padding:8px;margin:5px 0;}
 <a href="arsip.html">Arsip</a>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 <header>
 <h2>Pengumuman RT 07</h2>
@@ -57,7 +160,7 @@ input,textarea{width:100%;padding:8px;margin:5px 0;}
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbxBfQJWhRZLdMYVKPTcLteBoZC_kWzYgVp3sFpUKCgehkyWHDvkB0TN4Yt1sppHNC4/exec"; // ganti dengan script ID Anda
+const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 let dataPengumuman=[];
 
 function login(){
@@ -65,52 +168,74 @@ function login(){
   let p=prompt("Password");
   if(u=="admin" && p=="12345"){
     document.getElementById("formInput").style.display="block";
-  } else {
+  }else{
     alert("Login gagal");
   }
 }
 
 function loadData(){
-  fetch(API+"?sheet=Pengumuman")
-    .then(res=>res.json())
-    .then(data=>{
-      dataPengumuman = data.reverse();
-      let html="";
-      dataPengumuman.forEach(d=>{
-        let tgl = d.tanggal ? d.tanggal.split("-").reverse().join("/") : "-"; // YYYY-MM-DD → DD/MM/YYYY
-        html += `
-        <div class="card">
-          <h3>${d.judul}</h3>
-          <div class="date">${tgl}</div>
-          <p>${d.isi}</p>
-        </div>`;
-      });
-      document.getElementById("listPengumuman").innerHTML = html;
-    })
-    .catch(err=>console.log("Error:",err));
+  fetch(API)
+  .then(res=>res.json())
+  .then(data=>{
+    dataPengumuman=data.reverse();
+    let html="";
+    dataPengumuman.forEach(d=>{
+      let tgl="-";
+      if(d.tanggal){
+        let parts = d.tanggal.split("-");
+        if(parts.length===3){
+          tgl = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+      }
+      html+=`
+      <div class="card">
+        <h3>${d.judul}</h3>
+        <div class="date">${tgl}</div>
+        <p>${d.isi}</p>
+      </div>`;
+    });
+    document.getElementById("listPengumuman").innerHTML=html;
+  })
+  .catch(err=>{
+    console.log("Error:",err);
+  });
 }
 
 function simpan(){
+  let tanggal = document.getElementById("tanggal").value;
+  let judul = document.getElementById("judul").value.trim();
+  let isi = document.getElementById("isi").value.trim();
+  
+  if(!tanggal || !judul || !isi){
+    alert("Tanggal, Judul, dan Isi harus diisi!");
+    return;
+  }
+  
   let form=new FormData();
   form.append("sheet","Pengumuman");
-  form.append("tanggal",document.getElementById("tanggal").value);
-  form.append("judul",document.getElementById("judul").value);
-  form.append("isi",document.getElementById("isi").value);
-
-  fetch(API,{method:"POST",body:form})
-    .then(res=>res.text())
-    .then(res=>{
-      alert("Pengumuman berhasil disimpan");
-      document.getElementById("tanggal").value="";
-      document.getElementById("judul").value="";
-      document.getElementById("isi").value="";
-      loadData();
-    })
-    .catch(err=>console.log("Error:",err));
+  form.append("tanggal",tanggal);
+  form.append("judul",judul);
+  form.append("isi",isi);
+  
+  fetch(API,{
+    method:"POST",
+    body:form
+  })
+  .then(res=>res.text())
+  .then(res=>{
+    alert("Pengumuman berhasil disimpan");
+    document.getElementById("tanggal").value="";
+    document.getElementById("judul").value="";
+    document.getElementById("isi").value="";
+    loadData();
+  })
+  .catch(err=>{
+    console.log("Error:",err);
+    alert("Gagal menyimpan pengumuman");
+  });
 }
 
 loadData();
 </script>
-
 </body>
 </html>
