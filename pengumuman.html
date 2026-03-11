@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pengumuman RT</title>
+<title>Pengumuman RT 07</title>
 <style>
 body{
   font-family:Arial;
@@ -160,9 +160,11 @@ input,textarea{
 </div>
 
 <script>
+// URL Google Apps Script (pastikan diganti sesuai milik Anda)
 const API="https://script.google.com/macros/s/AKfycbwXirvSse7Z2vnhHH7APxwmYRaeBiU0s3xgSh6iQkYdNFdoHJIAX7z0JIrp5hUd1aU/exec";
 let dataPengumuman=[];
 
+// LOGIN ADMIN
 function login(){
   let u=prompt("Username");
   let p=prompt("Password");
@@ -173,19 +175,19 @@ function login(){
   }
 }
 
+// LOAD DATA
 function loadData(){
-  fetch(API)
+  fetch(API+"?sheet=Pengumuman")
   .then(res=>res.json())
   .then(data=>{
     dataPengumuman=data.reverse();
     let html="";
     dataPengumuman.forEach(d=>{
+      // Tanggal aman
       let tgl="-";
       if(d.tanggal){
-        let parts = d.tanggal.split("-");
-        if(parts.length===3){
-          tgl = `${parts[2]}/${parts[1]}/${parts[0]}`;
-        }
+        let dateObj = new Date(d.tanggal);
+        if(!isNaN(dateObj)) tgl = dateObj.toLocaleDateString("id-ID");
       }
       html+=`
       <div class="card">
@@ -201,6 +203,7 @@ function loadData(){
   });
 }
 
+// SIMPAN DATA
 function simpan(){
   let tanggal = document.getElementById("tanggal").value;
   let judul = document.getElementById("judul").value.trim();
@@ -211,7 +214,7 @@ function simpan(){
     return;
   }
   
-  let form=new FormData();
+  let form = new FormData();
   form.append("sheet","Pengumuman");
   form.append("tanggal",tanggal);
   form.append("judul",judul);
@@ -235,6 +238,7 @@ function simpan(){
   });
 }
 
+// Load data awal
 loadData();
 </script>
 </body>
