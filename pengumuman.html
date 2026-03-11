@@ -2,6 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Pengumuman RT</title>
 
 <style>
@@ -42,6 +44,8 @@ font-size:14px;
 background:#34495e;
 }
 
+/* MAIN */
+
 .main{
 margin-left:160px;
 }
@@ -78,6 +82,7 @@ margin:0 0 5px 0;
 .date{
 font-size:12px;
 color:#888;
+margin-bottom:5px;
 }
 
 button{
@@ -87,6 +92,10 @@ border:none;
 padding:8px 12px;
 border-radius:5px;
 cursor:pointer;
+}
+
+button:hover{
+background:#1f6fd1;
 }
 
 .formInput{
@@ -110,6 +119,8 @@ margin:5px 0;
 
 <body>
 
+<!-- SIDEBAR -->
+
 <div class="sidebar">
 
 <h2>RT 07 RW 09</h2>
@@ -122,6 +133,8 @@ margin:5px 0;
 <a href="arsip.html">Arsip</a>
 
 </div>
+
+<!-- MAIN -->
 
 <div class="main">
 
@@ -157,11 +170,13 @@ margin:5px 0;
 
 <script>
 
-const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
+/* API GOOGLE SCRIPT */
+
+const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec?sheet=Pengumuman";
 
 let dataPengumuman=[];
 
-/* LOGIN */
+/* LOGIN ADMIN */
 
 function login(){
 
@@ -169,9 +184,13 @@ let u=prompt("Username");
 let p=prompt("Password");
 
 if(u=="admin" && p=="12345"){
+
 document.getElementById("formInput").style.display="block";
+
 }else{
+
 alert("Login gagal");
+
 }
 
 }
@@ -195,6 +214,7 @@ dataPengumuman.forEach(d=>{
 let tgl=new Date(d.tanggal).toLocaleDateString("id-ID");
 
 html+=`
+
 <div class="card">
 
 <h3>${d.judul}</h3>
@@ -204,53 +224,57 @@ html+=`
 <p>${d.isi}</p>
 
 </div>
+
 `;
 
 });
 
 document.getElementById("listPengumuman").innerHTML=html;
 
-});
+})
 
-}
+.catch(err=>{
 
-/* SIMPAN */
-
-function loadData(){
-
-fetch(API)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-dataPengumuman=data.reverse();
-
-let html="";
-
-dataPengumuman.forEach(d=>{
-
-let tgl=new Date(d.tanggal).toLocaleDateString("id-ID");
-
-html+=`
-<div class="card">
-
-<h3>${d.judul}</h3>
-
-<div class="date">${tgl}</div>
-
-<p>${d.isi}</p>
-
-</div>
-`;
-
-});
-
-document.getElementById("listPengumuman").innerHTML=html;
+console.log("Error:",err);
 
 });
 
 }
+
+/* SIMPAN DATA */
+
+function simpan(){
+
+let form=new FormData();
+
+form.append("sheet","Pengumuman");
+form.append("tanggal",document.getElementById("tanggal").value);
+form.append("judul",document.getElementById("judul").value);
+form.append("isi",document.getElementById("isi").value);
+
+fetch("https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec",
+{
+method:"POST",
+body:form
+})
+
+.then(res=>res.text())
+
+.then(res=>{
+
+alert("Pengumuman berhasil disimpan");
+
+document.getElementById("judul").value="";
+document.getElementById("isi").value="";
+
+loadData();
+
+});
+
+}
+
+/* LOAD AWAL */
+
 loadData();
 
 </script>
