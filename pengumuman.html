@@ -216,27 +216,41 @@ document.getElementById("listPengumuman").innerHTML=html;
 
 /* SIMPAN */
 
-function simpan(){
+function loadData(){
 
-let form=new FormData();
+fetch(API)
 
-form.append("sheet","Pengumuman");
-form.append("tanggal",document.getElementById("tanggal").value);
-form.append("judul",document.getElementById("judul").value);
-form.append("isi",document.getElementById("isi").value);
+.then(res=>res.json())
 
-fetch("https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec",
-{method:"POST",body:form})
+.then(data=>{
 
-.then(r=>r.text())
+dataPengumuman=data.reverse();
 
-.then(res=>{
-alert("Pengumuman tersimpan");
-loadData();
+let html="";
+
+dataPengumuman.forEach(d=>{
+
+let tgl=new Date(d.tanggal).toLocaleDateString("id-ID");
+
+html+=`
+<div class="card">
+
+<h3>${d.judul}</h3>
+
+<div class="date">${tgl}</div>
+
+<p>${d.isi}</p>
+
+</div>
+`;
+
+});
+
+document.getElementById("listPengumuman").innerHTML=html;
+
 });
 
 }
-
 loadData();
 
 </script>
