@@ -177,34 +177,71 @@ Ketua RT : Bapak Muhammad Zainudin
 
 <script>
 
-const ctx=document.getElementById('kasChart');
+const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
+
+function loadGrafikDashboard(){
+
+fetch(API+"?sheet=Kas_RT")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let bulanMasuk=[0,0,0,0,0,0,0,0,0,0,0,0];
+let bulanKeluar=[0,0,0,0,0,0,0,0,0,0,0,0];
+
+data.forEach(d=>{
+
+let tgl=new Date(d.tanggal);
+let bulan=tgl.getMonth();
+
+bulanMasuk[bulan]+=Number(d.masuk);
+bulanKeluar[bulan]+=Number(d.keluar);
+
+});
+
+const ctx=document.getElementById("kasChart");
 
 new Chart(ctx,{
 type:'bar',
+
 data:{
-labels:['Jan','Feb','Mar','Apr','Mei','Jun'],
+labels:[
+'Jan','Feb','Mar','Apr','Mei','Jun',
+'Jul','Agu','Sep','Okt','Nov','Des'
+],
+
 datasets:[
 {
 label:'Pemasukan',
-data:[2000000,1500000,3000000,2500000,2000000,1800000],
-backgroundColor:'#27ae60'
+data:bulanMasuk,
+backgroundColor:'#2f80ed'
 },
 {
 label:'Pengeluaran',
-data:[500000,700000,400000,600000,800000,500000],
-backgroundColor:'#e74c3c'
+data:bulanKeluar,
+backgroundColor:'#eb5757'
 }
 ]
 },
+
 options:{
 responsive:true,
 plugins:{
-legend:{
-position:'top'
+title:{
+display:true,
+text:'Grafik Kas RT per Bulan'
 }
 }
 }
+
 });
+
+});
+
+}
+
+loadGrafikDashboard();
 
 </script>
 
