@@ -77,11 +77,124 @@ input,select{
   tr:hover{
 background:#f5f9ff;
 }
+  .sidebar{
+width:220px;
+background:#2c3e50;
+color:white;
+height:100vh;
+position:fixed;
+left:0;
+top:0;
+}
+
+.sidebar h2{
+text-align:center;
+padding:20px;
+border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar a{
+display:block;
+color:white;
+padding:15px;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+.main{
+margin-left:220px;
+}
+<style>
+
+body{
+  font-family:Arial;
+  margin:0;
+  background:#eef2f7;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:220px;
+background:#2c3e50;
+color:white;
+height:100vh;
+position:fixed;
+left:0;
+top:0;
+}
+
+.sidebar h2{
+text-align:center;
+padding:20px;
+border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar a{
+display:block;
+color:white;
+padding:15px;
+text-decoration:none;
+font-size:14px;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+/* AREA KONTEN */
+
+.main{
+margin-left:220px;
+padding:20px;
+}
+
+/* RESPONSIVE HP */
+
+@media (max-width:768px){
+
+.sidebar{
+width:70px;
+}
+
+.sidebar h2{
+font-size:12px;
+padding:10px;
+}
+
+.sidebar a{
+font-size:11px;
+padding:10px;
+}
+
+.main{
+margin-left:70px;
+padding:10px;
+}
+
+}
+
 </style>
 </head>
 
 <body>
+<div class="sidebar">
 
+<h2>RT 07 RW 09</h2>
+
+<a href="index.html">Dashboard</a>
+<a href="kas.html">Kas RT</a>
+<a href="warga.html">Data Warga</a>
+<a href="pengumuman.html">Pengumuman</a>
+<a href="kalender.html">Kalender</a>
+<a href="arsip.html">Arsip</a>
+
+</div>
+
+<div class="main">
 <header>
 <h2>Laporan Kas RT 07 RW 09 Bumi Indah City</h2>
 </header>
@@ -187,7 +300,7 @@ background:#f5f9ff;
 
 <script>
 
-const API="https://script.google.com/macros/s/AKfycbwE9r7dw_WkwcU02Ox5h2-LLOlJzRnZUjI2vPNKV7YbfeSOc8X0BWsi4lbuTH_V1Q/exec";
+const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 
 let chart;
 
@@ -449,6 +562,6 @@ loadData();
 setInterval(loadData,5000);
 
 </script>
-
+</div>
 </body>
 </html>
