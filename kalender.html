@@ -11,12 +11,13 @@ body{
 font-family:Arial;
 margin:0;
 background:#eef2f7;
+display:flex;
 }
 
 /* SIDEBAR */
 
 .sidebar{
-width:170px;
+width:160px;
 background:#2c3e50;
 color:white;
 height:100vh;
@@ -25,14 +26,16 @@ position:fixed;
 
 .sidebar h2{
 text-align:center;
-padding:15px;
+padding:12px;
+font-size:16px;
 }
 
 .sidebar a{
 display:block;
-padding:10px;
 color:white;
+padding:10px;
 text-decoration:none;
+font-size:14px;
 }
 
 .sidebar a:hover{
@@ -42,7 +45,8 @@ background:#34495e;
 /* MAIN */
 
 .main{
-margin-left:170px;
+margin-left:160px;
+width:100%;
 }
 
 header{
@@ -56,66 +60,97 @@ text-align:center;
 
 .container{
 padding:20px;
-max-width:950px;
+max-width:900px;
 margin:auto;
 }
 
-/* NAV BULAN */
+/* CALENDAR */
 
-.nav{
+.calendar{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.calendar-header{
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:10px;
+}
+
+.calendar-grid{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:6px;
+margin-top:15px;
+}
+
+.day-name{
+font-weight:bold;
+text-align:center;
+color:#666;
+}
+
+.day{
+background:#f7f9fc;
+padding:12px 0;
+text-align:center;
+border-radius:6px;
+cursor:pointer;
+position:relative;
+}
+
+.today{
+background:#2f80ed;
+color:white;
+}
+
+.event-dot{
+width:6px;
+height:6px;
+background:red;
+border-radius:50%;
+position:absolute;
+bottom:4px;
+left:50%;
+transform:translateX(-50%);
+}
+
+/* FORM */
+
+.formInput{
+display:none;
+margin-top:20px;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+input,textarea{
+width:100%;
+padding:8px;
+margin:5px 0;
 }
 
 button{
 background:#2f80ed;
 color:white;
 border:none;
-padding:6px 12px;
+padding:8px 12px;
 border-radius:5px;
 cursor:pointer;
 }
 
-/* KALENDER */
-
-.calendar{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:5px;
+button:hover{
+background:#1f6fd1;
 }
-
-.day{
-background:white;
-min-height:95px;
-border-radius:6px;
-padding:5px;
-box-shadow:0 1px 4px rgba(0,0,0,0.1);
-}
-
-.date{
-font-weight:bold;
-}
-
-/* EVENT */
-
-.event{
-margin-top:5px;
-font-size:12px;
-color:white;
-padding:2px 4px;
-border-radius:3px;
-cursor:pointer;
-}
-
-.rapat{background:#3498db;}
-.kerja{background:#27ae60;}
-.kesehatan{background:#e74c3c;}
 
 /* POPUP */
 
 .popup{
+display:none;
 position:fixed;
 top:50%;
 left:50%;
@@ -124,13 +159,30 @@ background:white;
 padding:20px;
 border-radius:10px;
 box-shadow:0 5px 20px rgba(0,0,0,0.2);
-display:none;
+max-width:300px;
+}
+
+/* HP */
+
+@media(max-width:768px){
+
+.sidebar{
+width:120px;
+}
+
+.main{
+margin-left:120px;
+}
+
 }
 
 </style>
+
 </head>
 
 <body>
+
+<!-- SIDEBAR -->
 
 <div class="sidebar">
 
@@ -145,6 +197,8 @@ display:none;
 
 </div>
 
+<!-- MAIN -->
+
 <div class="main">
 
 <header>
@@ -153,45 +207,120 @@ display:none;
 
 <div class="container">
 
-<div class="nav">
+<div class="calendar">
+
+<div class="calendar-header">
+
 <button onclick="prevMonth()">◀</button>
-<h3 id="bulan"></h3>
+
+<h3 id="monthYear"></h3>
+
 <button onclick="nextMonth()">▶</button>
-</div>
-
-<div class="calendar" id="calendar"></div>
 
 </div>
 
+<div class="calendar-grid" id="calendar"></div>
+
 </div>
 
-<div class="popup" id="popup"></div>
+<br>
+
+<div style="text-align:right">
+<button onclick="login()">Login Admin</button>
+</div>
+
+<!-- FORM TAMBAH KEGIATAN -->
+
+<div class="formInput" id="formInput">
+
+<h3>Tambah Kegiatan</h3>
+
+<input type="text" id="judul" placeholder="Judul kegiatan">
+
+<input type="date" id="tanggal">
+
+<input type="text" id="waktu" placeholder="Waktu">
+
+<input type="text" id="tempat" placeholder="Tempat">
+
+<textarea id="deskripsi" placeholder="Deskripsi"></textarea>
+
+<button onclick="simpan()">Simpan</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- POPUP EVENT -->
+
+<div class="popup" id="popup">
+
+<h3 id="popupTanggal"></h3>
+
+<div id="popupIsi"></div>
+
+<br>
+
+<button onclick="tutupPopup()">Tutup</button>
+
+</div>
 
 <script>
 
-const API="URL_APPS_SCRIPT_ANDA";
+const API="https://script.google.com/macros/s/AKfycbwWl-lJGcO2c-na3nMdcTLu0V34PeOWunRFjn0lhcc-u4UwW1AibsIXaqbu47LalFM/exec";
 
-let current=new Date();
+let currentDate=new Date();
+let dataEvent=[];
 
-const bulanNama=[
-"Januari","Februari","Maret","April","Mei","Juni",
-"Juli","Agustus","September","Oktober","November","Desember"
-];
+/* LOGIN */
 
-let events=[];
+function login(){
 
-function render(){
+let u=prompt("Username");
+let p=prompt("Password");
 
-let year=current.getFullYear();
-let month=current.getMonth();
+if(u=="admin" && p=="12345"){
+document.getElementById("formInput").style.display="block";
+}else{
+alert("Login gagal");
+}
 
-document.getElementById("bulan").innerText=
-bulanNama[month]+" "+year;
+}
+
+/* LOAD EVENT */
+
+function loadEvent(){
+
+fetch(API+"?sheet=Kalender")
+
+.then(res=>res.json())
+
+.then(data=>{
+dataEvent=data;
+renderCalendar();
+});
+
+}
+
+/* RENDER CALENDAR */
+
+function renderCalendar(){
+
+let year=currentDate.getFullYear();
+let month=currentDate.getMonth();
 
 let firstDay=new Date(year,month,1).getDay();
 let days=new Date(year,month+1,0).getDate();
 
+let hari=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+
 let html="";
+
+hari.forEach(h=>{
+html+=`<div class="day-name">${h}</div>`;
+});
 
 for(let i=0;i<firstDay;i++){
 html+="<div></div>";
@@ -201,74 +330,111 @@ for(let d=1;d<=days;d++){
 
 let dateStr=year+"-"+String(month+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
 
-let eventHtml="";
+let today=new Date();
 
-events.forEach(e=>{
-if(e.tanggal==dateStr){
+let classDay="day";
 
-eventHtml+=`
-<div class="event ${e.jenis}" onclick="detail('${e.kegiatan}','${e.tempat}','${e.waktu}')">
-${e.kegiatan}
-</div>`;
-
+if(d==today.getDate() && month==today.getMonth()){
+classDay+=" today";
 }
-});
+
+let adaEvent=dataEvent.some(e=>e.tanggal==dateStr);
+
+let dot=adaEvent?'<div class="event-dot"></div>':"";
 
 html+=`
-<div class="day">
-<div class="date">${d}</div>
-${eventHtml}
-</div>`;
+<div class="${classDay}" onclick="lihatEvent('${dateStr}')">
+${d}
+${dot}
+</div>
+`;
 
 }
 
 document.getElementById("calendar").innerHTML=html;
 
+let bulan=[
+"Januari","Februari","Maret","April","Mei","Juni",
+"Juli","Agustus","September","Oktober","November","Desember"
+];
+
+document.getElementById("monthYear").innerText=bulan[month]+" "+year;
+
 }
 
+/* PINDAH BULAN */
+
 function prevMonth(){
-current.setMonth(current.getMonth()-1);
-render();
+currentDate.setMonth(currentDate.getMonth()-1);
+renderCalendar();
 }
 
 function nextMonth(){
-current.setMonth(current.getMonth()+1);
-render();
+currentDate.setMonth(currentDate.getMonth()+1);
+renderCalendar();
 }
 
-function detail(kegiatan,tempat,waktu){
+/* LIHAT EVENT */
 
-let popup=document.getElementById("popup");
+function lihatEvent(tanggal){
 
-popup.innerHTML=`
-<h3>${kegiatan}</h3>
-<p>Tempat : ${tempat}</p>
-<p>Waktu : ${waktu}</p>
-<button onclick="tutup()">Tutup</button>
+let events=dataEvent.filter(e=>e.tanggal==tanggal);
+
+let html="";
+
+if(events.length==0){
+
+html="Tidak ada kegiatan";
+
+}else{
+
+events.forEach(e=>{
+html+=`
+<p>
+<b>${e.judul}</b><br>
+Waktu : ${e.waktu}<br>
+Tempat : ${e.tempat}<br>
+${e.deskripsi}
+</p>
 `;
-
-popup.style.display="block";
+});
 
 }
 
-function tutup(){
+document.getElementById("popupTanggal").innerText=tanggal;
+document.getElementById("popupIsi").innerHTML=html;
+document.getElementById("popup").style.display="block";
+
+}
+
+function tutupPopup(){
 document.getElementById("popup").style.display="none";
 }
 
-function loadData(){
+/* SIMPAN */
 
-fetch(API)
+function simpan(){
 
-.then(res=>res.json())
+let form=new FormData();
 
-.then(data=>{
-events=data;
-render();
-})
+form.append("judul",document.getElementById("judul").value);
+form.append("tanggal",document.getElementById("tanggal").value);
+form.append("waktu",document.getElementById("waktu").value);
+form.append("tempat",document.getElementById("tempat").value);
+form.append("deskripsi",document.getElementById("deskripsi").value);
+
+fetch(API,{method:"POST",body:form})
+
+.then(res=>res.text())
+
+.then(res=>{
+alert("Kegiatan disimpan");
+loadEvent();
+});
 
 }
 
-loadData();
+loadEvent();
 
 </script>
 
