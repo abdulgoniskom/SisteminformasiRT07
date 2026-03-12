@@ -185,7 +185,7 @@ width:90%;
 
 <script>
 
-const url="https://script.google.com/macros/s/AKfycbxHVusEP-b1O-FZ57gHpPiRjHBX3xDHbFZfAQj5n5T5IrsPGXKSQk-5gp27WSiqArnf/exec"
+const url="https://script.google.com/macros/s/AKfycbwOx97L4CPLYPDWNzOFYKW_V1frYXnD7ZptNiWBVH7QnvnKCvI2vNG6l5-b53J_1I0/exec"
 
 let calendar
 
@@ -235,37 +235,38 @@ document.getElementById("formPopup").style.display="none"
 
 function simpan(){
 
-let data={
-Kegiatan:document.getElementById("kegiatan").value,
-Tanggal:document.getElementById("tanggal").value,
-Lokasi:document.getElementById("lokasi").value,
-Kategori:document.getElementById("kategori").value
-}
+let kegiatan=document.getElementById("kegiatan").value
+let tanggal=document.getElementById("tanggal").value
+let lokasi=document.getElementById("lokasi").value
+let kategori=document.getElementById("kategori").value
 
-if(!data.Kegiatan || !data.Tanggal){
+if(!kegiatan || !tanggal){
 alert("Isi kegiatan dan tanggal dulu")
 return
 }
 
+let formData=new FormData()
+
+formData.append("Kegiatan",kegiatan)
+formData.append("Tanggal",tanggal)
+formData.append("Lokasi",lokasi)
+formData.append("Kategori",kategori)
+
 fetch(url,{
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify(data)
+body:formData
 })
-.then(res=>res.json())
+.then(res=>res.text())
 .then(res=>{
 alert("Kegiatan berhasil disimpan")
 location.reload()
 })
 .catch(err=>{
-alert("Gagal menyimpan")
 console.log(err)
+alert("Gagal menyimpan")
 })
 
 }
-
 </script>
 
 </body>
