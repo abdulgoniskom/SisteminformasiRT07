@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Arsip RT</title>
+<title>Kalender Kegiatan RT</title>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
 <style>
 
@@ -18,8 +23,8 @@ background:#eef2f7;
 
 .sidebar{
 width:200px;
-height:100vh;
 background:#2c3e50;
+height:100vh;
 position:fixed;
 left:0;
 top:0;
@@ -50,86 +55,42 @@ margin-left:200px;
 padding:20px;
 }
 
-h1{
-margin-top:0;
-}
-
-/* FILTER */
-
-.filter{
-display:flex;
-gap:10px;
-margin-bottom:20px;
-flex-wrap:wrap;
-}
-
-input,select{
-padding:8px;
-border-radius:5px;
-border:1px solid #ccc;
-}
-
-/* CARD */
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-
-.card{
+#calendar{
 background:white;
-border-radius:10px;
 padding:15px;
+border-radius:10px;
 box-shadow:0 3px 8px rgba(0,0,0,0.1);
 }
 
-.card h3{
-margin-top:0;
-}
+/* POPUP */
 
-.tag{
-display:inline-block;
-padding:4px 8px;
-border-radius:5px;
-font-size:12px;
-color:white;
-margin-bottom:5px;
-}
-
-.laporan{background:#3498db;}
-.surat{background:#2ecc71;}
-.foto{background:#e67e22;}
-.lainnya{background:#9b59b6;}
-
-.btn{
-display:inline-block;
-margin-top:10px;
-padding:6px 10px;
-background:#2980b9;
-color:white;
-border-radius:5px;
-text-decoration:none;
-font-size:13px;
-}
-
-.btn:hover{
-background:#1f6694;
-}
-
-/* PREVIEW */
-
-.preview{
-margin-top:10px;
-}
-
-iframe{
+.popup{
+position:fixed;
+top:0;
+left:0;
 width:100%;
-height:200px;
-border:none;
+height:100%;
+background:rgba(0,0,0,0.5);
+display:none;
+align-items:center;
+justify-content:center;
+}
+
+.popup-content{
+background:white;
+padding:20px;
+border-radius:10px;
+width:300px;
+}
+
+.close{
+float:right;
+cursor:pointer;
+font-size:18px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -145,6 +106,7 @@ border:none;
 <a href="warga.html">Data Warga</a>
 <a href="pengumuman.html">Pengumuman</a>
 <a href="arsip.html">Arsip</a>
+<a href="kalender.html">Kalender</a>
 <a href="struktur.html">Struktur RT</a>
 
 </div>
@@ -153,98 +115,101 @@ border:none;
 
 <div class="content">
 
-<h1>Arsip RT</h1>
+<h1>Kalender Kegiatan RT</h1>
 
-<div class="filter">
-
-<input type="text" id="search" placeholder="Cari arsip...">
-
-<select id="kategori">
-<option value="">Semua Kategori</option>
-<option value="Surat">Surat</option>
-<option value="Laporan">Laporan</option>
-<option value="Foto">Foto</option>
-<option value="Lainnya">Lainnya</option>
-</select>
+<div id="calendar"></div>
 
 </div>
 
-<div class="grid" id="arsipList"></div>
+<!-- POPUP DETAIL -->
+
+<div class="popup" id="popup">
+
+<div class="popup-content">
+
+<span class="close" onclick="tutupPopup()">✖</span>
+
+<h3 id="judul"></h3>
+
+<p><b>Tanggal :</b> <span id="tgl"></span></p>
+
+<p><b>Lokasi :</b> <span id="lokasi"></span></p>
+
+<p><b>Kategori :</b> <span id="kategori"></span></p>
+
+</div>
 
 </div>
 
 <script>
 
-let dataArsip=[]
-
-const url="https://script.google.com/macros/s/AKfycbzrx-1h7n3I-PLNkiNpZn-Aa5J9IOhXTdAqKn-Kbl2k3DZmTjlMBi6uXmLrM4uh_q3z/exec"
+const url="https://script.google.com/macros/s/AKfycbzXWDQp3Sn2BMrhNrnzJ0niJnZQnNb5gUo1W_Ee-O2sHwGV2WuS7slvfY7wYTN8DPU/exec"
 
 fetch(url)
 .then(res=>res.json())
 .then(data=>{
-dataArsip=data
-tampilkan(data)
-})
 
-function tampilkan(data){
+let events=data.map(e=>{
 
-let html=""
+let warna="#3498db"
 
-data.forEach(a=>{
+if(e.Kategori=="Rapat") warna="#e74c3c"
+if(e.Kategori=="Sosial") warna="#2ecc71"
+if(e.Kategori=="Keamanan") warna="#f39c12"
+if(e.Kategori=="Kesehatan") warna="#9b59b6"
 
-let tagClass=a.Kategori.toLowerCase()
-
-html+=`
-
-<div class="card">
-
-<span class="tag ${tagClass}">${a.Kategori}</span>
-
-<h3>${a.Judul}</h3>
-
-<small>${a.Tanggal}</small>
-
-<p>${a.Deskripsi}</p>
-
-<div class="preview">
-
-<iframe src="${a['Link File']}"></iframe>
-
-</div>
-
-<a class="btn" href="${a['Link File']}" target="_blank">Download</a>
-
-</div>
-
-`
+return{
+title:e.Kegiatan,
+start:e.Tanggal,
+extendedProps:{
+lokasi:e.Lokasi,
+kategori:e.Kategori
+},
+color:warna
+}
 
 })
 
-document.getElementById("arsipList").innerHTML=html
+tampilkanKalender(events)
+
+})
+
+function tampilkanKalender(events){
+
+let calendarEl=document.getElementById('calendar')
+
+let calendar=new FullCalendar.Calendar(calendarEl,{
+
+initialView:'dayGridMonth',
+
+headerToolbar:{
+left:'prev,next today',
+center:'title',
+right:'dayGridMonth,timeGridWeek,timeGridDay'
+},
+
+events:events,
+
+eventClick:function(info){
+
+document.getElementById("judul").innerText=info.event.title
+document.getElementById("tgl").innerText=info.event.start.toLocaleDateString()
+document.getElementById("lokasi").innerText=info.event.extendedProps.lokasi
+document.getElementById("kategori").innerText=info.event.extendedProps.kategori
+
+document.getElementById("popup").style.display="flex"
 
 }
 
-/* SEARCH */
-
-document.getElementById("search").addEventListener("keyup",filter)
-
-document.getElementById("kategori").addEventListener("change",filter)
-
-function filter(){
-
-let s=document.getElementById("search").value.toLowerCase()
-let k=document.getElementById("kategori").value
-
-let hasil=dataArsip.filter(a=>{
-
-let cocokJudul=a.Judul.toLowerCase().includes(s)
-let cocokKategori=!k || a.Kategori==k
-
-return cocokJudul && cocokKategori
-
 })
 
-tampilkan(hasil)
+calendar.render()
+
+}
+
+function tutupPopup(){
+
+document.getElementById("popup").style.display="none"
 
 }
 
