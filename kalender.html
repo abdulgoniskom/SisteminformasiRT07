@@ -3,17 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalender RT</title>
+<title>Kalender RT 07</title>
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #eef2f7;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+body{
+    background:#eef2f7;
+    display:flex;
 }
 
-/* Sidebar */
+/* SIDEBAR */
 .sidebar{
-    width:200px;
+    width:220px;
     background:#2c3e50;
     color:white;
     height:100vh;
@@ -24,7 +29,8 @@ body {
 }
 .sidebar h2{
     text-align:center;
-    margin-bottom:20px;
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(255,255,255,0.2);
 }
 .sidebar a{
     display:block;
@@ -42,22 +48,22 @@ body {
     border-left:4px solid #1abc9c;
 }
 
-/* Main content */
+/* MAIN CONTENT */
 .main{
-    margin-left:200px;
+    margin-left:220px;
     padding:20px;
+    width:100%;
 }
 h1{
     color:#2c3e50;
+    margin-bottom:20px;
 }
 
-/* Scrollable table container */
+/* Kalender table */
 .table-container{
     overflow-x:auto;
     width:100%;
 }
-
-/* Kalender styling */
 #calendar{
     border-collapse:collapse;
     width:100%;
@@ -128,10 +134,12 @@ h1{
 </div>
 
 <script>
+// Ambil tanggal sekarang
 const sekarang = new Date();
 const tahun = sekarang.getFullYear();
 const bulanSekarang = sekarang.getMonth();
 
+// Generate kalender
 function generateCalendar(year, month){
     const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
