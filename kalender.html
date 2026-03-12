@@ -17,7 +17,7 @@ body{
 
 /* Sidebar */
 .sidebar{
-    width:200px;
+    width:220px;
     background:#2c3e50;
     height:100vh;
     position:fixed;
@@ -27,88 +27,125 @@ body{
     color:white;
     transition: all 0.3s;
 }
-.sidebar h2{
-    text-align:center;
-    margin-bottom:25px;
-}
+.sidebar h2{text-align:center; margin-bottom:25px;}
 .sidebar a{
     display:block;
+    padding:12px 20px;
     color:white;
     text-decoration:none;
-    padding:12px 20px;
 }
-.sidebar a:hover{
-    background:#34495e;
+.sidebar a:hover{background:#34495e;}
+
+/* Hamburger for mobile */
+.hamburger{
+    display:none;
+    position:fixed;
+    top:10px;
+    left:10px;
+    font-size:24px;
+    color:#2c3e50;
+    background:white;
+    padding:6px 10px;
+    border-radius:5px;
+    cursor:pointer;
+    z-index:1001;
 }
 
 /* Content */
 .content{
-    margin-left:200px;
-    padding:20px;
+    margin-left:220px;
+    padding:25px;
 }
 
-/* Kalender */
+/* Judul */
+.title{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+/* Kalender styling */
 #calendar{
     background:white;
-    padding:15px;
     border-radius:10px;
-    box-shadow:0 3px 8px rgba(0,0,0,0.1);
+    padding:15px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
 
 /* Responsive */
 @media(max-width:768px){
     .sidebar{
-        width:100%;
-        height:auto;
-        position:relative;
-        display:flex;
-        overflow-x:auto;
+        width:60px;
+        height:100vh;
+        padding-top:10px;
     }
     .sidebar h2{display:none;}
     .sidebar a{
-        flex:1;
-        text-align:center;
-        font-size:13px;
-        padding:10px;
+        font-size:12px;
+        padding:10px 8px;
     }
     .content{
-        margin-left:0;
+        margin-left:60px;
         padding:10px;
     }
+    .hamburger{display:block;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="sidebar">
-<h2>RT 01</h2>
-<a href="index.html">Dashboard</a>
-<a href="kas.html">Kas RT</a>
-<a href="warga.html">Data Warga</a>
-<a href="pengumuman.html">Pengumuman</a>
-<a href="arsip.html">Arsip</a>
-<a href="kalender.html">Kalender</a>
-<a href="struktur.html">Struktur</a>
+<div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+<div class="sidebar" id="sidebar">
+    <h2>RT 01</h2>
+    <a href="index.html">Dashboard</a>
+    <a href="kas.html">Kas RT</a>
+    <a href="warga.html">Data Warga</a>
+    <a href="pengumuman.html">Pengumuman</a>
+    <a href="arsip.html">Arsip</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="struktur.html">Struktur RT</a>
 </div>
 
 <div class="content">
-<h1>Kalender Kegiatan RT</h1>
-<div id="calendar"></div>
+    <div class="title">Kalender Kegiatan RT</div>
+    <div id="calendar"></div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    let calendarEl = document.getElementById('calendar');
+// Contoh event sementara
+const events = [
+    { title:'Rapat RT', start:'2026-03-15', color:'#e74c3c' },
+    { title:'Gotong Royong', start:'2026-03-18', color:'#2ecc71' },
+    { title:'Pengajian', start:'2026-03-20', color:'#9b59b6' },
+    { title:'Patroli Keamanan', start:'2026-03-22', color:'#f39c12' }
+];
 
-    let calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        height: 'auto',
-        events: [] // Untuk sementara kosong
+document.addEventListener("DOMContentLoaded", function(){
+    const calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl,{
+        initialView:'dayGridMonth',
+        height:'auto',
+        headerToolbar:{
+            left:'prev,next today',
+            center:'title',
+            right:'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: events,
+        eventClick: function(info){
+            alert(info.event.title + "\nTanggal: " + info.event.start.toLocaleDateString());
+        }
     });
 
     calendar.render();
 });
+
+function toggleSidebar(){
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
 </script>
 
 </body>
