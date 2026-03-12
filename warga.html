@@ -11,6 +11,7 @@ body { margin:0; font-family:Arial, sans-serif; background:#eef2f7; }
 .sidebar a{ display:block; color:white; text-decoration:none; padding:12px 20px; margin-bottom:2px; border-left:4px solid transparent; }
 .sidebar a:hover{ background:#34495e; border-left:4px solid #1abc9c; }
 .sidebar a.active{ border-left:4px solid #1abc9c; }
+.sidebar button{ margin:20px; padding:8px; border:none; border-radius:4px; cursor:pointer; background:#3498db; color:white; width:160px; }
 .content{ margin-left:200px; padding:20px; }
 h1{ color:#2c3e50; margin-bottom:20px; }
 .table-container{ max-width:100%; overflow-x:auto; }
@@ -33,6 +34,7 @@ tr:hover{ background:#f1f1f1; }
     .sidebar{width:60px;}
     .sidebar h2{display:none;}
     .sidebar a{font-size:12px;padding:10px 8px;}
+    .sidebar button{width:50px;font-size:10px;margin:10px;}
     .content{margin-left:60px;padding:10px;}
 }
 </style>
@@ -48,11 +50,12 @@ tr:hover{ background:#f1f1f1; }
     <a href="kalender.html">Kalender</a>
     <a href="arsip.html">Arsip</a>
     <a href="struktur.html">Struktur</a>
+    <button onclick="tampilkanLogin()">Login Admin</button>
 </div>
 
 <div class="content">
     <h1>Data Warga RT</h1>
-    <button id="btnTambah" class="btn btn-add" style="display:none;">Tambah Warga</button>
+    <button id="btnTambah" class="btn btn-add" style="display:none;" onclick="tambahWarga()">Tambah Warga</button>
     <button class="btn btn-pdf" onclick="cetakPDF()">Cetak PDF</button>
     <br><br>
     <div class="table-container">
@@ -99,7 +102,7 @@ tr:hover{ background:#f1f1f1; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyLsVhXF5_RExerCEuZjFhOSn48zfGcdsAh8a38k5OPphG3AMUEyvvHRJAWMttCEn0V/exec"; // Ganti dengan URL Web App dari Google Sheet
+const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL"; // ganti dengan Web App URL
 let dataWarga = [];
 let isAdmin = false;
 let editIndex = null;
@@ -131,8 +134,14 @@ async function ambilData(){
     tampilkanData();
 }
 
-// tambah data
+// tampilkan modal login admin
+function tampilkanLogin(){
+    document.getElementById("loginModal").style.display="flex";
+}
+
+// tambah warga (hanya admin)
 function tambahWarga(){
+    if(!isAdmin) return;
     editIndex = null;
     document.getElementById("formTitle").innerText = "Tambah Warga";
     document.getElementById("namaWarga").value = "";
@@ -141,8 +150,9 @@ function tambahWarga(){
     document.getElementById("formModal").style.display="flex";
 }
 
-// edit data
+// edit warga (hanya admin)
 function editWarga(index){
+    if(!isAdmin) return;
     editIndex = index;
     document.getElementById("formTitle").innerText = "Edit Warga";
     document.getElementById("namaWarga").value = dataWarga[index].nama;
@@ -159,17 +169,9 @@ async function submitForm(){
     if(!nama || !alamat) return alert("Nama dan Alamat wajib diisi!");
     
     if(editIndex === null){
-        // tambah baru
-        await fetch(API_URL, {
-            method:"POST",
-            body: JSON.stringify({nama, alamat, status})
-        });
+        await fetch(API_URL, {method:"POST", body: JSON.stringify({nama, alamat, status})});
     } else {
-        // edit
-        await fetch(API_URL, {
-            method:"PUT",
-            body: JSON.stringify({no: editIndex+1, nama, alamat, status})
-        });
+        await fetch(API_URL, {method:"PUT", body: JSON.stringify({no: editIndex+1, nama, alamat, status})});
     }
     document.getElementById("formModal").style.display="none";
     ambilData();
@@ -177,11 +179,9 @@ async function submitForm(){
 
 // hapus warga
 async function hapusWarga(index){
+    if(!isAdmin) return;
     if(confirm("Yakin hapus data ini?")){
-        await fetch(API_URL, {
-            method:"DELETE",
-            body: JSON.stringify({no:index+1})
-        });
+        await fetch(API_URL, {method:"DELETE", body: JSON.stringify({no:index+1})});
         ambilData();
     }
 }
@@ -219,9 +219,9 @@ window.onclick = function(e){
     }
 }
 
-// awal
-document.getElementById("loginModal").style.display="flex";
+// ambil data saat halaman dibuka
 ambilData();
 </script>
+
 </body>
 </html>
