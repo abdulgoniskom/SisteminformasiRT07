@@ -5,10 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Kalender Kegiatan RT</title>
+<title>Kalender RT</title>
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
 <style>
@@ -26,16 +25,11 @@ width:200px;
 background:#2c3e50;
 height:100vh;
 position:fixed;
-left:0;
-top:0;
 color:white;
 padding-top:20px;
 }
 
-.sidebar h2{
-text-align:center;
-margin-bottom:30px;
-}
+.sidebar h2{text-align:center}
 
 .sidebar a{
 display:block;
@@ -44,9 +38,7 @@ color:white;
 text-decoration:none;
 }
 
-.sidebar a:hover{
-background:#34495e;
-}
+.sidebar a:hover{background:#34495e}
 
 /* CONTENT */
 
@@ -57,9 +49,21 @@ padding:20px;
 
 #calendar{
 background:white;
-padding:15px;
+padding:20px;
 border-radius:10px;
-box-shadow:0 3px 8px rgba(0,0,0,0.1);
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* BUTTON */
+
+.tambah{
+background:#27ae60;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:5px;
+cursor:pointer;
+margin-bottom:15px;
 }
 
 /* POPUP */
@@ -83,10 +87,10 @@ border-radius:10px;
 width:300px;
 }
 
-.close{
-float:right;
-cursor:pointer;
-font-size:18px;
+input,select{
+width:100%;
+padding:8px;
+margin:5px 0;
 }
 
 </style>
@@ -94,8 +98,6 @@ font-size:18px;
 </head>
 
 <body>
-
-<!-- SIDEBAR -->
 
 <div class="sidebar">
 
@@ -107,35 +109,43 @@ font-size:18px;
 <a href="pengumuman.html">Pengumuman</a>
 <a href="arsip.html">Arsip</a>
 <a href="kalender.html">Kalender</a>
-<a href="struktur.html">Struktur RT</a>
+<a href="struktur.html">Struktur</a>
 
 </div>
-
-<!-- CONTENT -->
 
 <div class="content">
 
 <h1>Kalender Kegiatan RT</h1>
 
+<button class="tambah" onclick="bukaForm()">+ Tambah Kegiatan</button>
+
 <div id="calendar"></div>
 
 </div>
 
-<!-- POPUP DETAIL -->
+<!-- POPUP FORM -->
 
-<div class="popup" id="popup">
+<div class="popup" id="formPopup">
 
 <div class="popup-content">
 
-<span class="close" onclick="tutupPopup()">✖</span>
+<h3>Tambah Kegiatan</h3>
 
-<h3 id="judul"></h3>
+<input id="kegiatan" placeholder="Nama kegiatan">
 
-<p><b>Tanggal :</b> <span id="tgl"></span></p>
+<input type="date" id="tanggal">
 
-<p><b>Lokasi :</b> <span id="lokasi"></span></p>
+<input id="lokasi" placeholder="Lokasi">
 
-<p><b>Kategori :</b> <span id="kategori"></span></p>
+<select id="kategori">
+<option>Rapat</option>
+<option>Sosial</option>
+<option>Keamanan</option>
+<option>Kesehatan</option>
+</select>
+
+<button onclick="simpan()">Simpan</button>
+<button onclick="tutupForm()">Batal</button>
 
 </div>
 
@@ -143,7 +153,11 @@ font-size:18px;
 
 <script>
 
-const url="https://script.google.com/macros/s/AKfycbzXWDQp3Sn2BMrhNrnzJ0niJnZQnNb5gUo1W_Ee-O2sHwGV2WuS7slvfY7wYTN8DPU/exec"
+const url="https://script.google.com/macros/s/AKfycbwQiuocSzKF7Q0RbH6wLsodtNBbrPMhqrgsQv0gWwuNUg4gBRhheb4-p-Z50_tMBq6c/exec"
+
+let calendar
+
+document.addEventListener("DOMContentLoaded",function(){
 
 fetch(url)
 .then(res=>res.json())
@@ -161,55 +175,46 @@ if(e.Kategori=="Kesehatan") warna="#9b59b6"
 return{
 title:e.Kegiatan,
 start:e.Tanggal,
-extendedProps:{
-lokasi:e.Lokasi,
-kategori:e.Kategori
-},
 color:warna
 }
 
 })
 
-tampilkanKalender(events)
-
-})
-
-function tampilkanKalender(events){
-
 let calendarEl=document.getElementById('calendar')
 
-let calendar=new FullCalendar.Calendar(calendarEl,{
-
+calendar=new FullCalendar.Calendar(calendarEl,{
 initialView:'dayGridMonth',
-
-headerToolbar:{
-left:'prev,next today',
-center:'title',
-right:'dayGridMonth,timeGridWeek,timeGridDay'
-},
-
-events:events,
-
-eventClick:function(info){
-
-document.getElementById("judul").innerText=info.event.title
-document.getElementById("tgl").innerText=info.event.start.toLocaleDateString()
-document.getElementById("lokasi").innerText=info.event.extendedProps.lokasi
-document.getElementById("kategori").innerText=info.event.extendedProps.kategori
-
-document.getElementById("popup").style.display="flex"
-
-}
-
+events:events
 })
 
 calendar.render()
 
+})
+
+})
+
+function bukaForm(){
+document.getElementById("formPopup").style.display="flex"
 }
 
-function tutupPopup(){
+function tutupForm(){
+document.getElementById("formPopup").style.display="none"
+}
 
-document.getElementById("popup").style.display="none"
+function simpan(){
+
+let data={
+Kegiatan:document.getElementById("kegiatan").value,
+Tanggal:document.getElementById("tanggal").value,
+Lokasi:document.getElementById("lokasi").value,
+Kategori:document.getElementById("kategori").value
+}
+
+fetch(url,{
+method:"POST",
+body:JSON.stringify(data)
+})
+.then(()=>location.reload())
 
 }
 
