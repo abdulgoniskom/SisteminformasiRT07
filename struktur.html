@@ -1,1 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Struktur Pengurus RT</title>
 
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#eef2f7;
+}
+
+/* Sidebar */
+
+.sidebar{
+width:200px;
+background:#2c3e50;
+height:100vh;
+position:fixed;
+left:0;
+top:0;
+padding-top:20px;
+}
+
+.sidebar h2{
+color:white;
+text-align:center;
+margin-bottom:30px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+padding:12px 20px;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+/* Content */
+
+.content{
+margin-left:200px;
+padding:30px;
+}
+
+.title{
+font-size:24px;
+font-weight:bold;
+margin-bottom:30px;
+}
+
+/* Struktur */
+
+.org{
+text-align:center;
+}
+
+.box{
+background:white;
+display:inline-block;
+padding:12px 20px;
+border-radius:8px;
+box-shadow:0 3px 10px rgba(0,0,0,0.15);
+margin:10px;
+min-width:180px;
+}
+
+.jabatan{
+font-weight:bold;
+color:#2c3e50;
+}
+
+.nama{
+font-size:14px;
+margin-top:5px;
+}
+
+/* Garis */
+
+.line{
+width:2px;
+height:30px;
+background:#999;
+margin:auto;
+}
+
+/* Grid bawah */
+
+.row{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>RT Digital</h2>
+
+<a href="index.html">Dashboard</a>
+<a href="kas.html">Kas RT</a>
+<a href="datawarga.html">Data Warga</a>
+<a href="kalender.html">Kalender</a>
+<a href="arsip.html">Arsip</a>
+<a href="struktur.html">Struktur RT</a>
+
+</div>
+
+<div class="content">
+
+<div class="title">Struktur Pengurus RT</div>
+
+<div class="org">
+
+<!-- Ketua -->
+
+<div class="box">
+<div class="jabatan">Ketua RT</div>
+<div class="nama">Bapak Muhammad Zainudin</div>
+</div>
+
+<div class="line"></div>
+
+<!-- Sekretaris & Bendahara -->
+
+<div class="row">
+
+<div class="box">
+<div class="jabatan">Sekretaris</div>
+<div class="nama">Bapak Aris Munandar</div>
+</div>
+
+<div class="box">
+<div class="jabatan">Bendahara</div>
+<div class="nama">Abdul Goni</div>
+</div>
+
+</div>
+
+<div class="line"></div>
+
+<!-- Bidang -->
+
+<div class="row">
+
+<div class="box">
+<div class="jabatan">Humas</div>
+<div class="nama">Bapak Syamsi</div>
+</div>
+
+<div class="box">
+<div class="jabatan">Keamanan</div>
+<div class="nama">Bapak Zebua<br>Bapak Hari</div>
+</div>
+
+<div class="box">
+<div class="jabatan">Keagamaan</div>
+<div class="nama">Bapak Usep Supriyatna</div>
+</div>
+
+<div class="box">
+<div class="jabatan">Olahraga</div>
+<div class="nama">Bapak Alfian</div>
+</div>
+
+<div class="box">
+<div class="jabatan">Kelistrikan</div>
+<div class="nama">Bapak Odi</div>
+</div>
+
+<div class="box">
+<div class="jabatan">Lingkungan</div>
+<div class="nama">Bapak Yadi Sumantono<br>Bapak Arsani</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
