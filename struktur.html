@@ -6,188 +6,244 @@
 <title>Struktur Pengurus RT</title>
 
 <style>
-
 body{
-font-family:Arial;
-margin:0;
-background:#eef2f7;
+    font-family:Arial, sans-serif;
+    margin:0;
+    background:#eef2f7;
 }
 
 /* Sidebar */
-
 .sidebar{
-width:200px;
-background:#2c3e50;
-height:100vh;
-position:fixed;
-left:0;
-top:0;
-padding-top:20px;
+    width:220px;
+    background:#2c3e50;
+    height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+    padding-top:20px;
+    transition: all 0.3s;
+    z-index:1000;
 }
-
 .sidebar h2{
-color:white;
-text-align:center;
-margin-bottom:30px;
+    color:white;
+    text-align:center;
+    margin-bottom:30px;
 }
-
 .sidebar a{
-display:block;
-color:white;
-padding:12px 20px;
-text-decoration:none;
+    display:block;
+    color:white;
+    padding:12px 20px;
+    text-decoration:none;
+    font-size:15px;
+}
+.sidebar a:hover{
+    background:#34495e;
 }
 
-.sidebar a:hover{
-background:#34495e;
+/* Hamburger menu for mobile */
+.hamburger{
+    display:none;
+    position:fixed;
+    top:15px;
+    left:15px;
+    font-size:24px;
+    color:#2c3e50;
+    background:white;
+    padding:5px 10px;
+    border-radius:5px;
+    cursor:pointer;
+    z-index:1001;
 }
 
 /* Content */
-
 .content{
-margin-left:200px;
-padding:30px;
+    margin-left:220px;
+    padding:30px;
+    transition: margin-left 0.3s;
 }
-
 .title{
-font-size:24px;
-font-weight:bold;
-margin-bottom:30px;
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:30px;
 }
 
-/* Struktur */
-
+/* Struktur bagan */
 .org{
-text-align:center;
+    display:flex;
+    justify-content:center;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
 }
 
+/* Kotak jabatan */
 .box{
-background:white;
-display:inline-block;
-padding:12px 20px;
-border-radius:8px;
-box-shadow:0 3px 10px rgba(0,0,0,0.15);
-margin:10px;
-min-width:180px;
+    background:white;
+    padding:12px 20px;
+    border-radius:8px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.15);
+    text-align:center;
+    min-width:180px;
+    margin:10px;
+    cursor:pointer;
+    transition: transform 0.2s;
 }
-
+.box:hover{
+    transform: scale(1.05);
+}
 .jabatan{
-font-weight:bold;
-color:#2c3e50;
+    font-weight:bold;
+    color:#2c3e50;
 }
-
 .nama{
-font-size:14px;
-margin-top:5px;
+    font-size:14px;
+    margin-top:5px;
 }
 
-/* Garis */
-
-.line{
-width:2px;
-height:30px;
-background:#999;
-margin:auto;
+/* Garis koneksi */
+.connector{
+    width:2px;
+    background:#999;
+    position:absolute;
+}
+.horizontal{
+    height:2px;
+    background:#999;
+    position:absolute;
 }
 
 /* Grid bawah */
-
 .row{
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    position:relative;
 }
 
+/* Tooltip */
+.tooltip{
+    display:none;
+    position:absolute;
+    background:white;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+    z-index:100;
+    font-size:14px;
+}
 </style>
 </head>
-
 <body>
 
-<div class="sidebar">
+<div class="hamburger" onclick="toggleSidebar()">☰ Menu</div>
 
-<h2>RT Digital</h2>
+<div class="sidebar" id="sidebar">
+    <h2>RT Digital</h2>
+    <a href="index.html">Dashboard</a>
+    <a href="kas.html">Kas RT</a>
+    <a href="datawarga.html">Data Warga</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="arsip.html">Arsip</a>
+    <a href="struktur.html">Struktur RT</a>
+</div>
 
-<a href="index.html">Dashboard</a>
-<a href="kas.html">Kas RT</a>
-<a href="datawarga.html">Data Warga</a>
-<a href="kalender.html">Kalender</a>
-<a href="arsip.html">Arsip</a>
-<a href="struktur.html">Struktur RT</a>
+<div class="content" id="content">
+
+    <div class="title">Struktur Pengurus RT</div>
+
+    <div class="org" id="org">
+
+        <!-- Ketua -->
+        <div class="box" onclick="showDetail('Ketua RT','Bapak Muhammad Zainudin')">
+            <div class="jabatan">Ketua RT</div>
+            <div class="nama">Bapak Muhammad Zainudin</div>
+        </div>
+
+        <!-- Garis ke Sekretaris & Bendahara -->
+        <div class="horizontal" style="width:420px; height:2px; background:#999; margin-top:10px;"></div>
+
+        <div class="row">
+
+            <div class="box" onclick="showDetail('Sekretaris','Bapak Aris Munandar')">
+                <div class="jabatan">Sekretaris</div>
+                <div class="nama">Bapak Aris Munandar</div>
+            </div>
+
+            <div class="box" onclick="showDetail('Bendahara','Abdul Goni')">
+                <div class="jabatan">Bendahara</div>
+                <div class="nama">Abdul Goni</div>
+            </div>
+
+        </div>
+
+        <!-- Garis ke Bidang -->
+        <div class="horizontal" style="width:840px; height:2px; background:#999; margin-top:20px;"></div>
+
+        <div class="row">
+
+            <div class="box" onclick="showDetail('Humas','Bapak Syamsi')">
+                <div class="jabatan">Humas</div>
+                <div class="nama">Bapak Syamsi<br>Bapak Suyana</div>
+            </div>
+
+            <div class="box" onclick="showDetail('Keamanan','Bapak Zebua & Bapak Hari')">
+                <div class="jabatan">Keamanan</div>
+                <div class="nama">Bapak Zebua<br>Bapak Hari</div>
+            </div>
+
+            <div class="box" onclick="showDetail('Keagamaan','Bapak Usep Supriyatna')">
+                <div class="jabatan">Keagamaan</div>
+                <div class="nama">Bapak Usep Supriyatna</div>
+            </div>
+
+            <div class="box" onclick="showDetail('Olahraga','Bapak Alfian')">
+                <div class="jabatan">Olahraga</div>
+                <div class="nama">Bapak Alfian</div>
+            </div>
+
+            <div class="box" onclick="showDetail('Kelistrikan','Bapak Odi')">
+                <div class="jabatan">Kelistrikan</div>
+                <div class="nama">Bapak Odi</div>
+            </div>
+
+            <div class="box" onclick="showDetail('Lingkungan','Bapak Yadi Sumantono & Bapak Arsani')">
+                <div class="jabatan">Lingkungan</div>
+                <div class="nama">Bapak Yadi Sumantono<br>Bapak Arsani</div>
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="content">
+<!-- Tooltip detail -->
+<div class="tooltip" id="tooltip"></div>
 
-<div class="title">Struktur Pengurus RT</div>
+<script>
+function toggleSidebar(){
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('content');
+    sidebar.classList.toggle('active');
+    content.classList.toggle('shift');
+}
 
-<div class="org">
+function showDetail(jabatan, nama){
+    const tooltip = document.getElementById('tooltip');
+    tooltip.innerHTML = `<strong>${jabatan}</strong><br>${nama}`;
+    tooltip.style.display = 'block';
+    tooltip.style.top = event.clientY + 15 + 'px';
+    tooltip.style.left = event.clientX + 15 + 'px';
+}
 
-<!-- Ketua -->
-
-<div class="box">
-<div class="jabatan">Ketua RT</div>
-<div class="nama">Bapak Muhammad Zainudin</div>
-</div>
-
-<div class="line"></div>
-
-<!-- Sekretaris & Bendahara -->
-
-<div class="row">
-
-<div class="box">
-<div class="jabatan">Sekretaris</div>
-<div class="nama">Bapak Aris Munandar</div>
-</div>
-
-<div class="box">
-<div class="jabatan">Bendahara</div>
-<div class="nama">Abdul Goni</div>
-</div>
-
-</div>
-
-<div class="line"></div>
-
-<!-- Bidang -->
-
-<div class="row">
-
-<div class="box">
-<div class="jabatan">Humas</div>
-<div class="nama">Bapak Syamsi</div>
-</div>
-
-<div class="box">
-<div class="jabatan">Keamanan</div>
-<div class="nama">Bapak Zebua<br>Bapak Hari</div>
-</div>
-
-<div class="box">
-<div class="jabatan">Keagamaan</div>
-<div class="nama">Bapak Usep Supriyatna</div>
-</div>
-
-<div class="box">
-<div class="jabatan">Olahraga</div>
-<div class="nama">Bapak Alfian</div>
-</div>
-
-<div class="box">
-<div class="jabatan">Kelistrikan</div>
-<div class="nama">Bapak Odi</div>
-</div>
-
-<div class="box">
-<div class="jabatan">Lingkungan</div>
-<div class="nama">Bapak Yadi Sumantono<br>Bapak Arsani</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
+document.addEventListener('click', function(e){
+    const tooltip = document.getElementById('tooltip');
+    if(!e.target.classList.contains('box')){
+        tooltip.style.display = 'none';
+    }
+});
+</script>
 
 </body>
 </html>
