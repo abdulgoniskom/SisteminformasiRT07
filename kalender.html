@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalender RT</title>
+
+<title>Arsip RT</title>
 
 <style>
 
@@ -11,173 +12,124 @@ body{
 font-family:Arial;
 margin:0;
 background:#eef2f7;
-display:flex;
 }
 
 /* SIDEBAR */
 
 .sidebar{
-width:160px;
-background:#2c3e50;
-color:white;
+width:200px;
 height:100vh;
+background:#2c3e50;
 position:fixed;
+left:0;
+top:0;
+color:white;
+padding-top:20px;
 }
 
 .sidebar h2{
 text-align:center;
-padding:12px;
-font-size:16px;
+margin-bottom:30px;
 }
 
 .sidebar a{
 display:block;
+padding:12px 20px;
 color:white;
-padding:10px;
 text-decoration:none;
-font-size:14px;
 }
 
 .sidebar a:hover{
 background:#34495e;
 }
 
-/* MAIN */
+/* CONTENT */
 
-.main{
-margin-left:160px;
-width:100%;
-}
-
-header{
-background:#2f80ed;
-color:white;
-padding:15px;
-text-align:center;
-}
-
-/* CONTAINER */
-
-.container{
+.content{
+margin-left:200px;
 padding:20px;
-max-width:900px;
-margin:auto;
 }
 
-/* CALENDAR */
-
-.calendar{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
+h1{
+margin-top:0;
 }
 
-.calendar-header{
+/* FILTER */
+
+.filter{
 display:flex;
-justify-content:space-between;
-align-items:center;
+gap:10px;
+margin-bottom:20px;
+flex-wrap:wrap;
 }
 
-.calendar-grid{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:6px;
-margin-top:15px;
-}
-
-.day-name{
-font-weight:bold;
-text-align:center;
-color:#666;
-}
-
-.day{
-background:#f7f9fc;
-padding:12px 0;
-text-align:center;
-border-radius:6px;
-cursor:pointer;
-position:relative;
-}
-
-.today{
-background:#2f80ed;
-color:white;
-}
-
-.event-dot{
-width:6px;
-height:6px;
-background:red;
-border-radius:50%;
-position:absolute;
-bottom:4px;
-left:50%;
-transform:translateX(-50%);
-}
-
-/* FORM */
-
-.formInput{
-display:none;
-margin-top:20px;
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-
-input,textarea{
-width:100%;
+input,select{
 padding:8px;
-margin:5px 0;
-}
-
-button{
-background:#2f80ed;
-color:white;
-border:none;
-padding:8px 12px;
 border-radius:5px;
-cursor:pointer;
+border:1px solid #ccc;
 }
 
-button:hover{
-background:#1f6fd1;
+/* CARD */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
 }
 
-/* POPUP */
-
-.popup{
-display:none;
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
+.card{
 background:white;
-padding:20px;
 border-radius:10px;
-box-shadow:0 5px 20px rgba(0,0,0,0.2);
-max-width:300px;
+padding:15px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
 }
 
-/* HP */
-
-@media(max-width:768px){
-
-.sidebar{
-width:120px;
+.card h3{
+margin-top:0;
 }
 
-.main{
-margin-left:120px;
+.tag{
+display:inline-block;
+padding:4px 8px;
+border-radius:5px;
+font-size:12px;
+color:white;
+margin-bottom:5px;
 }
 
+.laporan{background:#3498db;}
+.surat{background:#2ecc71;}
+.foto{background:#e67e22;}
+.lainnya{background:#9b59b6;}
+
+.btn{
+display:inline-block;
+margin-top:10px;
+padding:6px 10px;
+background:#2980b9;
+color:white;
+border-radius:5px;
+text-decoration:none;
+font-size:13px;
+}
+
+.btn:hover{
+background:#1f6694;
+}
+
+/* PREVIEW */
+
+.preview{
+margin-top:10px;
+}
+
+iframe{
+width:100%;
+height:200px;
+border:none;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -186,264 +138,115 @@ margin-left:120px;
 
 <div class="sidebar">
 
-<h2>RT 07 RW 09</h2>
+<h2>RT 01</h2>
 
 <a href="index.html">Dashboard</a>
 <a href="kas.html">Kas RT</a>
 <a href="warga.html">Data Warga</a>
 <a href="pengumuman.html">Pengumuman</a>
-<a href="kalender.html">Kalender</a>
 <a href="arsip.html">Arsip</a>
+<a href="struktur.html">Struktur RT</a>
 
 </div>
 
-<!-- MAIN -->
+<!-- CONTENT -->
 
-<div class="main">
+<div class="content">
 
-<header>
-<h2>Kalender Kegiatan RT</h2>
-</header>
+<h1>Arsip RT</h1>
 
-<div class="container">
+<div class="filter">
 
-<div class="calendar">
+<input type="text" id="search" placeholder="Cari arsip...">
 
-<div class="calendar-header">
-
-<button onclick="prevMonth()">◀</button>
-
-<h3 id="monthYear"></h3>
-
-<button onclick="nextMonth()">▶</button>
+<select id="kategori">
+<option value="">Semua Kategori</option>
+<option value="Surat">Surat</option>
+<option value="Laporan">Laporan</option>
+<option value="Foto">Foto</option>
+<option value="Lainnya">Lainnya</option>
+</select>
 
 </div>
 
-<div class="calendar-grid" id="calendar"></div>
-
-</div>
-
-<br>
-
-<div style="text-align:right">
-<button onclick="login()">Login Admin</button>
-</div>
-
-<!-- FORM TAMBAH KEGIATAN -->
-
-<div class="formInput" id="formInput">
-
-<h3>Tambah Kegiatan</h3>
-
-<input type="text" id="judul" placeholder="Judul kegiatan">
-
-<input type="date" id="tanggal">
-
-<input type="text" id="waktu" placeholder="Waktu">
-
-<input type="text" id="tempat" placeholder="Tempat">
-
-<textarea id="deskripsi" placeholder="Deskripsi"></textarea>
-
-<button onclick="simpan()">Simpan</button>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- POPUP EVENT -->
-
-<div class="popup" id="popup">
-
-<h3 id="popupTanggal"></h3>
-
-<div id="popupIsi"></div>
-
-<br>
-
-<button onclick="tutupPopup()">Tutup</button>
+<div class="grid" id="arsipList"></div>
 
 </div>
 
 <script>
 
-const API="https://script.google.com/macros/s/AKfycbyLOEi2zjGnYIH70s2x8MHJvG1bd6KvFEbMogYMnJpR5MOVc3M9D90lVd_Cuh4clZ8/exec";
+let dataArsip=[]
 
-let currentDate=new Date();
-let dataEvent=[];
+const url="https://script.google.com/macros/s/AKfycbzrx-1h7n3I-PLNkiNpZn-Aa5J9IOhXTdAqKn-Kbl2k3DZmTjlMBi6uXmLrM4uh_q3z/exec"
 
-/* LOGIN */
-
-function login(){
-
-let u=prompt("Username");
-let p=prompt("Password");
-
-if(u=="admin" && p=="12345"){
-document.getElementById("formInput").style.display="block";
-}else{
-alert("Login gagal");
-}
-
-}
-
-/* LOAD EVENT */
-
-function loadEvent(){
-
-fetch(API+"?sheet=Kalender")
-
+fetch(url)
 .then(res=>res.json())
-
 .then(data=>{
-dataEvent=data;
-renderCalendar();
-});
+dataArsip=data
+tampilkan(data)
+})
 
-}
+function tampilkan(data){
 
-/* RENDER CALENDAR */
+let html=""
 
-function renderCalendar(){
+data.forEach(a=>{
 
-let year=currentDate.getFullYear();
-let month=currentDate.getMonth();
-
-let firstDay=new Date(year,month,1).getDay();
-let days=new Date(year,month+1,0).getDate();
-
-let hari=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
-
-let html="";
-
-hari.forEach(h=>{
-html+=`<div class="day-name">${h}</div>`;
-});
-
-for(let i=0;i<firstDay;i++){
-html+="<div></div>";
-}
-
-for(let d=1;d<=days;d++){
-
-let dateStr=year+"-"+String(month+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
-
-let today=new Date();
-
-let classDay="day";
-
-if(d==today.getDate() && month==today.getMonth()){
-classDay+=" today";
-}
-
-let adaEvent=dataEvent.some(e=>e.tanggal==dateStr);
-
-let dot=adaEvent?'<div class="event-dot"></div>':"";
+let tagClass=a.Kategori.toLowerCase()
 
 html+=`
-<div class="${classDay}" onclick="lihatEvent('${dateStr}')">
-${d}
-${dot}
+
+<div class="card">
+
+<span class="tag ${tagClass}">${a.Kategori}</span>
+
+<h3>${a.Judul}</h3>
+
+<small>${a.Tanggal}</small>
+
+<p>${a.Deskripsi}</p>
+
+<div class="preview">
+
+<iframe src="${a['Link File']}"></iframe>
+
 </div>
-`;
 
-}
+<a class="btn" href="${a['Link File']}" target="_blank">Download</a>
 
-document.getElementById("calendar").innerHTML=html;
+</div>
 
-let bulan=[
-"Januari","Februari","Maret","April","Mei","Juni",
-"Juli","Agustus","September","Oktober","November","Desember"
-];
-
-document.getElementById("monthYear").innerText=bulan[month]+" "+year;
-
-}
-
-/* PINDAH BULAN */
-
-function prevMonth(){
-currentDate.setMonth(currentDate.getMonth()-1);
-renderCalendar();
-}
-
-function nextMonth(){
-currentDate.setMonth(currentDate.getMonth()+1);
-renderCalendar();
-}
-
-/* LIHAT EVENT */
-
-function lihatEvent(tanggal){
-
-let events=dataEvent.filter(e=>e.tanggal==tanggal);
-
-let html="";
-
-if(events.length==0){
-
-html="Tidak ada kegiatan";
-
-}else{
-
-events.forEach(e=>{
-html+=`
-<p>
-<b>${e.judul}</b><br>
-Waktu : ${e.waktu}<br>
-Tempat : ${e.tempat}<br>
-${e.deskripsi}
-</p>
-`;
-});
-
-}
-
-document.getElementById("popupTanggal").innerText=tanggal;
-document.getElementById("popupIsi").innerHTML=html;
-document.getElementById("popup").style.display="block";
-
-}
-
-function tutupPopup(){
-document.getElementById("popup").style.display="none";
-}
-
-/* SIMPAN */
-
-function simpan(){
-
-const data = new URLSearchParams();
-
-data.append("judul",document.getElementById("judul").value);
-data.append("tanggal",document.getElementById("tanggal").value);
-data.append("waktu",document.getElementById("waktu").value);
-data.append("tempat",document.getElementById("tempat").value);
-data.append("deskripsi",document.getElementById("deskripsi").value);
-
-fetch(API,{
-method:"POST",
-body:data
-})
-.then(res=>res.text())
-.then(res=>{
-
-alert("Kegiatan berhasil disimpan");
-
-location.reload();
+`
 
 })
-.catch(err=>{
-alert("Gagal kirim data");
-console.log(err);
-});
+
+document.getElementById("arsipList").innerHTML=html
 
 }
-}
 
-loadEvent();
+/* SEARCH */
+
+document.getElementById("search").addEventListener("keyup",filter)
+
+document.getElementById("kategori").addEventListener("change",filter)
+
+function filter(){
+
+let s=document.getElementById("search").value.toLowerCase()
+let k=document.getElementById("kategori").value
+
+let hasil=dataArsip.filter(a=>{
+
+let cocokJudul=a.Judul.toLowerCase().includes(s)
+let cocokKategori=!k || a.Kategori==k
+
+return cocokJudul && cocokKategori
+
+})
+
+tampilkan(hasil)
+
+}
 
 </script>
 
