@@ -415,23 +415,32 @@ document.getElementById("popup").style.display="none";
 
 function simpan(){
 
-let form=new FormData();
+const data = new URLSearchParams();
 
-form.append("judul",document.getElementById("judul").value);
-form.append("tanggal",document.getElementById("tanggal").value);
-form.append("waktu",document.getElementById("waktu").value);
-form.append("tempat",document.getElementById("tempat").value);
-form.append("deskripsi",document.getElementById("deskripsi").value);
+data.append("judul",document.getElementById("judul").value);
+data.append("tanggal",document.getElementById("tanggal").value);
+data.append("waktu",document.getElementById("waktu").value);
+data.append("tempat",document.getElementById("tempat").value);
+data.append("deskripsi",document.getElementById("deskripsi").value);
 
-fetch(API,{method:"POST",body:form})
-
+fetch(API,{
+method:"POST",
+body:data
+})
 .then(res=>res.text())
-
 .then(res=>{
-alert("Kegiatan disimpan");
-loadEvent();
+
+alert("Kegiatan berhasil disimpan");
+
+location.reload();
+
+})
+.catch(err=>{
+alert("Gagal kirim data");
+console.log(err);
 });
 
+}
 }
 
 loadEvent();
