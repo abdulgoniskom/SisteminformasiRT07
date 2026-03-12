@@ -16,10 +16,11 @@ header{background:#2f80ed;color:white;padding:15px;text-align:center;}
 .card{background:white;padding:15px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
 .card img{max-width:100%;border-radius:5px;margin-bottom:10px;}
 .card h3{margin:0 0 5px 0;}
+.card p{margin:5px 0 0 0;color:#333;}
 button{background:#2f80ed;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
 button:hover{background:#1f6fd1;}
 .formInput{display:none;margin-top:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-input{width:100%;padding:8px;margin:5px 0;}
+input, textarea{width:100%;padding:8px;margin:5px 0;}
 @media (max-width:768px){.sidebar{width:120px;}.main{margin-left:120px;}}
 </style>
 </head>
@@ -49,6 +50,7 @@ input{width:100%;padding:8px;margin:5px 0;}
 <h3>Tambah Pengumuman</h3>
 <input type="text" id="judul" placeholder="Judul pengumuman">
 <input type="text" id="gambar" placeholder="Link gambar/banner">
+<textarea id="konten" placeholder="Isi pengumuman"></textarea>
 <button onclick="simpan()">Simpan</button>
 </div>
 
@@ -56,11 +58,11 @@ input{width:100%;padding:8px;margin:5px 0;}
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbxbKa90hcVlGsEyN-eqKcVZkNJsUC1u60Ha07OggJ0clPex8Ae1i86OmS1xw99o2SU/exec"; // ganti dengan URL Web App Apps Script
+const API = "https://script.google.com/macros/s/AKfycbx8DnxUlZTCaHF_yX6NVwanbs5cCjkfAXP0SuIr7_W8fz7hxSSfY2PZOj2V_51WoHA/exec"; // Ganti dengan URL Web App
 
 function login(){
-  let u=prompt("Username");
-  let p=prompt("Password");
+  let u = prompt("Username");
+  let p = prompt("Password");
   if(u=="admin" && p=="12345"){
     document.getElementById("formInput").style.display="block";
   } else {
@@ -69,39 +71,45 @@ function login(){
 }
 
 function loadData(){
-  fetch(API+"?sheet=Pengumuman")
-  .then(res=>res.json())
-  .then(data=>{
+  fetch(API)
+  .then(res => res.json())
+  .then(data => {
     data = data.reverse();
-    let html="";
-    data.forEach(d=>{
+    let html = "";
+    data.forEach(d => {
+      const judul = d.judul || "Judul kosong";
+      const gambar = d.gambar || "";
+      const konten = d.konten || "";
       html += `<div class="card">
-        ${d.gambar?`<img src="${d.gambar}" alt="${d.judul}">`:""}
-        <h3>${d.judul}</h3>
+        ${gambar?`<img src="${gambar}" alt="${judul}">`:""}
+        <h3>${judul}</h3>
+        ${konten?`<p>${konten}</p>`:""}
       </div>`;
     });
-    document.getElementById("listPengumuman").innerHTML=html;
+    document.getElementById("listPengumuman").innerHTML = html;
   })
-  .catch(err=>console.log(err));
+  .catch(err => console.log("Error loadData:", err));
 }
 
 function simpan(){
-  let judul = document.getElementById("judul").value.trim();
-  let gambar = document.getElementById("gambar").value.trim();
-  if(!judul || !gambar){alert("Judul dan Gambar harus diisi!"); return;}
+  const judul = document.getElementById("judul").value.trim();
+  const gambar = document.getElementById("gambar").value.trim();
+  const konten = document.getElementById("konten").value.trim();
+  if(!judul){alert("Judul harus diisi!"); return;}
 
   let form = new FormData();
-  form.append("sheet","Pengumuman");
   form.append("judul", judul);
   form.append("gambar", gambar);
+  form.append("konten", konten);
 
-  fetch(API,{method:"POST",body:form})
-  .then(res=>res.text())
-  .then(res=>{
+  fetch(API, {method:"POST", body: form})
+  .then(res => res.text())
+  .then(res => {
     if(res=="success"){
       alert("Pengumuman berhasil disimpan");
       document.getElementById("judul").value="";
       document.getElementById("gambar").value="";
+      document.getElementById("konten").value="";
       loadData();
     } else {
       alert("Gagal menyimpan pengumuman: "+res);
@@ -115,5 +123,6 @@ function simpan(){
 
 loadData();
 </script>
+
 </body>
 </html>
