@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Warga RT</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #eef2f7;
+    }
+    /* Sidebar */
+    .sidebar {
+        width: 200px;
+        background: #2c3e50;
+        color: white;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding-top: 20px;
+    }
+    .sidebar a {
+        display: block;
+        color: white;
+        padding: 12px 20px;
+        text-decoration: none;
+        margin-bottom: 2px;
+        border-left: 4px solid transparent;
+    }
+    .sidebar a:hover {
+        background: #34495e;
+        border-left: 4px solid #1abc9c;
+    }
+
+    /* Main content */
+    .main {
+        margin-left: 200px;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #2c3e50;
+    }
+
+    /* Table styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+    th {
+        background: #1abc9c;
+        color: white;
+    }
+    tr:hover {
+        background: #f1f1f1;
+    }
+
+    /* Button styling */
+    .btn {
+        padding: 8px 14px;
+        margin-right: 5px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        color: white;
+    }
+    .btn-add { background: #1abc9c; }
+    .btn-edit { background: #3498db; }
+    .btn-delete { background: #e74c3c; }
+
+    @media screen and (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+        }
+        .main {
+            margin-left: 0;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="index.html">Dashboard</a>
+    <a href="kas.html">Kas RT</a>
+    <a href="warga.html" style="border-left: 4px solid #1abc9c;">Data Warga</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="arsip.html">Arsip</a>
+    <a href="struktur.html">Struktur RT</a>
+</div>
+
+<div class="main">
+    <h1>Data Warga RT</h1>
+    <button class="btn btn-add" onclick="tambahWarga()">Tambah Warga</button>
+    <br><br>
+    <table id="tabelWarga">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Alamat</th>
+                <th>No HP</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data warga akan muncul di sini -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Contoh data warga (bisa diganti ambil dari Google Sheets API)
+    let dataWarga = [
+        {nama: "Abdul Goni", alamat: "Jl. Merpati No. 5", hp: "08123456789", status: "Aktif"},
+        {nama: "Siti Aminah", alamat: "Jl. Kenari No. 3", hp: "08198765432", status: "Tidak Aktif"},
+    ];
+
+    function tampilkanData() {
+        const tbody = document.querySelector("#tabelWarga tbody");
+        tbody.innerHTML = "";
+        dataWarga.forEach((warga, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${index+1}</td>
+                <td>${warga.nama}</td>
+                <td>${warga.alamat}</td>
+                <td>${warga.hp}</td>
+                <td>${warga.status}</td>
+                <td>
+                    <button class="btn btn-edit" onclick="editWarga(${index})">Edit</button>
+                    <button class="btn btn-delete" onclick="hapusWarga(${index})">Hapus</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function tambahWarga() {
+        const nama = prompt("Nama Warga:");
+        const alamat = prompt("Alamat:");
+        const hp = prompt("No HP:");
+        const status = prompt("Status (Aktif/Tidak Aktif):");
+        if(nama && alamat && hp && status){
+            dataWarga.push({nama, alamat, hp, status});
+            tampilkanData();
+        }
+    }
+
+    function editWarga(index) {
+        const warga = dataWarga[index];
+        const nama = prompt("Nama Warga:", warga.nama);
+        const alamat = prompt("Alamat:", warga.alamat);
+        const hp = prompt("No HP:", warga.hp);
+        const status = prompt("Status (Aktif/Tidak Aktif):", warga.status);
+        if(nama && alamat && hp && status){
+            dataWarga[index] = {nama, alamat, hp, status};
+            tampilkanData();
+        }
+    }
+
+    function hapusWarga(index) {
+        if(confirm("Apakah yakin ingin menghapus data ini?")){
+            dataWarga.splice(index, 1);
+            tampilkanData();
+        }
+    }
+
+    // Tampilkan data saat halaman dibuka
+    tampilkanData();
+</script>
+
+</body>
+</html>
