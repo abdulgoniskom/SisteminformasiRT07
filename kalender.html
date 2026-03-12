@@ -1,368 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Kalender Kegiatan RT</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengumuman RT</title>
 <style>
-
-body{
-font-family:Arial;
-background:#eef2f7;
-margin:0;
-}
-
-header{
-background:#2f80ed;
-color:white;
-padding:15px;
-text-align:center;
-}
-
-.container{
-max-width:900px;
-margin:auto;
-padding:20px;
-}
-
-.calendar{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-
-.calendar-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-}
-
-button{
-padding:8px 12px;
-border:none;
-background:#2f80ed;
-color:white;
-border-radius:5px;
-cursor:pointer;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-}
-
-th{
-background:#2f80ed;
-color:white;
-padding:10px;
-}
-
-td{
-height:80px;
-text-align:center;
-vertical-align:top;
-border:1px solid #ddd;
-position:relative;
-}
-
-.event{
-background:#27ae60;
-color:white;
-font-size:11px;
-padding:2px 4px;
-border-radius:4px;
-display:block;
-margin-top:3px;
-}
-
-.today{
-background:#fff5cc;
-}
-
-.formInput{
-margin-top:20px;
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-display:none;
-}
-.sidebar{
-width:220px;
-background:#2c3e50;
-color:white;
-height:100vh;
-position:fixed;
-left:0;
-top:0;
-}
-
-.sidebar h2{
-text-align:center;
-padding:20px;
-border-bottom:1px solid rgba(255,255,255,0.2);
-}
-
-.sidebar a{
-display:block;
-color:white;
-padding:15px;
-text-decoration:none;
-}
-
-.sidebar a:hover{
-background:#34495e;
-}
-
-.main{
-margin-left:220px;
-}
+body{font-family:Arial;margin:0;background:#eef2f7;}
+.sidebar{width:160px;background:#2c3e50;color:white;height:100vh;position:fixed;left:0;top:0;}
+.sidebar h2{text-align:center;padding:12px;font-size:16px;}
+.sidebar a{display:block;color:white;padding:10px;text-decoration:none;font-size:14px;}
+.sidebar a:hover{background:#34495e;}
+.main{margin-left:160px;}
+header{background:#2f80ed;color:white;padding:15px;text-align:center;}
+.container{padding:20px;max-width:900px;margin:auto;}
+.card{background:white;padding:15px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+.card img{max-width:100%;border-radius:5px;margin-bottom:10px;}
+.card h3{margin:0 0 5px 0;}
+button{background:#2f80ed;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
+button:hover{background:#1f6fd1;}
+.formInput{display:none;margin-top:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+input{width:100%;padding:8px;margin:5px 0;}
+@media (max-width:768px){.sidebar{width:120px;}.main{margin-left:120px;}}
 </style>
-
 </head>
-
 <body>
 
 <div class="sidebar">
-
 <h2>RT 07 RW 09</h2>
-
 <a href="index.html">Dashboard</a>
 <a href="kas.html">Kas RT</a>
 <a href="warga.html">Data Warga</a>
 <a href="pengumuman.html">Pengumuman</a>
 <a href="kalender.html">Kalender</a>
 <a href="arsip.html">Arsip</a>
-
 </div>
 
 <div class="main">
-<header>
-<h2>Kalender Kegiatan RT 07</h2>
-</header>
-
+<header><h2>Pengumuman RT 07</h2></header>
 <div class="container">
 
-<div class="calendar">
+<div id="listPengumuman"></div>
 
-<div class="calendar-header">
-
-<button onclick="prevMonth()">◀</button>
-
-<h3 id="bulanTahun"></h3>
-
-<button onclick="nextMonth()">▶</button>
-
-</div>
-
-<table>
-
-<thead>
-
-<tr>
-<th>Ming</th>
-<th>Sen</th>
-<th>Sel</th>
-<th>Rab</th>
-<th>Kam</th>
-<th>Jum</th>
-<th>Sab</th>
-</tr>
-
-</thead>
-
-<tbody id="kalender"></tbody>
-
-</table>
-
-</div>
-
-<div style="text-align:right;margin-top:10px">
+<div style="text-align:right;margin-bottom:10px;">
 <button onclick="login()">Login Admin</button>
 </div>
 
 <div class="formInput" id="formInput">
-
-<h3>Tambah Kegiatan</h3>
-
-<input type="date" id="tanggal">
-
-<input type="text" id="kegiatan" placeholder="Nama kegiatan">
-
+<h3>Tambah Pengumuman</h3>
+<input type="text" id="judul" placeholder="Judul pengumuman">
+<input type="text" id="gambar" placeholder="Link gambar/banner">
 <button onclick="simpan()">Simpan</button>
-
 </div>
 
+</div>
 </div>
 
 <script>
-
-const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec?sheet=Kalender";
-
-let date=new Date();
-
-let events=[];
-
-/* LOGIN ADMIN */
+const API="https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec"; // ganti dengan URL Web App Apps Script
 
 function login(){
-
-let u=prompt("Username");
-let p=prompt("Password");
-
-if(u=="admin" && p=="12345"){
-
-document.getElementById("formInput").style.display="block";
-
-}else{
-
-alert("Login gagal");
-
+  let u=prompt("Username");
+  let p=prompt("Password");
+  if(u=="admin" && p=="12345"){
+    document.getElementById("formInput").style.display="block";
+  } else {
+    alert("Login gagal");
+  }
 }
 
+function loadData(){
+  fetch(API+"?sheet=Pengumuman")
+  .then(res=>res.json())
+  .then(data=>{
+    data = data.reverse(); // terbaru di atas
+    let html="";
+    data.forEach(d=>{
+      html += `<div class="card">
+        ${d.gambar?`<img src="${d.gambar}" alt="${d.judul}">`:""}
+        <h3>${d.judul}</h3>
+      </div>`;
+    });
+    document.getElementById("listPengumuman").innerHTML=html;
+  })
+  .catch(err=>console.log(err));
 }
-
-
-/* LOAD EVENT */
-
-function loadEvents(){
-
-fetch(API)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-events=data;
-
-renderCalendar();
-
-});
-
-}
-
-
-/* RENDER CALENDAR */
-
-function renderCalendar(){
-
-let year=date.getFullYear();
-let month=date.getMonth();
-
-let firstDay=new Date(year,month,1).getDay();
-let lastDate=new Date(year,month+1,0).getDate();
-
-document.getElementById("bulanTahun").innerText=
-date.toLocaleString("id-ID",{month:"long",year:"numeric"});
-
-let html="";
-
-let day=1;
-
-for(let i=0;i<6;i++){
-
-html+="<tr>";
-
-for(let j=0;j<7;j++){
-
-if(i===0 && j<firstDay){
-
-html+="<td></td>";
-
-}else if(day>lastDate){
-
-html+="<td></td>";
-
-}else{
-
-let fullDate=year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
-
-let eventHtml="";
-
-events.forEach(e=>{
-
-if(e.tanggal==fullDate){
-
-eventHtml+=`<span class="event">${e.kegiatan}</span>`;
-
-}
-
-});
-
-html+=`<td>
-
-<strong>${day}</strong>
-
-${eventHtml}
-
-</td>`;
-
-day++;
-
-}
-
-}
-
-html+="</tr>";
-
-}
-
-document.getElementById("kalender").innerHTML=html;
-
-}
-
-
-/* BULAN SEBELUMNYA */
-
-function prevMonth(){
-
-date.setMonth(date.getMonth()-1);
-
-renderCalendar();
-
-}
-
-/* BULAN BERIKUTNYA */
-
-function nextMonth(){
-
-date.setMonth(date.getMonth()+1);
-
-renderCalendar();
-
-}
-
-
-/* SIMPAN KEGIATAN */
 
 function simpan(){
+  let judul = document.getElementById("judul").value.trim();
+  let gambar = document.getElementById("gambar").value.trim();
+  if(!judul || !gambar){alert("Judul dan Gambar harus diisi!"); return;}
 
-let form=new FormData();
+  let form = new FormData();
+  form.append("sheet","Pengumuman");
+  form.append("judul", judul);
+  form.append("gambar", gambar);
 
-form.append("sheet","Kalender");
-form.append("tanggal",document.getElementById("tanggal").value);
-form.append("kegiatan",document.getElementById("kegiatan").value);
-
-fetch("https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec",
-{method:"POST",body:form})
-
-.then(r=>r.text())
-
-.then(res=>{
-
-alert("Kegiatan tersimpan");
-
-loadEvents();
-
-});
-
+  fetch(API,{method:"POST",body:form})
+  .then(res=>res.text())
+  .then(res=>{
+    if(res=="success"){
+      alert("Pengumuman berhasil disimpan");
+      document.getElementById("judul").value="";
+      document.getElementById("gambar").value="";
+      loadData();
+    } else {
+      alert("Gagal menyimpan pengumuman: "+res);
+    }
+  })
+  .catch(err=>{
+    console.log(err);
+    alert("Gagal menyimpan pengumuman");
+  });
 }
 
-loadEvents();
-
+// load pengumuman saat halaman dibuka
+loadData();
 </script>
-</div>
 </body>
 </html>
