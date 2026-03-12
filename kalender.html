@@ -3,64 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender RT 07</title>
+    <title>Kalender RT 07 - Sistem Informasi</title>
     <style>
-        /* CSS DISAMAKAN DENGAN INDEX.HTML */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial;
+        /* CSS DASAR DARI INDEX.HTML */
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial;
         }
 
-        body {
-            background: #f1f4f9;
-            display: flex;
+        body{
+            background:#f1f4f9;
+            display:flex;
         }
 
-        /* SIDEBAR (Sama persis dengan index.html) */
-        .sidebar {
-            width: 220px;
-            background: #2c3e50;
-            height: 100vh;
-            color: white;
-            position: fixed;
+        /* SIDEBAR (Identik dengan index.html) */
+        .sidebar{
+            width:220px;
+            background:#2c3e50;
+            height:100vh;
+            color:white;
+            position:fixed;
+            transition: 0.3s;
+            z-index: 1000;
         }
 
-        .sidebar h2 {
-            text-align: center;
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        .sidebar h2{
+            text-align:center;
+            padding:20px;
+            border-bottom:1px solid rgba(255,255,255,0.2);
         }
 
-        .sidebar a {
-            display: block;
-            color: white;
+        .sidebar a{
+            display:block;
+            color:white;
+            padding:15px;
+            text-decoration:none;
+        }
+
+        .sidebar a:hover, .sidebar a.active{
+            background:#34495e;
+        }
+
+        /* Tombol Login di Sidebar */
+        .admin-section {
             padding: 15px;
-            text-decoration: none;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 20px;
         }
-
-        .sidebar a:hover, .sidebar a.active {
-            background: #34495e;
-        }
-
-        /* MAIN CONTENT (Sama persis dengan index.html) */
-        .main {
-            margin-left: 220px;
+        .btn-login {
             width: 100%;
+            padding: 10px;
+            background: #f2994a;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
-        header {
-            background: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
+        /* MAIN CONTENT */
+        .main{
+            margin-left:220px;
+            width:100%;
+            transition: 0.3s;
+        }
+
+        header{
+            background:white;
+            padding:15px 30px;
+            box-shadow:0 2px 5px rgba(0,0,0,0.1);
+            display:flex;
+            justify-content:space-between;
             align-items: center;
         }
 
-        .container {
-            padding: 30px;
+        .container{
+            padding:30px;
+        }
+
+        /* MOBILE MENU TOGGLE (Hanya muncul di HP) */
+        .menu-btn {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
         }
 
         /* KALENDER STYLE */
@@ -68,7 +95,8 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow-x: auto;
         }
 
         .calendar-nav {
@@ -78,85 +106,64 @@
             margin-bottom: 20px;
         }
 
-        .btn-nav {
-            background: #2c3e50;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+        #month-year { font-weight: bold; font-size: 20px; }
+        .btn-nav { background: #2c3e50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 
-        #month-year {
-            font-size: 20px;
-            font-weight: bold;
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { background: #f7f9fc; padding: 15px; border: 1px solid #ddd; }
+        td { border: 1px solid #ddd; height: 110px; vertical-align: top; padding: 10px; width: 14.28%; }
+        
+        .date-num { font-weight: bold; }
+        .today { background: #e3f2fd; border: 2px solid #2f80ed !important; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #f7f9fc;
-            padding: 15px;
-            border: 1px solid #ddd;
-        }
-
-        td {
-            border: 1px solid #ddd;
-            height: 100px;
-            vertical-align: top;
-            padding: 10px;
-            width: 14.28%;
-        }
-
-        .date-num {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .today {
-            background: #e3f2fd;
-            border: 2px solid #2f80ed !important;
-        }
-
-        /* EVENT STYLE */
         .event-item {
             font-size: 11px;
             padding: 4px;
             border-radius: 3px;
-            margin-top: 3px;
+            margin-top: 5px;
             color: white;
-            line-height: 1.2;
+            background: #2f80ed;
         }
 
-        .cat-rapat { background: #9b59b6; }
-        .cat-sosial { background: #27ae60; }
-        .cat-umum { background: #2f80ed; }
-        .loc-text { font-size: 9px; display: block; opacity: 0.8; }
-
-        /* ADMIN BUTTON */
+        /* ADMIN INPUT PANEL */
         #adminPanel {
-            display: none; /* Default sembunyi, hanya muncul jika ?role=admin */
+            display: none;
             margin-bottom: 20px;
         }
-
-        .btn-input {
+        .btn-add {
             background: #27ae60;
             color: white;
+            padding: 12px 20px;
             border: none;
-            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
+        }
+
+        /* RESPONSIVE HP */
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                left: -220px;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .menu-btn {
+                display: block;
+            }
+            .container {
+                padding: 15px;
+            }
+            header h2 { font-size: 16px; }
         }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="kas.html">Kas RT</a>
@@ -165,24 +172,29 @@
     <a href="kalender.html" class="active">Kalender</a>
     <a href="arsip.html">Arsip</a>
     <a href="struktur.html">Struktur</a>
+
+    <div class="admin-section">
+        <button class="btn-login" id="authBtn" onclick="handleAuth()">Login Admin</button>
+    </div>
 </div>
 
 <div class="main">
     <header>
+        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
         <h2>Kalender Kegiatan RT 07</h2>
-        <div id="userStatus">Mode: Warga</div>
+        <div id="statusUser" style="font-size: 12px; color: #7f8c8d;">Mode Warga</div>
     </header>
 
     <div class="container">
         <div id="adminPanel">
-            <button class="btn-input" onclick="inputKegiatan()">+ Tambah Kegiatan Baru</button>
+            <button class="btn-add" onclick="inputKegiatan()">+ Input Kegiatan RT</button>
         </div>
 
         <div class="calendar-box">
             <div class="calendar-nav">
-                <button class="btn-nav" id="prevBulan">← Prev</button>
-                <div id="month-year">Maret 2026</div>
-                <button class="btn-nav" id="nextBulan">Next →</button>
+                <button class="btn-nav" onclick="moveMonth(-1)">← Prev</button>
+                <div id="month-year"></div>
+                <button class="btn-nav" onclick="moveMonth(1)">Next →</button>
             </div>
 
             <table id="calendarTable">
@@ -198,30 +210,57 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycby4Q6kprAvG3llcnA3MPjnKjQJTLYQt8mFlbj7EaKK3r4qnWZJYXLq501RR8kJM2vk/exec';
-    const params = new URLSearchParams(window.location.search);
-    const role = params.get('role'); // Ambil ?role=...
-
+    const scriptURL = 'MASUKKAN_URL_WEB_APP_ANDA_DISINI';
     let date = new Date();
-    let currYear = date.getFullYear();
-    let currMonth = date.getMonth();
     let eventsData = {};
 
-    // CEK ROLE ADMIN
-    if (role === 'admin') {
-        document.getElementById('adminPanel').style.display = 'block';
-        document.getElementById('userStatus').innerText = "Mode: Administrator";
+    // FUNGSI SIDEBAR MOBILE
+    function toggleSidebar() {
+        document.getElementById("mySidebar").classList.toggle("open");
     }
 
-    async function loadData() {
+    // FUNGSI LOGIN ADMIN
+    function handleAuth() {
+        const role = localStorage.getItem('rt07_admin');
+        if (role === 'true') {
+            localStorage.removeItem('rt07_admin');
+            alert("Logout berhasil");
+            location.reload();
+        } else {
+            const pass = prompt("Masukkan Password Admin:");
+            if (pass === "123") { // Silakan ganti passwordnya di sini
+                localStorage.setItem('rt07_admin', 'true');
+                alert("Login Admin Berhasil!");
+                location.reload();
+            } else {
+                alert("Password Salah!");
+            }
+        }
+    }
+
+    // CEK STATUS LOGIN SAAT HALAMAN DIBUKA
+    function checkAdmin() {
+        if (localStorage.getItem('rt07_admin') === 'true') {
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('authBtn').innerText = "Logout Admin";
+            document.getElementById('authBtn').style.background = "#eb5757";
+            document.getElementById('statusUser').innerText = "Mode Administrator";
+            document.getElementById('statusUser').style.color = "#27ae60";
+        }
+    }
+
+    // LOAD DATA DARI GOOGLE SHEETS
+    async function fetchEvents() {
         try {
-            const res = await fetch(scriptURL);
-            eventsData = await res.json();
-            renderKalender(currYear, currMonth);
-        } catch (e) { console.log("Gagal load"); }
+            const response = await fetch(scriptURL);
+            eventsData = await response.json();
+            renderCalendar();
+        } catch (e) { console.error("Gagal ambil data"); }
     }
 
-    function renderKalender(year, month) {
+    function renderCalendar() {
+        const year = date.getFullYear();
+        const month = date.getMonth();
         const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
         document.getElementById("month-year").innerText = months[month] + " " + year;
 
@@ -231,62 +270,52 @@
         tbody.innerHTML = "";
 
         let row = document.createElement("tr");
-        for (let i = 0; i < firstDay; i++) {
-            row.appendChild(document.createElement("td"));
-        }
+        for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
 
         for (let d = 1; d <= lastDate; d++) {
             if ((firstDay + d - 1) % 7 === 0 && d !== 1) {
                 tbody.appendChild(row);
                 row = document.createElement("tr");
             }
-
             let cell = document.createElement("td");
             let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             
             if (tglKey === new Date().toISOString().split('T')[0]) cell.classList.add('today');
 
             let html = `<span class="date-num">${d}</span>`;
-            
             if (eventsData[tglKey]) {
-                let ev = eventsData[tglKey];
-                let cat = ev.kategori.toLowerCase();
-                let catClass = cat.includes('rapat') ? 'cat-rapat' : (cat.includes('sosial') ? 'cat-sosial' : 'cat-umum');
-                
-                html += `<div class="event-item ${catClass}">
-                            <b>${ev.kegiatan}</b>
-                            <span class="loc-text">📍 ${ev.lokasi}</span>
-                         </div>`;
+                html += `<div class="event-item"><b>${eventsData[tglKey].kegiatan}</b><br><small>📍 ${eventsData[tglKey].lokasi}</small></div>`;
             }
-
             cell.innerHTML = html;
             row.appendChild(cell);
         }
         tbody.appendChild(row);
     }
 
-    // FUNGSI INPUT (Hanya jalan jika Admin)
+    function moveMonth(v) {
+        date.setMonth(date.getMonth() + v);
+        renderCalendar();
+    }
+
     async function inputKegiatan() {
-        const tgl = prompt("Tanggal (YYYY-MM-DD):", `${currYear}-${String(currMonth+1).padStart(2,'0')}-01`);
+        const tgl = prompt("Tanggal (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
         const keg = prompt("Nama Kegiatan:");
         const lok = prompt("Lokasi:");
-        const kat = prompt("Kategori (Rapat/Sosial/Umum):");
+        const kat = prompt("Kategori (Rapat/Umum/Bakti):");
 
-        if (tgl && keg && lok && kat) {
-            alert("Sedang menyimpan...");
+        if (tgl && keg) {
+            alert("Sedang menyimpan ke Google Sheets...");
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
             });
-            window.location.reload();
+            location.reload();
         }
     }
 
-    document.getElementById("prevBulan").onclick = () => { currMonth--; if(currMonth<0){currMonth=11; currYear--;} renderKalender(currYear, currMonth); };
-    document.getElementById("nextBulan").onclick = () => { currMonth++; if(currMonth>11){currMonth=0; currYear++;} renderKalender(currYear, currMonth); };
-
-    loadData();
+    checkAdmin();
+    fetchEvents();
 </script>
 
 </body>
