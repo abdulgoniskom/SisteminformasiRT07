@@ -59,6 +59,29 @@ h1{
     margin-bottom:20px;
 }
 
+/* Kalender header & nav */
+.calendar-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+.calendar-header button{
+    background:#1abc9c;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:5px;
+    cursor:pointer;
+}
+.calendar-header button:hover{
+    background:#16a085;
+}
+#month-year{
+    font-weight:bold;
+    font-size:18px;
+}
+
 /* Kalender table */
 .table-container{
     overflow-x:auto;
@@ -73,10 +96,23 @@ h1{
     border:1px solid #ccc;
     padding:12px;
     text-align:center;
+    height:50px;
 }
 #calendar th{
     background:#1abc9c;
     color:white;
+}
+#calendar td.today{
+    background:#f39c12;
+    color:white;
+    font-weight:bold;
+    border-radius:50%;
+}
+#calendar td.event{
+    background:#3498db;
+    color:white;
+    font-weight:bold;
+    border-radius:50%;
 }
 #calendar td:hover{
     background:#f1f1f1;
@@ -93,6 +129,10 @@ h1{
     .main{margin-left:60px;padding:10px;}
     #calendar th, #calendar td{
         padding:8px;
+        font-size:12px;
+    }
+    .calendar-header button{
+        padding:6px 10px;
         font-size:12px;
     }
 }
@@ -113,6 +153,13 @@ h1{
 
 <div class="main">
     <h1>Kalender Kegiatan RT</h1>
+
+    <div class="calendar-header">
+        <button id="prev">&#8592; Prev</button>
+        <div id="month-year">Maret 2026</div>
+        <button id="next">Next &#8594;</button>
+    </div>
+
     <div class="table-container">
         <table id="calendar">
             <thead>
@@ -134,17 +181,26 @@ h1{
 </div>
 
 <script>
-// Ambil tanggal sekarang
 const sekarang = new Date();
-const tahun = sekarang.getFullYear();
-const bulanSekarang = sekarang.getMonth();
+let tahun = sekarang.getFullYear();
+let bulan = sekarang.getMonth();
 
-// Generate kalender
+// Contoh event/tanggal kegiatan
+const events = {
+    "2026-03-10":"Rapat RT",
+    "2026-03-17":"Gotong Royong",
+    "2026-03-25":"Pengajian"
+};
+
 function generateCalendar(year, month){
     const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
     const tbody = document.getElementById("calendar-body");
     tbody.innerHTML = "";
+
+    const monthNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    document.getElementById("month-year").textContent = `${monthNames[month]} ${year}`;
+
     let row = document.createElement("tr");
     let cell;
 
@@ -154,21 +210,40 @@ function generateCalendar(year, month){
         row.appendChild(cell);
     }
 
-    // Isi tanggal
     for(let date=1;date<=lastDate;date++){
         if((firstDay+date-1)%7===0 && date!==1){
             tbody.appendChild(row);
             row = document.createElement("tr");
         }
         cell = document.createElement("td");
+        const fullDate = `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
         cell.textContent = date;
+
+        if(fullDate === new Date().toISOString().split('T')[0]){
+            cell.classList.add("today");
+        }
+        if(events[fullDate]){
+            cell.classList.add("event");
+            cell.title = events[fullDate];
+        }
+
         row.appendChild(cell);
     }
-
     tbody.appendChild(row);
 }
 
-generateCalendar(tahun, bulanSekarang);
+document.getElementById("prev").addEventListener("click",()=>{
+    bulan--;
+    if(bulan<0){bulan=11; tahun--;}
+    generateCalendar(tahun, bulan);
+});
+document.getElementById("next").addEventListener("click",()=>{
+    bulan++;
+    if(bulan>11){bulan=0; tahun++;}
+    generateCalendar(tahun, bulan);
+});
+
+generateCalendar(tahun, bulan);
 </script>
 
 </body>
