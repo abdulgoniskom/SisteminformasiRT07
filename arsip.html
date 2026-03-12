@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Arsip RT</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#eef2f7;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:200px;
+height:100vh;
+background:#2c3e50;
+position:fixed;
+left:0;
+top:0;
+color:white;
+padding-top:20px;
+}
+
+.sidebar h2{
+text-align:center;
+margin-bottom:30px;
+}
+
+.sidebar a{
+display:block;
+padding:12px 20px;
+color:white;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+/* CONTENT */
+
+.content{
+margin-left:200px;
+padding:20px;
+}
+
+h1{
+margin-top:0;
+}
+
+/* FILTER */
+
+.filter{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+flex-wrap:wrap;
+}
+
+input,select{
+padding:8px;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+/* CARD */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+border-radius:10px;
+padding:15px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
+}
+
+.card h3{
+margin-top:0;
+}
+
+.tag{
+display:inline-block;
+padding:4px 8px;
+border-radius:5px;
+font-size:12px;
+color:white;
+margin-bottom:5px;
+}
+
+.laporan{background:#3498db;}
+.surat{background:#2ecc71;}
+.foto{background:#e67e22;}
+.lainnya{background:#9b59b6;}
+
+.btn{
+display:inline-block;
+margin-top:10px;
+padding:6px 10px;
+background:#2980b9;
+color:white;
+border-radius:5px;
+text-decoration:none;
+font-size:13px;
+}
+
+.btn:hover{
+background:#1f6694;
+}
+
+/* PREVIEW */
+
+.preview{
+margin-top:10px;
+}
+
+iframe{
+width:100%;
+height:200px;
+border:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>RT 07 RW 09</h2>
+
+<a href="index.html">Dashboard</a>
+<a href="kas.html">Kas RT</a>
+<a href="warga.html">Data Warga</a>
+<a href="pengumuman.html">Pengumuman</a>
+<a href="arsip.html">Arsip</a>
+<a href="struktur.html">Struktur RT</a>
+
+</div>
+
+<!-- CONTENT -->
+
+<div class="content">
+
+<h1>Arsip RT</h1>
+
+<div class="filter">
+
+<input type="text" id="search" placeholder="Cari arsip...">
+
+<select id="kategori">
+<option value="">Semua Kategori</option>
+<option value="Surat">Surat</option>
+<option value="Laporan">Laporan</option>
+<option value="Foto">Foto</option>
+<option value="Lainnya">Lainnya</option>
+</select>
+
+</div>
+
+<div class="grid" id="arsipList"></div>
+
+</div>
+
+<script>
+
+let dataArsip=[]
+
+const url="https://script.google.com/macros/s/AKfycbzrx-1h7n3I-PLNkiNpZn-Aa5J9IOhXTdAqKn-Kbl2k3DZmTjlMBi6uXmLrM4uh_q3z/exec"
+
+fetch(url)
+.then(res=>res.json())
+.then(data=>{
+dataArsip=data
+tampilkan(data)
+})
+
+function tampilkan(data){
+
+let html=""
+
+data.forEach(a=>{
+
+let tagClass=a.Kategori.toLowerCase()
+
+html+=`
+
+<div class="card">
+
+<span class="tag ${tagClass}">${a.Kategori}</span>
+
+<h3>${a.Judul}</h3>
+
+<small>${a.Tanggal}</small>
+
+<p>${a.Deskripsi}</p>
+
+<div class="preview">
+
+<iframe src="${a['Link File']}"></iframe>
+
+</div>
+
+<a class="btn" href="${a['Link File']}" target="_blank">Download</a>
+
+</div>
+
+`
+
+})
+
+document.getElementById("arsipList").innerHTML=html
+
+}
+
+/* SEARCH */
+
+document.getElementById("search").addEventListener("keyup",filter)
+
+document.getElementById("kategori").addEventListener("change",filter)
+
+function filter(){
+
+let s=document.getElementById("search").value.toLowerCase()
+let k=document.getElementById("kategori").value
+
+let hasil=dataArsip.filter(a=>{
+
+let cocokJudul=a.Judul.toLowerCase().includes(s)
+let cocokKategori=!k || a.Kategori==k
+
+return cocokJudul && cocokKategori
+
+})
+
+tampilkan(hasil)
+
+}
+
+</script>
+
+</body>
+</html>
