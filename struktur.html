@@ -13,15 +13,13 @@ body{
 
 /* Sidebar */
 .sidebar{
-    width:220px;
+    width:200px;
     background:#2c3e50;
     height:100vh;
     position:fixed;
     top:0;
     left:0;
     padding-top:20px;
-    transition: all 0.3s;
-    z-index:1000;
 }
 .sidebar h2{
     color:white;
@@ -33,31 +31,21 @@ body{
     color:white;
     text-decoration:none;
     padding:12px 20px;
+    margin-bottom:2px;
+    border-left:4px solid transparent;
 }
 .sidebar a:hover{
     background:#34495e;
+    border-left:4px solid #1abc9c;
 }
-
-/* Hamburger mobile */
-.hamburger{
-    display:none;
-    position:fixed;
-    top:10px;
-    left:10px;
-    font-size:24px;
-    background:white;
-    color:#2c3e50;
-    padding:6px 10px;
-    border-radius:5px;
-    cursor:pointer;
-    z-index:1001;
+.sidebar a.active{
+    border-left:4px solid #1abc9c;
 }
 
 /* Content */
 .content{
-    margin-left:220px;
+    margin-left:200px;
     padding:20px;
-    transition: margin-left 0.3s;
 }
 .title{
     font-size:24px;
@@ -71,8 +59,6 @@ body{
     flex-direction:column;
     align-items:center;
 }
-
-/* Kotak jabatan */
 .box{
     background:white;
     padding:10px 15px;
@@ -95,23 +81,17 @@ body{
     font-size:13px;
     margin-top:5px;
 }
-
-/* Grid baris */
 .row{
     display:flex;
     justify-content:center;
     flex-wrap:wrap;
 }
-
-/* Garis horizontal */
 .line-horizontal{
     height:2px;
     background:#999;
     width:100%;
     margin:5px auto;
 }
-
-/* Tooltip */
 .tooltip{
     display:none;
     position:absolute;
@@ -124,47 +104,33 @@ body{
     font-size:13px;
 }
 
-/* Responsive HP */
+/* Responsive */
 @media(max-width:768px){
     .sidebar{
         width:60px;
-        height:100vh;
-        padding-top:10px;
     }
     .sidebar h2{display:none;}
-    .sidebar a{
-        font-size:12px;
-        padding:10px 8px;
-    }
-    .content{
-        margin-left:60px;
-        padding:10px;
-    }
-    .hamburger{
-        display:block;
-    }
-    .box{
-        min-width:120px;
-        padding:8px 10px;
-        margin:5px;
-        font-size:12px;
-    }
+    .sidebar a{font-size:12px;padding:10px 8px;}
+    .content{margin-left:60px;padding:10px;}
+    .box{min-width:120px;padding:8px 10px;margin:5px;font-size:12px;}
 }
 </style>
 </head>
 <body>
 
+<!-- Sidebar konsisten -->
 <div class="sidebar" id="sidebar">
     <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="kas.html">Kas RT</a>
-    <a href="datawarga.html">Data Warga</a>
+    <a href="warga.html">Data Warga</a>
+    <a href="pengumuman.html">Pengumuman</a>
     <a href="kalender.html">Kalender</a>
     <a href="arsip.html">Arsip</a>
-    <a href="struktur.html">Struktur RT</a>
+    <a href="struktur.html" class="active">Struktur</a>
 </div>
 
-<div class="content" id="content">
+<div class="content">
     <div class="title">Struktur Pengurus RT</div>
     <div class="org">
 
@@ -224,12 +190,6 @@ body{
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-function toggleSidebar(){
-    const sidebar = document.getElementById('sidebar');
-    const content = document.getElementById('content');
-    sidebar.classList.toggle('active');
-}
-
 function showDetail(jabatan,nama){
     const tooltip = document.getElementById('tooltip');
     tooltip.innerHTML = `<strong>${jabatan}</strong><br>${nama}`;
@@ -248,3 +208,5 @@ document.addEventListener('click',function(e){
 
 </body>
 </html>
+
+
