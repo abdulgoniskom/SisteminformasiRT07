@@ -3,118 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pengumuman RT</title>
+<title>Kalender RT</title>
+
 <style>
-body{font-family:Arial;margin:0;background:#eef2f7;}
-.sidebar{width:160px;background:#2c3e50;color:white;height:100vh;position:fixed;left:0;top:0;}
-.sidebar h2{text-align:center;padding:12px;font-size:16px;}
-.sidebar a{display:block;color:white;padding:10px;text-decoration:none;font-size:14px;}
-.sidebar a:hover{background:#34495e;}
-.main{margin-left:160px;}
-header{background:#2f80ed;color:white;padding:15px;text-align:center;}
-.container{padding:20px;max-width:900px;margin:auto;}
-.card{background:white;padding:15px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-.card img{max-width:100%;border-radius:5px;margin-bottom:10px;}
-.card h3{margin:0 0 5px 0;}
-button{background:#2f80ed;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
-button:hover{background:#1f6fd1;}
-.formInput{display:none;margin-top:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-input{width:100%;padding:8px;margin:5px 0;}
-@media (max-width:768px){.sidebar{width:120px;}.main{margin-left:120px;}}
+
+body{
+font-family:Arial;
+margin:0;
+background:#eef2f7;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:170px;
+background:#2c3e50;
+color:white;
+height:100vh;
+position:fixed;
+}
+
+.sidebar h2{
+text-align:center;
+padding:15px;
+}
+
+.sidebar a{
+display:block;
+padding:10px;
+color:white;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+/* MAIN */
+
+.main{
+margin-left:170px;
+}
+
+header{
+background:#2f80ed;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+/* CONTAINER */
+
+.container{
+padding:20px;
+max-width:950px;
+margin:auto;
+}
+
+/* NAV BULAN */
+
+.nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+button{
+background:#2f80ed;
+color:white;
+border:none;
+padding:6px 12px;
+border-radius:5px;
+cursor:pointer;
+}
+
+/* KALENDER */
+
+.calendar{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:5px;
+}
+
+.day{
+background:white;
+min-height:95px;
+border-radius:6px;
+padding:5px;
+box-shadow:0 1px 4px rgba(0,0,0,0.1);
+}
+
+.date{
+font-weight:bold;
+}
+
+/* EVENT */
+
+.event{
+margin-top:5px;
+font-size:12px;
+color:white;
+padding:2px 4px;
+border-radius:3px;
+cursor:pointer;
+}
+
+.rapat{background:#3498db;}
+.kerja{background:#27ae60;}
+.kesehatan{background:#e74c3c;}
+
+/* POPUP */
+
+.popup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+display:none;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="sidebar">
+
 <h2>RT 07 RW 09</h2>
+
 <a href="index.html">Dashboard</a>
 <a href="kas.html">Kas RT</a>
 <a href="warga.html">Data Warga</a>
 <a href="pengumuman.html">Pengumuman</a>
 <a href="kalender.html">Kalender</a>
 <a href="arsip.html">Arsip</a>
+
 </div>
 
 <div class="main">
-<header><h2>Pengumuman RT 07</h2></header>
+
+<header>
+<h2>Kalender Kegiatan RT</h2>
+</header>
+
 <div class="container">
 
-<div id="listPengumuman"></div>
-
-<div style="text-align:right;margin-bottom:10px;">
-<button onclick="login()">Login Admin</button>
+<div class="nav">
+<button onclick="prevMonth()">◀</button>
+<h3 id="bulan"></h3>
+<button onclick="nextMonth()">▶</button>
 </div>
 
-<div class="formInput" id="formInput">
-<h3>Tambah Pengumuman</h3>
-<input type="text" id="judul" placeholder="Judul pengumuman">
-<input type="text" id="gambar" placeholder="Link gambar/banner">
-<button onclick="simpan()">Simpan</button>
+<div class="calendar" id="calendar"></div>
+
 </div>
 
 </div>
-</div>
+
+<div class="popup" id="popup"></div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec"; // ganti dengan URL Web App Apps Script
 
-function login(){
-  let u=prompt("Username");
-  let p=prompt("Password");
-  if(u=="admin" && p=="12345"){
-    document.getElementById("formInput").style.display="block";
-  } else {
-    alert("Login gagal");
-  }
+const API="URL_APPS_SCRIPT_ANDA";
+
+let current=new Date();
+
+const bulanNama=[
+"Januari","Februari","Maret","April","Mei","Juni",
+"Juli","Agustus","September","Oktober","November","Desember"
+];
+
+let events=[];
+
+function render(){
+
+let year=current.getFullYear();
+let month=current.getMonth();
+
+document.getElementById("bulan").innerText=
+bulanNama[month]+" "+year;
+
+let firstDay=new Date(year,month,1).getDay();
+let days=new Date(year,month+1,0).getDate();
+
+let html="";
+
+for(let i=0;i<firstDay;i++){
+html+="<div></div>";
+}
+
+for(let d=1;d<=days;d++){
+
+let dateStr=year+"-"+String(month+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+
+let eventHtml="";
+
+events.forEach(e=>{
+if(e.tanggal==dateStr){
+
+eventHtml+=`
+<div class="event ${e.jenis}" onclick="detail('${e.kegiatan}','${e.tempat}','${e.waktu}')">
+${e.kegiatan}
+</div>`;
+
+}
+});
+
+html+=`
+<div class="day">
+<div class="date">${d}</div>
+${eventHtml}
+</div>`;
+
+}
+
+document.getElementById("calendar").innerHTML=html;
+
+}
+
+function prevMonth(){
+current.setMonth(current.getMonth()-1);
+render();
+}
+
+function nextMonth(){
+current.setMonth(current.getMonth()+1);
+render();
+}
+
+function detail(kegiatan,tempat,waktu){
+
+let popup=document.getElementById("popup");
+
+popup.innerHTML=`
+<h3>${kegiatan}</h3>
+<p>Tempat : ${tempat}</p>
+<p>Waktu : ${waktu}</p>
+<button onclick="tutup()">Tutup</button>
+`;
+
+popup.style.display="block";
+
+}
+
+function tutup(){
+document.getElementById("popup").style.display="none";
 }
 
 function loadData(){
-  fetch(API+"?sheet=Pengumuman")
-  .then(res=>res.json())
-  .then(data=>{
-    data = data.reverse(); // terbaru di atas
-    let html="";
-    data.forEach(d=>{
-      html += `<div class="card">
-        ${d.gambar?`<img src="${d.gambar}" alt="${d.judul}">`:""}
-        <h3>${d.judul}</h3>
-      </div>`;
-    });
-    document.getElementById("listPengumuman").innerHTML=html;
-  })
-  .catch(err=>console.log(err));
+
+fetch(API)
+
+.then(res=>res.json())
+
+.then(data=>{
+events=data;
+render();
+})
+
 }
 
-function simpan(){
-  let judul = document.getElementById("judul").value.trim();
-  let gambar = document.getElementById("gambar").value.trim();
-  if(!judul || !gambar){alert("Judul dan Gambar harus diisi!"); return;}
-
-  let form = new FormData();
-  form.append("sheet","Pengumuman");
-  form.append("judul", judul);
-  form.append("gambar", gambar);
-
-  fetch(API,{method:"POST",body:form})
-  .then(res=>res.text())
-  .then(res=>{
-    if(res=="success"){
-      alert("Pengumuman berhasil disimpan");
-      document.getElementById("judul").value="";
-      document.getElementById("gambar").value="";
-      loadData();
-    } else {
-      alert("Gagal menyimpan pengumuman: "+res);
-    }
-  })
-  .catch(err=>{
-    console.log(err);
-    alert("Gagal menyimpan pengumuman");
-  });
-}
-
-// load pengumuman saat halaman dibuka
 loadData();
+
 </script>
+
 </body>
 </html>
