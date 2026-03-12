@@ -3,289 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender RT 07 - Integrated Google Sheets</title>
+    <title>Kalender RT 07</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #1abc9c;
-            --admin-btn: #e67e22;
-            --bg-body: #f4f7f6;
+        /* CSS DISAMAKAN DENGAN INDEX.HTML */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        
-        body { background: var(--bg-body); display: flex; min-height: 100vh; }
+        body {
+            background: #f1f4f9;
+            display: flex;
+        }
 
-        /* SIDEBAR */
+        /* SIDEBAR (Sama persis dengan index.html) */
         .sidebar {
-            width: 240px;
-            background: var(--primary);
+            width: 220px;
+            background: #2c3e50;
+            height: 100vh;
             color: white;
             position: fixed;
-            height: 100%;
-            padding: 20px 0;
-            transition: 0.3s;
         }
-        .sidebar h2 { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; font-size: 1.2rem; }
-        .sidebar a { display: block; color: #bdc3c7; text-decoration: none; padding: 15px 25px; transition: 0.3s; border-left: 4px solid transparent; }
-        .sidebar a:hover, .sidebar a.active { background: #34495e; color: white; border-left: 4px solid var(--accent); }
 
-        /* MAIN CONTENT */
-        .main { margin-left: 240px; padding: 30px; width: 100%; }
-        
-        .header-area {
+        .sidebar h2 {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: #34495e;
+        }
+
+        /* MAIN CONTENT (Sama persis dengan index.html) */
+        .main {
+            margin-left: 220px;
+            width: 100%;
+        }
+
+        header {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
         }
 
-        .btn-admin {
-            background: var(--admin-btn);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: 0.2s;
+        .container {
+            padding: 30px;
         }
-        .btn-admin:hover { background: #d35400; transform: translateY(-2px); }
-        .btn-admin:disabled { background: #95a5a6; }
 
-        /* CALENDAR STYLING */
-        .calendar-wrapper {
+        /* KALENDER STYLE */
+        .calendar-box {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            overflow: hidden;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .calendar-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            background: #fff;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
         }
 
-        .calendar-nav button {
-            background: var(--accent);
+        .btn-nav {
+            background: #2c3e50;
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
         }
 
-        #month-year { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        #month-year {
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #f8f9fa; padding: 15px; text-transform: uppercase; font-size: 0.8rem; color: #7f8c8d; border-bottom: 1px solid #eee; }
-        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f7f9fc;
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+
         td {
-            border: 1px solid #eee;
-            height: 140px;
+            border: 1px solid #ddd;
+            height: 100px;
             vertical-align: top;
             padding: 10px;
-            transition: 0.2s;
+            width: 14.28%;
         }
 
-        .date-number { font-weight: 700; color: #34495e; margin-bottom: 8px; display: block; }
-        
-        /* STATE: HARI INI */
-        td.today { background: #fffdf2; border: 2px solid #f1c40f !important; }
+        .date-num {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
 
-        /* EVENT CARD */
-        .event-card {
-            background: #3498db;
-            color: white;
-            padding: 6px;
-            border-radius: 5px;
+        .today {
+            background: #e3f2fd;
+            border: 2px solid #2f80ed !important;
+        }
+
+        /* EVENT STYLE */
+        .event-item {
             font-size: 11px;
-            line-height: 1.3;
-            margin-top: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 4px;
+            border-radius: 3px;
+            margin-top: 3px;
+            color: white;
+            line-height: 1.2;
         }
-        .event-category { display: block; font-weight: 900; text-transform: uppercase; font-size: 9px; margin-bottom: 2px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 2px; }
-        .event-location { display: block; margin-top: 4px; font-style: italic; opacity: 0.9; font-size: 10px; }
 
-        /* AUTO COLORS BASED ON CATEGORY */
-        .cat-rapat { background: #8e44ad !important; }
-        .cat-sosial { background: #27ae60 !important; }
-        .cat-keamanan { background: #c0392b !important; }
-        .cat-umum { background: #2c3e50 !important; }
+        .cat-rapat { background: #9b59b6; }
+        .cat-sosial { background: #27ae60; }
+        .cat-umum { background: #2f80ed; }
+        .loc-text { font-size: 9px; display: block; opacity: 0.8; }
 
-        #loading-info { display: none; text-align: center; color: var(--admin-btn); font-weight: bold; margin-bottom: 10px; }
+        /* ADMIN BUTTON */
+        #adminPanel {
+            display: none; /* Default sembunyi, hanya muncul jika ?role=admin */
+            margin-bottom: 20px;
+        }
 
-        /* MOBILE OPTIMIZATION */
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar h2, .sidebar span { display: none; }
-            .main { margin-left: 60px; padding: 15px; }
-            td { height: 110px; padding: 5px; }
-            .event-category, .event-location { font-size: 8px; }
+        .btn-input {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>RT 07</h2>
-    <a href="#"><span>Dashboard</span></a>
-    <a href="#" class="active"><span>Kalender RT</span></a>
-    <a href="#"><span>Data Kas</span></a>
-    <a href="#"><span>Data Warga</span></a>
+    <h2>RT 07 RW 09</h2>
+    <a href="index.html">Dashboard</a>
+    <a href="kas.html">Kas RT</a>
+    <a href="warga.html">Data Warga</a>
+    <a href="pengumuman.html">Pengumuman</a>
+    <a href="kalender.html" class="active">Kalender</a>
+    <a href="arsip.html">Arsip</a>
+    <a href="struktur.html">Struktur</a>
 </div>
 
 <div class="main">
-    <div class="header-area">
-        <h1>Jadwal Kegiatan RT 07</h1>
-        <button class="btn-admin" id="btnAdmin" onclick="adminInput()">+ Input Kegiatan</button>
-    </div>
+    <header>
+        <h2>Kalender Kegiatan RT 07</h2>
+        <div id="userStatus">Mode: Warga</div>
+    </header>
 
-    <div id="loading-info">Menyambungkan ke Google Sheets...</div>
-
-    <div class="calendar-wrapper">
-        <div class="calendar-nav">
-            <button id="prevBtn">Kembali</button>
-            <div id="month-year"></div>
-            <button id="nextBtn">Lanjut</button>
+    <div class="container">
+        <div id="adminPanel">
+            <button class="btn-input" onclick="inputKegiatan()">+ Tambah Kegiatan Baru</button>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Min</th><th>Sen</th><th>Sel</th><th>Rab</th><th>Kam</th><th>Jum</th><th>Sab</th>
-                </tr>
-            </thead>
-            <tbody id="calendar-body"></tbody>
-        </table>
+        <div class="calendar-box">
+            <div class="calendar-nav">
+                <button class="btn-nav" id="prevBulan">← Prev</button>
+                <div id="month-year">Maret 2026</div>
+                <button class="btn-nav" id="nextBulan">Next →</button>
+            </div>
+
+            <table id="calendarTable">
+                <thead>
+                    <tr>
+                        <th>Min</th><th>Sen</th><th>Sel</th><th>Rab</th><th>Kam</th><th>Jum</th><th>Sab</th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
     const scriptURL = 'https://script.google.com/macros/s/AKfycby4Q6kprAvG3llcnA3MPjnKjQJTLYQt8mFlbj7EaKK3r4qnWZJYXLq501RR8kJM2vk/exec';
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role'); // Ambil ?role=...
 
-    const dateObj = new Date();
-    let currYear = dateObj.getFullYear();
-    let currMonth = dateObj.getMonth();
+    let date = new Date();
+    let currYear = date.getFullYear();
+    let currMonth = date.getMonth();
     let eventsData = {};
 
-    // 1. Ambil Data Dari Google Sheets
-    async function loadEvents() {
-        const loader = document.getElementById('loading-info');
-        loader.style.display = 'block';
-        try {
-            const response = await fetch(scriptURL);
-            eventsData = await response.json();
-            renderCalendar(currYear, currMonth);
-        } catch (err) {
-            console.error("Gagal load data:", err);
-        } finally {
-            loader.style.display = 'none';
-        }
+    // CEK ROLE ADMIN
+    if (role === 'admin') {
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('userStatus').innerText = "Mode: Administrator";
     }
 
-    // 2. Gambar Kalender
-    function renderCalendar(year, month) {
-        const tbody = document.getElementById('calendar-body');
-        const monthYearLabel = document.getElementById('month-year');
+    async function loadData() {
+        try {
+            const res = await fetch(scriptURL);
+            eventsData = await res.json();
+            renderKalender(currYear, currMonth);
+        } catch (e) { console.log("Gagal load"); }
+    }
+
+    function renderKalender(year, month) {
         const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-        
-        tbody.innerHTML = "";
-        monthYearLabel.innerText = `${months[month]} ${year}`;
+        document.getElementById("month-year").innerText = months[month] + " " + year;
 
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
+        const tbody = document.getElementById("calendarBody");
+        tbody.innerHTML = "";
 
-        let row = document.createElement('tr');
+        let row = document.createElement("tr");
         for (let i = 0; i < firstDay; i++) {
-            row.appendChild(document.createElement('td'));
+            row.appendChild(document.createElement("td"));
         }
 
-        for (let date = 1; date <= lastDate; date++) {
-            if ((firstDay + date - 1) % 7 === 0 && date !== 1) {
+        for (let d = 1; d <= lastDate; d++) {
+            if ((firstDay + d - 1) % 7 === 0 && d !== 1) {
                 tbody.appendChild(row);
-                row = document.createElement('tr');
+                row = document.createElement("tr");
             }
 
-            const cell = document.createElement('td');
-            const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+            let cell = document.createElement("td");
+            let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             
-            // Cek Hari Ini
-            const today = new Date().toLocaleDateString('en-CA');
-            if (dateKey === today) cell.classList.add('today');
+            if (tglKey === new Date().toISOString().split('T')[0]) cell.classList.add('today');
 
-            let cellHTML = `<span class="date-number">${date}</span>`;
-
-            // Jika ada event di tanggal ini
-            if (eventsData[dateKey]) {
-                const ev = eventsData[dateKey];
-                const cat = ev.kategori.toLowerCase();
-                let catClass = 'cat-umum';
+            let html = `<span class="date-num">${d}</span>`;
+            
+            if (eventsData[tglKey]) {
+                let ev = eventsData[tglKey];
+                let cat = ev.kategori.toLowerCase();
+                let catClass = cat.includes('rapat') ? 'cat-rapat' : (cat.includes('sosial') ? 'cat-sosial' : 'cat-umum');
                 
-                if (cat.includes('rapat')) catClass = 'cat-rapat';
-                else if (cat.includes('sosial') || cat.includes('bakti')) catClass = 'cat-sosial';
-                else if (cat.includes('aman') || cat.includes('ronda')) catClass = 'cat-keamanan';
-
-                cellHTML += `
-                    <div class="event-card ${catClass}">
-                        <span class="event-category">${ev.kategori}</span>
-                        <strong>${ev.kegiatan}</strong>
-                        <span class="event-location">📍 ${ev.lokasi}</span>
-                    </div>
-                `;
+                html += `<div class="event-item ${catClass}">
+                            <b>${ev.kegiatan}</b>
+                            <span class="loc-text">📍 ${ev.lokasi}</span>
+                         </div>`;
             }
 
-            cell.innerHTML = cellHTML;
+            cell.innerHTML = html;
             row.appendChild(cell);
         }
         tbody.appendChild(row);
     }
 
-    // 3. Fungsi Admin Input
-    async function adminInput() {
-        const tgl = prompt("Tanggal Kegiatan (Format: YYYY-MM-DD):", `${currYear}-${String(currMonth + 1).padStart(2, '0')}-01`);
-        if (!tgl) return;
+    // FUNGSI INPUT (Hanya jalan jika Admin)
+    async function inputKegiatan() {
+        const tgl = prompt("Tanggal (YYYY-MM-DD):", `${currYear}-${String(currMonth+1).padStart(2,'0')}-01`);
         const keg = prompt("Nama Kegiatan:");
-        const lok = prompt("Lokasi Kegiatan:");
-        const kat = prompt("Kategori (Rapat / Sosial / Keamanan / Umum):");
+        const lok = prompt("Lokasi:");
+        const kat = prompt("Kategori (Rapat/Sosial/Umum):");
 
         if (tgl && keg && lok && kat) {
-            const btn = document.getElementById('btnAdmin');
-            btn.disabled = true;
-            btn.innerText = "Mengirim...";
-
-            try {
-                // Kirim ke Google Sheets
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
-                });
-
-                alert("Data berhasil dikirim! Silakan tunggu beberapa detik lalu refresh halaman.");
-                setTimeout(loadEvents, 2000);
-            } catch (e) {
-                alert("Gagal mengirim data.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "+ Input Kegiatan";
-            }
+            alert("Sedang menyimpan...");
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
+            });
+            window.location.reload();
         }
     }
 
-    // Navigasi Bulan
-    document.getElementById('prevBtn').onclick = () => { currMonth--; if(currMonth < 0){ currMonth=11; currYear--; } renderCalendar(currYear, currMonth); };
-    document.getElementById('nextBtn').onclick = () => { currMonth++; if(currMonth > 11){ currMonth=0; currYear++; } renderCalendar(currYear, currMonth); };
+    document.getElementById("prevBulan").onclick = () => { currMonth--; if(currMonth<0){currMonth=11; currYear--;} renderKalender(currYear, currMonth); };
+    document.getElementById("nextBulan").onclick = () => { currMonth++; if(currMonth>11){currMonth=0; currYear++;} renderKalender(currYear, currMonth); };
 
-    // Load Pertama Kali
-    loadEvents();
+    loadData();
 </script>
 
 </body>
