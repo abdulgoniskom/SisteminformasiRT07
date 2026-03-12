@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Struktur Pengurus RT</title>
-
 <style>
 body{
     font-family:Arial, sans-serif;
@@ -18,8 +17,8 @@ body{
     background:#2c3e50;
     height:100vh;
     position:fixed;
-    left:0;
     top:0;
+    left:0;
     padding-top:20px;
     transition: all 0.3s;
     z-index:1000;
@@ -27,29 +26,28 @@ body{
 .sidebar h2{
     color:white;
     text-align:center;
-    margin-bottom:30px;
+    margin-bottom:25px;
 }
 .sidebar a{
     display:block;
     color:white;
-    padding:12px 20px;
     text-decoration:none;
-    font-size:15px;
+    padding:12px 20px;
 }
 .sidebar a:hover{
     background:#34495e;
 }
 
-/* Hamburger menu for mobile */
+/* Hamburger mobile */
 .hamburger{
     display:none;
     position:fixed;
-    top:15px;
-    left:15px;
+    top:10px;
+    left:10px;
     font-size:24px;
-    color:#2c3e50;
     background:white;
-    padding:5px 10px;
+    color:#2c3e50;
+    padding:6px 10px;
     border-radius:5px;
     cursor:pointer;
     z-index:1001;
@@ -58,33 +56,31 @@ body{
 /* Content */
 .content{
     margin-left:220px;
-    padding:30px;
+    padding:20px;
     transition: margin-left 0.3s;
 }
 .title{
     font-size:24px;
     font-weight:bold;
-    margin-bottom:30px;
+    margin-bottom:20px;
 }
 
 /* Struktur bagan */
 .org{
     display:flex;
-    justify-content:center;
     flex-direction:column;
     align-items:center;
-    position:relative;
 }
 
 /* Kotak jabatan */
 .box{
     background:white;
-    padding:12px 20px;
+    padding:10px 15px;
     border-radius:8px;
     box-shadow:0 3px 10px rgba(0,0,0,0.15);
     text-align:center;
-    min-width:180px;
-    margin:10px;
+    min-width:150px;
+    margin:8px;
     cursor:pointer;
     transition: transform 0.2s;
 }
@@ -96,28 +92,23 @@ body{
     color:#2c3e50;
 }
 .nama{
-    font-size:14px;
+    font-size:13px;
     margin-top:5px;
 }
 
-/* Garis koneksi */
-.connector{
-    width:2px;
-    background:#999;
-    position:absolute;
-}
-.horizontal{
-    height:2px;
-    background:#999;
-    position:absolute;
-}
-
-/* Grid bawah */
+/* Grid baris */
 .row{
     display:flex;
     justify-content:center;
     flex-wrap:wrap;
-    position:relative;
+}
+
+/* Garis horizontal */
+.line-horizontal{
+    height:2px;
+    background:#999;
+    width:100%;
+    margin:5px auto;
 }
 
 /* Tooltip */
@@ -125,18 +116,45 @@ body{
     display:none;
     position:absolute;
     background:white;
-    padding:10px;
+    padding:8px;
     border:1px solid #ccc;
     border-radius:5px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+    box-shadow:0 3px 8px rgba(0,0,0,0.2);
     z-index:100;
-    font-size:14px;
+    font-size:13px;
+}
+
+/* Responsive HP */
+@media(max-width:768px){
+    .sidebar{
+        width:60px;
+        height:100vh;
+        padding-top:10px;
+    }
+    .sidebar h2{display:none;}
+    .sidebar a{
+        font-size:12px;
+        padding:10px 8px;
+    }
+    .content{
+        margin-left:60px;
+        padding:10px;
+    }
+    .hamburger{
+        display:block;
+    }
+    .box{
+        min-width:120px;
+        padding:8px 10px;
+        margin:5px;
+        font-size:12px;
+    }
 }
 </style>
 </head>
 <body>
 
-<div class="hamburger" onclick="toggleSidebar()">☰ Menu</div>
+<div class="hamburger" onclick="toggleSidebar()">☰</div>
 
 <div class="sidebar" id="sidebar">
     <h2>RT Digital</h2>
@@ -149,10 +167,8 @@ body{
 </div>
 
 <div class="content" id="content">
-
     <div class="title">Struktur Pengurus RT</div>
-
-    <div class="org" id="org">
+    <div class="org">
 
         <!-- Ketua -->
         <div class="box" onclick="showDetail('Ketua RT','Bapak Muhammad Zainudin')">
@@ -160,65 +176,53 @@ body{
             <div class="nama">Bapak Muhammad Zainudin</div>
         </div>
 
-        <!-- Garis ke Sekretaris & Bendahara -->
-        <div class="horizontal" style="width:420px; height:2px; background:#999; margin-top:10px;"></div>
+        <div class="line-horizontal" style="width:50%;"></div>
 
+        <!-- Sekretaris & Bendahara -->
         <div class="row">
-
             <div class="box" onclick="showDetail('Sekretaris','Bapak Aris Munandar')">
                 <div class="jabatan">Sekretaris</div>
                 <div class="nama">Bapak Aris Munandar</div>
             </div>
-
             <div class="box" onclick="showDetail('Bendahara','Abdul Goni')">
                 <div class="jabatan">Bendahara</div>
                 <div class="nama">Abdul Goni</div>
             </div>
-
         </div>
 
-        <!-- Garis ke Bidang -->
-        <div class="horizontal" style="width:840px; height:2px; background:#999; margin-top:20px;"></div>
+        <div class="line-horizontal" style="width:80%;"></div>
 
+        <!-- Bidang -->
         <div class="row">
-
             <div class="box" onclick="showDetail('Humas','Bapak Syamsi')">
                 <div class="jabatan">Humas</div>
-                <div class="nama">Bapak Syamsi<br>Bapak Suyana</div>
+                <div class="nama">Bapak Syamsi</div>
             </div>
-
             <div class="box" onclick="showDetail('Keamanan','Bapak Zebua & Bapak Hari')">
                 <div class="jabatan">Keamanan</div>
                 <div class="nama">Bapak Zebua<br>Bapak Hari</div>
             </div>
-
             <div class="box" onclick="showDetail('Keagamaan','Bapak Usep Supriyatna')">
                 <div class="jabatan">Keagamaan</div>
                 <div class="nama">Bapak Usep Supriyatna</div>
             </div>
-
             <div class="box" onclick="showDetail('Olahraga','Bapak Alfian')">
                 <div class="jabatan">Olahraga</div>
                 <div class="nama">Bapak Alfian</div>
             </div>
-
             <div class="box" onclick="showDetail('Kelistrikan','Bapak Odi')">
                 <div class="jabatan">Kelistrikan</div>
                 <div class="nama">Bapak Odi</div>
             </div>
-
             <div class="box" onclick="showDetail('Lingkungan','Bapak Yadi Sumantono & Bapak Arsani')">
                 <div class="jabatan">Lingkungan</div>
                 <div class="nama">Bapak Yadi Sumantono<br>Bapak Arsani</div>
             </div>
-
         </div>
 
     </div>
-
 </div>
 
-<!-- Tooltip detail -->
 <div class="tooltip" id="tooltip"></div>
 
 <script>
@@ -226,21 +230,20 @@ function toggleSidebar(){
     const sidebar = document.getElementById('sidebar');
     const content = document.getElementById('content');
     sidebar.classList.toggle('active');
-    content.classList.toggle('shift');
 }
 
-function showDetail(jabatan, nama){
+function showDetail(jabatan,nama){
     const tooltip = document.getElementById('tooltip');
     tooltip.innerHTML = `<strong>${jabatan}</strong><br>${nama}`;
-    tooltip.style.display = 'block';
-    tooltip.style.top = event.clientY + 15 + 'px';
-    tooltip.style.left = event.clientX + 15 + 'px';
+    tooltip.style.display='block';
+    tooltip.style.top=event.clientY+10+'px';
+    tooltip.style.left=event.clientX+10+'px';
 }
 
-document.addEventListener('click', function(e){
+document.addEventListener('click',function(e){
     const tooltip = document.getElementById('tooltip');
     if(!e.target.classList.contains('box')){
-        tooltip.style.display = 'none';
+        tooltip.style.display='none';
     }
 });
 </script>
