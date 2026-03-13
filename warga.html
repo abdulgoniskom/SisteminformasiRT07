@@ -238,20 +238,13 @@ function cetakPDF(){
     doc.setFont(undefined, 'normal');
     doc.text(`Tangerang, ${tgl}`, 140, finalY);
     
-    finalY += 10;
-    doc.text("Mengetahui,", 35, finalY);
-    doc.text("Sekretaris RT 07,", 140, finalY);
-    
-    finalY += 25;
-    doc.setFont(undefined, 'bold');
-    doc.text("MUHAMMAD ZAINUDIN", 35, finalY);
-    doc.text("ARIS MUNANDAR", 140, finalY);
-    
-    finalY += 5;
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-    doc.text("Ketua RT 07", 35, finalY);
-    doc.text("Sekretaris RT 07", 140, finalY);
+   doc.text("Mengetahui,",14,ttdY+10);
+
+doc.text("Ketua RT 07",14,ttdY+20);
+doc.text("(Muhammad Zainudin)",14,ttdY+40);
+
+doc.text("Sekretariat RT 07",pageWidth-14,ttdY+20,{align:"right"});
+doc.text("(Aris Munandar)",pageWidth-14,ttdY+40,{align:"right"});
 
     doc.save(`Data_Warga_RT07_${tgl}.pdf`);
 }
