@@ -1,125 +1,71 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Struktur Pengurus RT</title>
-<style>
-body{
-    font-family:Arial, sans-serif;
-    margin:0;
-    background:#eef2f7;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struktur Pengurus RT - RT 07 RW 09</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+        body { background:#eef2f7; display:flex; overflow-x: hidden; }
 
-/* Sidebar */
-.sidebar{
-    width:200px;
-    background:#2c3e50;
-    height:100vh;
-    position:fixed;
-    top:0;
-    left:0;
-    padding-top:20px;
-}
-.sidebar h2{
-    color:white;
-    text-align:center;
-    margin-bottom:25px;
-}
-.sidebar a{
-    display:block;
-    color:white;
-    text-decoration:none;
-    padding:12px 20px;
-    margin-bottom:2px;
-    border-left:4px solid transparent;
-}
-.sidebar a:hover{
-    background:#34495e;
-    border-left:4px solid #1abc9c;
-}
-.sidebar a.active{
-    border-left:4px solid #1abc9c;
-}
+        /* SIDEBAR (Konsisten dengan Kas & Arsip) */
+        .sidebar { 
+            width:220px; background:#2c3e50; height:100vh; color:white; 
+            position:fixed; transition: 0.3s; z-index: 1000; left: 0;
+        }
+        .sidebar.closed { left: -220px; }
+        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
+        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
+        .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
+        .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
+        
+        /* AREA UTAMA */
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
+        .main.expanded { margin-left: 0; }
 
-/* Content */
-.content{
-    margin-left:200px;
-    padding:20px;
-}
-.title{
-    font-size:24px;
-    font-weight:bold;
-    margin-bottom:20px;
-}
+        header { 
+            background:#2f80ed; color:white; padding:15px; 
+            display:flex; align-items: center; 
+            position: sticky; top: 0; z-index: 900;
+        }
+        .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; }
 
-/* Struktur bagan */
-.org{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-}
-.box{
-    background:white;
-    padding:10px 15px;
-    border-radius:8px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.15);
-    text-align:center;
-    min-width:150px;
-    margin:8px;
-    cursor:pointer;
-    transition: transform 0.2s;
-}
-.box:hover{
-    transform: scale(1.05);
-}
-.jabatan{
-    font-weight:bold;
-    color:#2c3e50;
-}
-.nama{
-    font-size:13px;
-    margin-top:5px;
-}
-.row{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-}
-.line-horizontal{
-    height:2px;
-    background:#999;
-    width:100%;
-    margin:5px auto;
-}
-.tooltip{
-    display:none;
-    position:absolute;
-    background:white;
-    padding:8px;
-    border:1px solid #ccc;
-    border-radius:5px;
-    box-shadow:0 3px 8px rgba(0,0,0,0.2);
-    z-index:100;
-    font-size:13px;
-}
+        /* KONTEN STRUKTUR */
+        .content { padding:20px; }
+        .title { font-size:24px; font-weight:bold; margin-bottom:30px; text-align:center; color:#2c3e50; }
 
-/* Responsive */
-@media(max-width:768px){
-    .sidebar{
-        width:60px;
-    }
-    .sidebar h2{display:none;}
-    .sidebar a{font-size:12px;padding:10px 8px;}
-    .content{margin-left:60px;padding:10px;}
-    .box{min-width:120px;padding:8px 10px;margin:5px;font-size:12px;}
-}
-</style>
+        .org { display:flex; flex-direction:column; align-items:center; }
+        .box { 
+            background:white; padding:15px; border-radius:10px; 
+            box-shadow:0 4px 10px rgba(0,0,0,0.1); 
+            text-align:center; min-width:180px; margin:10px; 
+            cursor:pointer; transition: 0.2s; border-top: 4px solid #2f80ed;
+        }
+        .box:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .jabatan { font-weight:bold; color:#2c3e50; font-size: 14px; margin-bottom: 5px; }
+        .nama { font-size:13px; color: #555; line-height: 1.4; }
+
+        .row { display:flex; justify-content:center; flex-wrap:wrap; width: 100%; }
+        .line-horizontal { height:2px; background:#ccc; width:60%; margin:5px auto; }
+
+        .tooltip { 
+            display:none; position:fixed; background:white; padding:10px; 
+            border-radius:5px; box-shadow:0 5px 15px rgba(0,0,0,0.3); 
+            z-index:2000; font-size:13px; border-left: 4px solid #1abc9c;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { left: -220px; }
+            .sidebar.open { left: 0; }
+            .main { margin-left: 0; }
+            .box { min-width: 140px; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Sidebar konsisten -->
-<div class="sidebar" id="sidebar">
+<div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="kas.html">Kas RT</a>
@@ -130,94 +76,108 @@ body{
     <a href="struktur.html" class="active">Struktur</a>
 </div>
 
-<div class="content">
-    <div class="title" style="text-align:center;">Struktur Pengurus RT 07 RW 09</div>
-    <div class="org">
+<div class="main" id="mainContent">
+    <header>
+        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+        <h2 style="font-size: 16px;">Sistem Informasi RT 07 RW 09 Bumi Indah City</h2>
+    </header>
 
-        <!-- Ketua -->
-        <div class="row">
-            <div class="box" onclick="showDetail('Ketua RT','Bapak Muhammad Zainudin')">
-                <div class="jabatan">Ketua RT</div>
-                <div class="nama">Bapak Muhammad Zainudin</div>
+    <div class="content">
+        <div class="title">Struktur Pengurus RT 07 RW 09</div>
+        
+        <div class="org">
+            <div class="row">
+                <div class="box" onclick="showDetail('Ketua RT','Bapak Muhammad Zainudin')">
+                    <div class="jabatan">Ketua RT</div>
+                    <div class="nama">Bapak Muhammad Zainudin</div>
+                </div>
+            </div>
+
+            <div class="line-horizontal" style="width:30%;"></div>
+
+            <div class="row">
+                <div class="box" onclick="showDetail('Sekretaris','Bapak Aris Munandar')">
+                    <div class="jabatan">Sekretaris</div>
+                    <div class="nama">Bapak Aris Munandar</div>
+                </div>
+                <div class="box" onclick="showDetail('Bendahara','Bapak Abdul Goni')">
+                    <div class="jabatan">Bendahara</div>
+                    <div class="nama">Bapak Abdul Goni</div>
+                </div>
+            </div>
+
+            <div class="line-horizontal" style="width:70%;"></div>
+
+            <div class="row">
+                <div class="box" onclick="showDetail('Humas','Bapak Syamsi & Bapak Suyana')">
+                    <div class="jabatan">Humas</div>
+                    <div class="nama">Bapak Syamsi<br>Bapak Suyana</div>
+                </div>
+                <div class="box" onclick="showDetail('Keamanan','Bapak Beriman Zebua & Bapak Hari')">
+                    <div class="jabatan">Keamanan</div>
+                    <div class="nama">Bapak Beriman Zebua<br>Bapak Hari</div>
+                </div>
+                <div class="box" onclick="showDetail('Keagamaan','Bapak Ustd. Usep Supriyatna')">
+                    <div class="jabatan">Keagamaan</div>
+                    <div class="nama">Bapak Ustd. Usep Supriyatna</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="box" onclick="showDetail('Olahraga','Bapak Alfian Rivaldy Andanu')">
+                    <div class="jabatan">Olahraga</div>
+                    <div class="nama">Bapak Alfian Rivaldy Andanu</div>
+                </div>
+                <div class="box" onclick="showDetail('Kelistrikan','Bapak Odih Sanjaya & Bapak Abel Pasaribu')">
+                    <div class="jabatan">Kelistrikan</div>
+                    <div class="nama">Bapak Odih Sanjaya<br>Bapak Abel Pasaribu</div>
+                </div>
+                <div class="box" onclick="showDetail('Lingkungan','Bapak Yadi Sumantono & Bapak Arsani')">
+                    <div class="jabatan">Lingkungan</div>
+                    <div class="nama">Bapak Yadi Sumantono<br>Bapak Arsani</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="box" onclick="showDetail('Karang Taruna','Mas Arya')">
+                    <div class="jabatan">Karang Taruna</div>
+                    <div class="nama">Mas Arya</div>
+                </div>
             </div>
         </div>
-
-        <div class="line-horizontal" style="width:50%;"></div>
-
-        <!-- Sekretaris & Bendahara -->
-        <div class="row">
-            <div class="box" onclick="showDetail('Sekretaris','Bapak Aris Munandar')">
-                <div class="jabatan">Sekretaris</div>
-                <div class="nama">Bapak Aris Munandar</div>
-            </div>
-            <div class="box" onclick="showDetail('Bendahara','Abdul Goni')">
-                <div class="jabatan">Bendahara</div>
-                <div class="nama">Bapak Abdul Goni</div>
-            </div>
-        </div>
-
-        <div class="line-horizontal" style="width:80%;"></div>
-
-        <!-- Bidang -->
-        <div class="row">
-            <div class="box" onclick="showDetail('Humas','Bapak Samsi & Bapak Suyana')">
-                <div class="jabatan">Humas</div>
-                <div class="nama">Bapak Syamsi<br>Bapak Suyana</div>
-            </div>
-            <div class="box" onclick="showDetail('Keamanan','Bapak Zebua & Bapak Hari')">
-                <div class="jabatan">Keamanan</div>
-                <div class="nama">Bapak Beriman Zebua<br>Bapak Hari</div>
-            </div>
-            <div class="box" onclick="showDetail('Keagamaan','Bapak Usep Supriyatna')">
-                <div class="jabatan">Keagamaan</div>
-                <div class="nama">Bapak Ustd. Usep Supriyatna</div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="box" onclick="showDetail('Olahraga','Bapak Alfian')">
-                <div class="jabatan">Olahraga</div>
-                <div class="nama">Bapak Alfian Rivaldy Andanu</div>
-            </div>
-            <div class="box" onclick="showDetail('Kelistrikan','Bapak Odi')">
-                <div class="jabatan">Kelistrikan</div>
-                <div class="nama">Bapak Odih Sanjaya<br>Bapak Abel Pasaribu</div>
-            </div>
-            <div class="box" onclick="showDetail('Lingkungan','Bapak Yadi Sumantono & Bapak Arsani')">
-                <div class="jabatan">Lingkungan</div>
-                <div class="nama">Bapak Yadi Sumantono<br>Bapak Arsani</div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="box" onclick="showDetail('Karang Taruna','Mas Arya')">
-                <div class="jabatan">Karang Taruna</div>
-                <div class="nama">Mas Arya</div>
-            </div>
-        </div>
-
     </div>
 </div>
+
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-function showDetail(jabatan,nama){
-    const tooltip = document.getElementById('tooltip');
-    tooltip.innerHTML = `<strong>${jabatan}</strong><br>${nama}`;
-    tooltip.style.display='block';
-    tooltip.style.top=event.clientY+10+'px';
-    tooltip.style.left=event.clientX+10+'px';
-}
-
-document.addEventListener('click',function(e){
-    const tooltip = document.getElementById('tooltip');
-    if(!e.target.classList.contains('box')){
-        tooltip.style.display='none';
+    // FUNGSI SIDEBAR
+    function toggleSidebar() {
+        const sidebar = document.getElementById("mySidebar");
+        const main = document.getElementById("mainContent");
+        if (window.innerWidth > 768) {
+            sidebar.classList.toggle("closed");
+            main.classList.toggle("expanded");
+        } else {
+            sidebar.classList.toggle("open");
+        }
     }
-});
+
+    // FUNGSI TOOLTIP
+    function showDetail(jabatan, nama){
+        const tooltip = document.getElementById('tooltip');
+        tooltip.innerHTML = `<strong>${jabatan}</strong><br>${nama}`;
+        tooltip.style.display = 'block';
+        tooltip.style.top = (event.clientY + 10) + 'px';
+        tooltip.style.left = (event.clientX + 10) + 'px';
+        event.stopPropagation(); // Agar tidak langsung tertutup saat klik box
+    }
+
+    // Tutup tooltip saat klik di mana saja
+    document.addEventListener('click', function(){
+        document.getElementById('tooltip').style.display = 'none';
+    });
 </script>
 
 </body>
 </html>
-
-
