@@ -75,93 +75,25 @@
 </div>
 
 <script>
-// URL API Khusus Pengumuman Bapak
-const API = "const SHEET_NAME = "Pengumuman";
+// PERBAIKAN: Di sini hanya masukkan URL Web App Bapak saja!
+const API = "https://script.google.com/macros/s/AKfycbwztCRZt1BwQ_JmQKTxNBBlhYYcSmCTatjAXbqjR5WpSp8Yh5vsvLIp8TFRYJfoWY4/exec"; 
 
-function doGet(e){
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-  if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-  
-  const data = sheet.getDataRange().getValues();
-  const result = [];
-  const headers = data[0];
-  
-  for(let i=1;i<data.length;i++){
-    let rowObj = {};
-    for(let j=0;j<headers.length;j++){
-      let value = data[i][j];
-      
-      // Jika kolom gambar, ubah link Drive jadi direct link
-      if(headers[j].toLowerCase() === "gambar" && value && typeof value === "string"){
-        value = convertDriveLink(value);
-      }
-      rowObj[headers[j]] = value;
-    }
-    result.push(rowObj);
-  }
-  
-  return ContentService
-    .createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function convertDriveLink(link){
-  const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if(match && match[1]){
-    return "https://drive.google.com/uc?export=view&id=" + match[1];
-  }
-  return link;
-}
-
-function doPost(e){
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-  const params = e.parameter;
-  const action = params.action; // Kita tambah parameter aksi (insert atau delete)
-  const judul = params.judul || "";
-  const gambar = params.gambar || "";
-
-  // LOGIKA SIMPAN (INSERT)
-  if (action === "insert") {
-    if(!judul) return ContentService.createTextOutput("Gagal: Judul kosong");
-    sheet.appendRow([judul, gambar]);
-    return ContentService.createTextOutput("success");
-  }
-
-  // LOGIKA HAPUS (DELETE)
-  if (action === "delete") {
-    const data = sheet.getDataRange().getValues();
-    // Cari baris yang judulnya sama
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] == judul) { // Asumsi Judul ada di kolom A (index 0)
-        sheet.deleteRow(i + 1);
-        return ContentService.createTextOutput("success");
-      }
-    }
-    return ContentService.createTextOutput("Gagal: Data tidak ditemukan");
-  }
-
-  // Fallback jika action tidak dikenal (untuk kodingan lama Bapak)
-  if(!action && judul){
-    sheet.appendRow([judul, gambar]);
-    return ContentService.createTextOutput("success");
-  }
-
-  return ContentService.createTextOutput("Aksi tidak dikenal");
-}"; 
 let isAdmin = false;
 
+// Fungsi Login
 function login(){
     let u = prompt("Username");
     let p = prompt("Password");
+    // Gunakan password yang Bapak inginkan, contoh: 12345
     if(u == "admin" && p == "12345"){
         isAdmin = true;
         document.getElementById("formInput").style.display = "block";
         document.getElementById("btnTambah").style.display = "inline-block";
         document.getElementById("btnLogin").style.display = "none";
-        loadData(); // Reload untuk memunculkan tombol hapus
+        loadData(); 
         alert("Login Berhasil!");
     } else {
-        alert("Login gagal");
+        alert("Login gagal! Periksa kembali username dan password.");
     }
 }
 
@@ -171,6 +103,7 @@ function toggleForm() {
 }
 
 function loadData(){
+    // Pastikan variabel API benar-benar hanya berisi link URL
     fetch(API + "?sheet=Pengumuman")
     .then(res => res.json())
     .then(data => {
@@ -191,7 +124,7 @@ function loadData(){
     })
     .catch(err => {
         console.error(err);
-        document.getElementById("listPengumuman").innerHTML = "Gagal memuat pengumuman.";
+        document.getElementById("listPengumuman").innerHTML = "Gagal memuat pengumuman. Pastikan URL API benar.";
     });
 }
 
@@ -203,7 +136,6 @@ function simpan(){
 
     document.getElementById("btnSimpan").innerText = "Menyimpan...";
 
-    // Format URLSearchParams agar terbaca oleh e.parameter Apps Script
     let params = new URLSearchParams();
     params.append("sheet", "Pengumuman");
     params.append("action", "insert");
@@ -250,6 +182,7 @@ function hapus(judul) {
     }
 }
 
+// Jalankan loadData saat pertama kali buka
 loadData();
 </script>
 </body>
