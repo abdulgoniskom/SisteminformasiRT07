@@ -7,19 +7,13 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
         body { background:#f1f4f9; display:flex; }
-
-        /* SIDEBAR */
         .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; }
         .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
-
-        /* MAIN CONTENT */
         .main { margin-left:220px; width:100%; }
         header { background:white; padding:15px 30px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items: center; }
         .container { padding:30px; }
-
-        /* CARDS - Diperbaiki agar rapi seperti gambar */
         .cards { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
         .card { flex:1; min-width:200px; padding:20px; border-radius:10px; color:white; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
         .card:nth-child(1){background:#2f80ed;}
@@ -28,8 +22,6 @@
         .card:nth-child(4){background:#f2994a;}
         .card h3 { font-size:14px; margin-bottom:10px; opacity: 0.9; }
         .card p { font-size:24px; font-weight:bold; }
-
-        /* CHART & CALENDAR */
         .chart-box { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
         .mini-calendar { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-top:30px; }
         .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top: 10px;}
@@ -77,7 +69,7 @@
         </div>
 
         <div class="chart-box">
-            <h3>Grafik Kas RT</h3>
+            <h3>Grafik Kas RT (Pemasukan vs Pengeluaran)</h3>
             <canvas id="kasChart" style="max-height: 300px;"></canvas>
             
             <div class="mini-calendar">
@@ -89,7 +81,6 @@
 </div>
 
 <script>
-// URL API DISAMAKAN DENGAN WARGA.HTML AGAR DATA MUNCUL
 const API = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 let chart;
 
@@ -97,34 +88,48 @@ function rupiah(angka) {
     return "Rp " + Number(angka).toLocaleString("id-ID");
 }
 
+// Fungsi pembantu agar tidak pusing huruf besar/kecil di kolom Sheet
+function getValue(obj, key) {
+    return Number(obj[key] || obj[key.charAt(0).toUpperCase() + key.slice(1)] || 0);
+}
+
 /* 1. LOAD JUMLAH WARGA */
 function loadWargaCount() {
     fetch(API + "?sheet=Data_Warga")
         .then(res => res.json())
         .then(data => {
-            console.log("Data Warga:", data);
             if (data && data.length) {
                 document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
-            } else {
-                document.getElementById("jumlahWargaDisplay").innerText = "0 Orang";
             }
-        })
-        .catch(err => {
-            document.getElementById("jumlahWargaDisplay").innerText = "Error";
         });
 }
 
-/* 2. TOTAL KAS RT */
+/* 2. TOTAL KAS RT & PENGELUARAN BULAN INI */
 function loadKasRT() {
     fetch(API + "?sheet=Kas_RT")
         .then(res => res.json())
         .then(data => {
-            let masuk = 0, keluar = 0;
+            let totalMasuk = 0, totalKeluar = 0, keluarBulanIni = 0;
+            let bulanSekarang = new Date().getMonth();
+            let tahunSekarang = new Date().getFullYear();
+
             data.forEach(d => {
-                masuk += Number(d.masuk || 0);
-                keluar += Number(d.keluar || 0);
+                let m = getValue(d, "masuk");
+                let k = getValue(d, "keluar");
+                totalMasuk += m;
+                totalKeluar += k;
+
+                let tgl = new Date(d.tanggal || d.Tanggal);
+                if(tgl.getMonth() === bulanSekarang && tgl.getFullYear() === tahunSekarang) {
+                    keluarBulanIni += k;
+                }
             });
-            document.getElementById("totalKasRT").innerText = rupiah(masuk - keluar);
+
+            document.getElementById("totalKasRT").innerText = rupiah(totalMasuk - totalKeluar);
+            document.getElementById("pengeluaranBulan").innerText = rupiah(keluarBulanIni);
+            
+            // Update Grafik setelah data Kas RT beres
+            updateGrafik(data);
         });
 }
 
@@ -133,70 +138,43 @@ function loadKasAgustusan() {
     fetch(API + "?sheet=Kas_Agustusan")
         .then(res => res.json())
         .then(data => {
-            let masuk = 0, keluar = 0;
-            data.forEach(d => {
-                masuk += Number(d.masuk || 0);
-                keluar += Number(d.keluar || 0);
-            });
-            document.getElementById("kasAgustusan").innerText = rupiah(masuk - keluar);
-        });
-}
-
-/* 4. PENGELUARAN BULAN INI */
-function loadPengeluaranBulan() {
-    fetch(API + "?sheet=Kas_RT")
-        .then(res => res.json())
-        .then(data => {
-            let bulanIni = new Date().getMonth();
-            let tahunIni = new Date().getFullYear();
             let total = 0;
             data.forEach(d => {
-                let tgl = new Date(d.tanggal);
-                if(tgl.getMonth() == bulanIni && tgl.getFullYear() == tahunIni) {
-                    total += Number(d.keluar || 0);
-                }
+                total += (getValue(d, "masuk") - getValue(d, "keluar"));
             });
-            document.getElementById("pengeluaranBulan").innerText = rupiah(total);
+            document.getElementById("kasAgustusan").innerText = rupiah(total);
         });
 }
 
-/* 5. GRAFIK DASHBOARD */
-function loadGrafikDashboard() {
-    fetch(API + "?sheet=Kas_RT")
-        .then(res => res.json())
-        .then(data => {
-            let bulanMasuk = Array(12).fill(0);
-            let bulanKeluar = Array(12).fill(0);
+/* 4. GRAFIK KAS */
+function updateGrafik(data) {
+    let bulanMasuk = Array(12).fill(0);
+    let bulanKeluar = Array(12).fill(0);
 
-            data.forEach(d => {
-                let tgl = new Date(d.tanggal);
-                if (!isNaN(tgl)) {
-                    let bulan = tgl.getMonth();
-                    bulanMasuk[bulan] += Number(d.masuk || 0);
-                    bulanKeluar[bulan] += Number(d.keluar || 0);
-                }
-            });
+    data.forEach(d => {
+        let tgl = new Date(d.tanggal || d.Tanggal);
+        if (!isNaN(tgl)) {
+            let bulan = tgl.getMonth();
+            bulanMasuk[bulan] += getValue(d, "masuk");
+            bulanKeluar[bulan] += getValue(d, "keluar");
+        }
+    });
 
-            if(chart) chart.destroy();
-            chart = new Chart(document.getElementById("kasChart"), {
-                type: 'bar',
-                data: {
-                    labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-                    datasets: [
-                        { label: 'Pemasukan', data: bulanMasuk, backgroundColor: '#2f80ed' },
-                        { label: 'Pengeluaran', data: bulanKeluar, backgroundColor: '#eb5757' }
-                    ]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } } 
-                }
-            });
-        });
+    if(chart) chart.destroy();
+    chart = new Chart(document.getElementById("kasChart"), {
+        type: 'bar',
+        data: {
+            labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+            datasets: [
+                { label: 'Pemasukan', data: bulanMasuk, backgroundColor: '#2f80ed' },
+                { label: 'Pengeluaran', data: bulanKeluar, backgroundColor: '#eb5757' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
 }
 
-/* 6. MINI KALENDER */
+/* 5. MINI KALENDER */
 function loadMiniCalendar() {
     let now = new Date();
     let year = now.getFullYear(), month = now.getMonth(), today = now.getDate();
@@ -211,20 +189,15 @@ function loadMiniCalendar() {
     document.getElementById("miniCalendar").innerHTML = html;
 }
 
-function loadDashboard() {
+// Jalankan semua fungsi
+function init() {
     loadWargaCount();
     loadKasRT();
     loadKasAgustusan();
-    loadPengeluaranBulan();
-    loadGrafikDashboard();
     loadMiniCalendar();
 }
 
-// Jalankan saat halaman dibuka
-document.addEventListener("DOMContentLoaded", loadDashboard);
-
-// Update otomatis tiap 30 detik agar tidak berat
-setInterval(loadDashboard, 30000); 
+window.onload = init;
 </script>
 </body>
 </html>
