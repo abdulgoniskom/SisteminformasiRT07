@@ -5,33 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arsip Digital RT 07</title>
     <style>
-        /* CSS IDENTIK DENGAN INDEX.HTML ANDA */
+        /* CSS IDENTIK DENGAN INDEX.HTML */
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
         body { background:#f1f4f9; display:flex; }
-        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; }
-        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); }
-        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; }
-        .sidebar a:hover, .sidebar a.active { background:#34495e; }
+
+        /* SIDEBAR (Identik 220px) */
+        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; display: flex; flex-direction: column; }
+        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size: 18px; }
+        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size: 14px; }
+        .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #2f80ed; }
+
+        /* AREA LOGIN ADMIN DI SIDEBAR */
+        .admin-login-box { margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-login { width: 100%; padding: 10px; background: #34495e; color: #bdc3c7; border: 1px solid #4f6f8f; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .btn-login:hover { color: white; background: #2f80ed; border-color: #2f80ed; }
+
+        /* MAIN CONTENT */
         .main { margin-left:220px; width:100%; }
         header { background:white; padding:15px 30px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items: center; }
         .container { padding:30px; }
 
         /* STYLE KHUSUS ARSIP */
-        .folder-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .folder { 
-            background: white; padding: 20px; border-radius: 12px; text-align: center; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
-            border: 1px solid #eee;
-        }
-        .folder:hover { transform: translateY(-5px); border-color: #2f80ed; }
-        .folder i { font-size: 40px; margin-bottom: 10px; display: block; }
+        .folder-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .folder { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
+        .folder:hover { transform: translateY(-3px); border-color: #2f80ed; }
+        .folder h4 { font-size: 14px; color: #2c3e50; }
         
         .search-area { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; }
+        .search-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
         
         .btn-add { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: none; font-weight: bold; }
 
-        .table-box { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .table-box { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8f9fc; padding: 15px; text-align: left; color: #7f8c8d; font-size: 13px; border-bottom: 2px solid #eee; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
@@ -58,28 +63,32 @@
     <a href="kalender.html">Kalender</a>
     <a href="arsip.html" class="active">Arsip</a>
     <a href="struktur.html">Struktur</a>
+
+    <div class="admin-login-box">
+        <button class="btn-login" id="loginBtn" onclick="handleLogin()">Login Admin</button>
+    </div>
 </div>
 
 <div class="main">
     <header>
         <h2>Digital Archive RT 07</h2>
-        <div id="status">Mode Warga</div>
+        <div id="status" style="font-size: 12px; font-weight: bold; color: #7f8c8d;">Mode Warga</div>
     </header>
 
     <div class="container">
         <div class="folder-grid">
-            <div class="folder" onclick="filterData('')"><i>📂</i><h4>Semua</h4></div>
-            <div class="folder" onclick="filterData('Surat')"><i>✉️</i><h4>Surat</h4></div>
-            <div class="folder" onclick="filterData('Keuangan')"><i>💰</i><h4>Keuangan</h4></div>
-            <div class="folder" onclick="filterData('Laporan')"><i>📊</i><h4>Laporan</h4></div>
+            <div class="folder" onclick="filterData('')"><h4>📁 Semua</h4></div>
+            <div class="folder" onclick="filterData('Surat')"><h4>✉️ Surat</h4></div>
+            <div class="folder" onclick="filterData('Keuangan')"><h4>💰 Keuangan</h4></div>
+            <div class="folder" onclick="filterData('Laporan')"><h4>📊 Laporan</h4></div>
         </div>
 
         <div class="search-area">
-            <input type="text" id="search" class="search-input" placeholder="Cari dokumen..." onkeyup="searchData()">
+            <input type="text" id="search" class="search-input" placeholder="Cari nama dokumen..." onkeyup="searchData()">
             <button class="btn-add" id="adminBtn" onclick="tambahArsip()">+ Arsip Baru</button>
         </div>
 
-        <div id="loading">Memuat arsip...</div>
+        <div id="loading">Memuat data arsip...</div>
 
         <div class="table-box">
             <table>
@@ -99,17 +108,40 @@
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbz2zMa4ELr76mfmg8egQLohWWddKiDyk9sEtICzHA4N9IVIZvG90KvhFtGOwRYI5HSx/exec"; // Ganti dengan URL Apps Script Anda
+    // URL API Google Apps Script Anda
+    const API = "https://script.google.com/macros/s/AKfycbz2zMa4ELr76mfmg8egQLohWWddKiDyk9sEtICzHA4N9IVIZvG90KvhFtGOwRYI5HSx/exec"; 
     let allData = [];
 
-    // CEK ADMIN
-    if(localStorage.getItem('rt07_admin') === 'true') {
-        document.getElementById('adminBtn').style.display = 'block';
-        document.getElementById('status').innerText = "Administrator";
-        document.getElementById('status').style.color = "#27ae60";
+    // FUNGSI LOGIN ADMIN
+    function handleLogin() {
+        const isAdmin = localStorage.getItem('rt07_admin');
+        if (isAdmin === 'true') {
+            localStorage.removeItem('rt07_admin');
+            alert("Anda telah logout.");
+            location.reload();
+        } else {
+            const pass = prompt("Masukkan Password Admin:");
+            if (pass === "123") {
+                localStorage.setItem('rt07_admin', 'true');
+                alert("Login Berhasil!");
+                location.reload();
+            } else {
+                alert("Password Salah!");
+            }
+        }
     }
 
-    // AMBIL DATA
+    // CEK STATUS LOGIN SAAT HALAMAN DIMUAT
+    function checkAdminStatus() {
+        if(localStorage.getItem('rt07_admin') === 'true') {
+            document.getElementById('adminBtn').style.display = 'block';
+            document.getElementById('loginBtn').innerText = "Logout Admin";
+            document.getElementById('status').innerText = "Mode Administrator";
+            document.getElementById('status').style.color = "#27ae60";
+        }
+    }
+
+    // AMBIL DATA DARI GOOGLE SHEETS
     async function loadArsip() {
         try {
             const res = await fetch(API + "?sheet=Arsip RT 07");
@@ -117,7 +149,7 @@
             renderTable(allData);
             document.getElementById('loading').style.display = 'none';
         } catch (e) {
-            document.getElementById('loading').innerText = "Gagal memuat data.";
+            document.getElementById('loading').innerText = "Gagal memuat data dari server.";
         }
     }
 
@@ -125,54 +157,59 @@
         let html = "";
         data.forEach(item => {
             let badgeClass = "bg-doc";
-            if(item.jenis.toLowerCase() === 'pdf') badgeClass = "bg-pdf";
-            if(item.jenis.toLowerCase() === 'img') badgeClass = "bg-img";
+            let jenis = item.jenis ? item.jenis.toLowerCase() : "doc";
+            if(jenis === 'pdf') badgeClass = "bg-pdf";
+            if(jenis === 'img' || jenis === 'jpg' || jenis === 'png') badgeClass = "bg-img";
 
             html += `<tr>
-                <td>${item.tanggal.split('T')[0]}</td>
+                <td>${item.tanggal ? item.tanggal.split('T')[0] : '-'}</td>
                 <td><b>${item.nama}</b></td>
                 <td>${item.kategori}</td>
-                <td><span class="badge ${badgeClass}">${item.jenis}</span></td>
+                <td><span class="badge ${badgeClass}">${jenis.toUpperCase()}</span></td>
                 <td><a href="${item.link}" target="_blank" class="btn-view">Lihat Dokumen</a></td>
             </tr>`;
         });
         document.getElementById('arsipBody').innerHTML = html;
     }
 
-    // FILTER SEARCH
     function searchData() {
         let val = document.getElementById('search').value.toLowerCase();
         let filtered = allData.filter(i => i.nama.toLowerCase().includes(val));
         renderTable(filtered);
     }
 
-    // FILTER FOLDER
     function filterData(cat) {
         if(cat === "") return renderTable(allData);
         let filtered = allData.filter(i => i.kategori === cat);
         renderTable(filtered);
     }
 
-    // INPUT ADMIN
     async function tambahArsip() {
         let tgl = new Date().toISOString().split('T')[0];
         let nama = prompt("Nama Dokumen:");
         let kat = prompt("Kategori (Surat/Keuangan/Laporan):");
-        let link = prompt("Link Google Drive (Pastikan setting: Anyone with link can view):");
+        let link = prompt("Link Google Drive:");
         let jenis = prompt("Jenis File (PDF/IMG/DOC):");
 
         if(nama && link) {
             document.getElementById('adminBtn').innerText = "Menyimpan...";
-            await fetch(API, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ tanggal: tgl, nama: nama, kategori: kat, link: link, jenis: jenis })
-            });
-            alert("Berhasil!");
-            location.reload();
+            try {
+                await fetch(API, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ tanggal: tgl, nama: nama, kategori: kat, link: link, jenis: jenis })
+                });
+                alert("Dokumen berhasil diarsipkan!");
+                location.reload();
+            } catch (e) {
+                alert("Gagal menyimpan data.");
+                document.getElementById('adminBtn').innerText = "+ Arsip Baru";
+            }
         }
     }
 
+    // Jalankan fungsi saat start
+    checkAdminStatus();
     loadArsip();
 </script>
 </body>
