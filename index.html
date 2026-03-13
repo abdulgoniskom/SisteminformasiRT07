@@ -81,94 +81,77 @@
 </div>
 
 <script>
-// URL API yang sudah terbukti jalan di data warga
-const API = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
+// MENGGUNAKAN API YANG SAMA DENGAN KAS.HTML
+const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 let chart;
 
 function rupiah(angka) {
     return "Rp " + Number(angka).toLocaleString("id-ID");
 }
 
-// FUNGSI KUNCI: Supaya tidak pusing Masuk/masuk atau Keluar/keluar
-function ambilNilai(obj, key) {
-    let keyBesar = key.charAt(0).toUpperCase() + key.slice(1); // Jadi 'Masuk'
-    let keyKecil = key.toLowerCase(); // Jadi 'masuk'
-    return Number(obj[keyBesar] || obj[keyKecil] || 0);
-}
-
-/* 1. LOAD JUMLAH WARGA */
+/* 1. LOAD JUMLAH WARGA (Menggunakan API Warga jika berbeda, atau API ini jika satu script) */
 function loadWargaCount() {
-    fetch(API + "?sheet=Data_Warga")
+    // Karena URL API ini khusus Kas, pastikan data warga juga ada di script yang sama 
+    // atau gunakan API Warga yang sebelumnya (akhiran ...1WR/exec)
+    const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
+    fetch(API_WARGA + "?sheet=Data_Warga")
         .then(res => res.json())
         .then(data => {
-            if (data && data.length) {
-                document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
-            }
+            if (data) document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
         });
 }
 
-/* 2. TOTAL KAS RT & PENGELUARAN */
+/* 2. LOAD KAS RT & PENGELUARAN */
 function loadKasRT() {
     fetch(API + "?sheet=Kas_RT")
         .then(res => res.json())
         .then(data => {
             let totalMasuk = 0, totalKeluar = 0, keluarBulanIni = 0;
-            let bulanSekarang = new Date().getMonth();
-            let tahunSekarang = new Date().getFullYear();
+            let sekarang = new Date();
 
             data.forEach(d => {
-                let m = ambilNilai(d, "masuk");
-                let k = ambilNilai(d, "keluar");
+                // Sesuai Apps Script Bapak: huruf kecil (masuk, keluar, tanggal)
+                let m = Number(d.masuk || 0);
+                let k = Number(d.keluar || 0);
                 totalMasuk += m;
                 totalKeluar += k;
 
-                // Cek pengeluaran bulan ini (kolom 'tanggal' atau 'Tanggal')
-                let tglRaw = d.tanggal || d.Tanggal;
-                if (tglRaw) {
-                    let tgl = new Date(tglRaw);
-                    if(tgl.getMonth() === bulanSekarang && tgl.getFullYear() === tahunSekarang) {
-                        keluarBulanIni += k;
-                    }
+                let tgl = new Date(d.tanggal);
+                if(tgl.getMonth() === sekarang.getMonth() && tgl.getFullYear() === sekarang.getFullYear()) {
+                    keluarBulanIni += k;
                 }
             });
 
             document.getElementById("totalKasRT").innerText = rupiah(totalMasuk - totalKeluar);
             document.getElementById("pengeluaranBulan").innerText = rupiah(keluarBulanIni);
-            
-            // Update Grafik otomatis setelah data Kas RT ditarik
             updateGrafik(data);
-        })
-        .catch(err => console.error("Gagal Kas RT:", err));
+        });
 }
 
-/* 3. KAS AGUSTUSAN */
+/* 3. LOAD KAS AGUSTUSAN */
 function loadKasAgustusan() {
     fetch(API + "?sheet=Kas_Agustusan")
         .then(res => res.json())
         .then(data => {
             let total = 0;
             data.forEach(d => {
-                total += (ambilNilai(d, "masuk") - ambilNilai(d, "keluar"));
+                total += (Number(d.masuk || 0) - Number(d.keluar || 0));
             });
             document.getElementById("kasAgustusan").innerText = rupiah(total);
-        })
-        .catch(err => console.error("Gagal Kas Agustusan:", err));
+        });
 }
 
-/* 4. GRAFIK KAS */
+/* 4. UPDATE GRAFIK */
 function updateGrafik(data) {
     let bulanMasuk = Array(12).fill(0);
     let bulanKeluar = Array(12).fill(0);
 
     data.forEach(d => {
-        let tglRaw = d.tanggal || d.Tanggal;
-        if (tglRaw) {
-            let tgl = new Date(tglRaw);
-            if (!isNaN(tgl)) {
-                let bulan = tgl.getMonth();
-                bulanMasuk[bulan] += ambilNilai(d, "masuk");
-                bulanKeluar[bulan] += ambilNilai(d, "keluar");
-            }
+        let tgl = new Date(d.tanggal);
+        if (!isNaN(tgl)) {
+            let bulan = tgl.getMonth();
+            bulanMasuk[bulan] += Number(d.masuk || 0);
+            bulanKeluar[bulan] += Number(d.keluar || 0);
         }
     });
 
@@ -182,36 +165,30 @@ function updateGrafik(data) {
                 { label: 'Pengeluaran', data: bulanKeluar, backgroundColor: '#eb5757' }
             ]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
 /* 5. MINI KALENDER */
 function loadMiniCalendar() {
     let now = new Date();
-    let year = now.getFullYear(), month = now.getMonth(), today = now.getDate();
-    let firstDay = new Date(year, month, 1).getDay();
-    let days = new Date(year, month + 1, 0).getDate();
+    let days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    let firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     let html = "";
     for(let i=0; i<firstDay; i++) html += "<div></div>";
     for(let d=1; d<=days; d++) {
-        let cls = (d === today) ? "day today" : "day";
+        let cls = (d === now.getDate()) ? "day today" : "day";
         html += `<div class="${cls}">${d}</div>`;
     }
     document.getElementById("miniCalendar").innerHTML = html;
 }
 
-// Jalankan semua saat halaman dibuka
-document.addEventListener("DOMContentLoaded", () => {
+window.onload = () => {
     loadWargaCount();
     loadKasRT();
     loadKasAgustusan();
     loadMiniCalendar();
-});
+};
 </script>
 </body>
 </html>
