@@ -3,58 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengumuman RT 07</title>
+    <title>Pengumuman RT 07 - RT 07 RW 09</title>
     <style>
-        body{font-family:Arial, sans-serif; margin:0; background:#eef2f7;}
-        .sidebar{width:220px; background:#2c3e50; color:white; height:100vh; position:fixed; left:0; top:0;}
-        .sidebar h2{text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px;}
-        .sidebar a{display:block; color:white; padding:15px; text-decoration:none; font-size:14px;}
-        .sidebar a:hover{background:#34495e; border-left: 4px solid #1abc9c;}
+        /* CSS DASAR (Konsisten dengan Arsip & Kas) */
+        * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+        body { background:#eef2f7; display:flex; overflow-x: hidden; }
+
+        /* SIDEBAR */
+        .sidebar { 
+            width:220px; background:#2c3e50; height:100vh; color:white; 
+            position:fixed; transition: 0.3s; z-index: 1000; left: 0;
+        }
+        .sidebar.closed { left: -220px; }
+        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
+        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
+        .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
+        .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
         
-        .main{margin-left:220px;}
-        header{background:#2f80ed; color:white; padding:15px; text-align:center;}
+        /* AREA UTAMA */
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
+        .main.expanded { margin-left: 0; }
+
+        header { 
+            background:#2f80ed; color:white; padding:15px; 
+            display:flex; align-items: center; 
+            position: sticky; top: 0; z-index: 900;
+        }
+        .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; }
+
+        /* KONTEN PENGUMUMAN */
+        .container { padding:20px; max-width:900px; margin:auto; }
         
-        .container{padding:20px; max-width:900px; margin:auto;}
-        .card{background:white; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); position: relative;}
-        .card img{max-width:100%; border-radius:5px; margin-bottom:10px; display: block;}
-        .card h3{margin:0; font-size: 18px; color: #2c3e50;}
+        .card { 
+            background:white; padding:15px; border-radius:10px; 
+            margin-bottom:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); 
+            position: relative; border-left: 5px solid #2f80ed;
+        }
+        .card img { max-width:100%; border-radius:5px; margin-bottom:10px; display: block; }
+        .card h3 { margin:0; font-size: 18px; color: #2c3e50; line-height: 1.5; }
         
-        /* Tombol Hapus */
+        /* TOMBOL-TOMBOL */
+        .toolbar { text-align: right; margin-bottom: 15px; }
+        button { background:#2f80ed; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; font-weight: bold; }
+        button:hover { background:#1f6fd1; }
+        
         .btn-delete {
             background: #e74c3c; color: white; border: none; padding: 5px 10px; 
             border-radius: 4px; cursor: pointer; position: absolute; top: 15px; right: 15px;
+            font-size: 11px;
         }
 
-        button{background:#2f80ed; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;}
-        button:hover{background:#1f6fd1;}
-        
-        .formInput{display:none; margin-top:20px; background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-        input{width:100%; padding:10px; margin:10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
+        /* FORM INPUT */
+        .formInput { 
+            display:none; margin-bottom:25px; background:white; padding:20px; 
+            border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1); 
+            border: 1px solid #2f80ed;
+        }
+        .formInput h3 { margin-bottom: 10px; color: #2f80ed; }
+        input { width:100%; padding:12px; margin:10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #2f80ed; }
 
-        @media (max-width:768px){
-            .sidebar{width:70px;} .sidebar h2{display:none;}
-            .main{margin-left:70px;}
+        @media (max-width: 768px) {
+            .sidebar { left: -220px; }
+            .sidebar.open { left: 0; }
+            .main { margin-left: 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="kas.html">Kas RT</a>
     <a href="warga.html">Data Warga</a>
-    <a href="pengumuman.html">Pengumuman</a>
+    <a href="pengumuman.html" class="active">Pengumuman</a>
     <a href="kalender.html">Kalender</a>
     <a href="arsip.html">Arsip</a>
     <a href="struktur.html">Struktur</a>
 </div>
 
-<div class="main">
-    <header><h2>Pengumuman RT 07</h2></header>
-    <div class="container">
+<div class="main" id="mainContent">
+    <header>
+        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+        <h2 style="font-size: 16px;">Pengumuman RT 07 RW 09 Bumi Indah City</h2>
+    </header>
 
-        <div style="text-align:right; margin-bottom:15px;">
+    <div class="container">
+        <div class="toolbar">
             <button id="btnLogin" onclick="login()">Login Admin</button>
             <button id="btnTambah" style="display:none;" onclick="toggleForm()">+ Tambah Pengumuman</button>
         </div>
@@ -64,126 +100,136 @@
             <p style="font-size: 12px; color: #666;">* Judul akan muncul otomatis di tulisan berjalan halaman depan.</p>
             <input type="text" id="judul" placeholder="Ketik isi pengumuman di sini...">
             <input type="text" id="gambar" placeholder="Link Gambar/Banner (Boleh dikosongkan)">
-            <button id="btnSimpan" onclick="simpan()">Simpan & Publikasikan</button>
+            <button id="btnSimpan" style="width: 100%;" onclick="simpan()">Simpan & Publikasikan</button>
         </div>
 
         <div id="listPengumuman">
-            <p style="text-align: center;">Memuat data...</p>
+            <p style="text-align: center;">Memuat data pengumuman...</p>
         </div>
-
     </div>
 </div>
 
 <script>
-// PERBAIKAN: Di sini hanya masukkan URL Web App Bapak saja!
-const API = "https://script.google.com/macros/s/AKfycbwztCRZt1BwQ_JmQKTxNBBlhYYcSmCTatjAXbqjR5WpSp8Yh5vsvLIp8TFRYJfoWY4/exec"; 
+    // URL API TETAP SAMA
+    const API = "https://script.google.com/macros/s/AKfycbwztCRZt1BwQ_JmQKTxNBBlhYYcSmCTatjAXbqjR5WpSp8Yh5vsvLIp8TFRYJfoWY4/exec"; 
 
-let isAdmin = false;
+    let isAdmin = false;
 
-// Fungsi Login
-function login(){
-    let u = prompt("Username");
-    let p = prompt("Password");
-    // Gunakan password yang Bapak inginkan, contoh: 12345
-    if(u == "admin" && p == "12345"){
-        isAdmin = true;
-        document.getElementById("formInput").style.display = "block";
-        document.getElementById("btnTambah").style.display = "inline-block";
-        document.getElementById("btnLogin").style.display = "none";
-        loadData(); 
-        alert("Login Berhasil!");
-    } else {
-        alert("Login gagal! Periksa kembali username dan password.");
-    }
-}
-
-function toggleForm() {
-    const f = document.getElementById("formInput");
-    f.style.display = f.style.display === "none" ? "block" : "none";
-}
-
-function loadData(){
-    // Pastikan variabel API benar-benar hanya berisi link URL
-    fetch(API + "?sheet=Pengumuman")
-    .then(res => res.json())
-    .then(data => {
-        let reversedData = [...data].reverse(); 
-        let html = "";
-        if(reversedData.length === 0) {
-            html = "<p style='text-align:center;'>Tidak ada pengumuman saat ini.</p>";
+    // FUNGSI SIDEBAR
+    function toggleSidebar() {
+        const sidebar = document.getElementById("mySidebar");
+        const main = document.getElementById("mainContent");
+        if (window.innerWidth > 768) {
+            sidebar.classList.toggle("closed");
+            main.classList.toggle("expanded");
+        } else {
+            sidebar.classList.toggle("open");
         }
-        reversedData.forEach((d) => {
-            html += `
-                <div class="card">
-                    ${isAdmin ? `<button class="btn-delete" onclick="hapus('${d.judul}')">Hapus</button>` : ""}
-                    ${d.gambar ? `<img src="${d.gambar}" alt="banner">` : ""}
-                    <h3>${d.judul}</h3>
-                </div>`;
+    }
+
+    // FUNGSI LOGIN
+    function login(){
+        let u = prompt("Username");
+        let p = prompt("Password");
+        if(u == "admin" && p == "12345"){
+            isAdmin = true;
+            document.getElementById("formInput").style.display = "block";
+            document.getElementById("btnTambah").style.display = "inline-block";
+            document.getElementById("btnLogin").style.display = "none";
+            loadData(); 
+            alert("Login Berhasil!");
+        } else {
+            alert("Login gagal! Periksa kembali username dan password.");
+        }
+    }
+
+    function toggleForm() {
+        const f = document.getElementById("formInput");
+        f.style.display = f.style.display === "none" ? "block" : "none";
+    }
+
+    function loadData(){
+        fetch(API + "?sheet=Pengumuman")
+        .then(res => res.json())
+        .then(data => {
+            let reversedData = [...data].reverse(); 
+            let html = "";
+            if(reversedData.length === 0) {
+                html = "<p style='text-align:center;'>Tidak ada pengumuman saat ini.</p>";
+            }
+            reversedData.forEach((d) => {
+                html += `
+                    <div class="card">
+                        ${isAdmin ? `<button class="btn-delete" onclick="hapus('${d.judul}')">Hapus</button>` : ""}
+                        ${d.gambar ? `<img src="${d.gambar}" alt="banner">` : ""}
+                        <h3>${d.judul}</h3>
+                    </div>`;
+            });
+            document.getElementById("listPengumuman").innerHTML = html;
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById("listPengumuman").innerHTML = "Gagal memuat pengumuman.";
         });
-        document.getElementById("listPengumuman").innerHTML = html;
-    })
-    .catch(err => {
-        console.error(err);
-        document.getElementById("listPengumuman").innerHTML = "Gagal memuat pengumuman. Pastikan URL API benar.";
-    });
-}
+    }
 
-function simpan(){
-    let judul = document.getElementById("judul").value.trim();
-    let gambar = document.getElementById("gambar").value.trim();
-    
-    if(!judul){ alert("Isi pengumuman wajib diisi!"); return; }
+    function simpan(){
+        let judul = document.getElementById("judul").value.trim();
+        let gambar = document.getElementById("gambar").value.trim();
+        
+        if(!judul){ alert("Isi pengumuman wajib diisi!"); return; }
 
-    document.getElementById("btnSimpan").innerText = "Menyimpan...";
+        document.getElementById("btnSimpan").innerText = "Menyimpan...";
+        document.getElementById("btnSimpan").disabled = true;
 
-    let params = new URLSearchParams();
-    params.append("sheet", "Pengumuman");
-    params.append("action", "insert");
-    params.append("judul", judul);
-    params.append("gambar", gambar);
-
-    fetch(API, {
-        method: "POST",
-        body: params.toString(),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    .then(res => res.text())
-    .then(res => {
-        alert("Pengumuman berhasil disimpan!");
-        document.getElementById("judul").value = "";
-        document.getElementById("gambar").value = "";
-        document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
-        toggleForm();
-        loadData();
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Gagal menyimpan");
-        document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
-    });
-}
-
-function hapus(judul) {
-    if(confirm("Hapus pengumuman: " + judul + "?")) {
         let params = new URLSearchParams();
         params.append("sheet", "Pengumuman");
-        params.append("action", "delete");
+        params.append("action", "insert");
         params.append("judul", judul);
+        params.append("gambar", gambar);
 
         fetch(API, {
             method: "POST",
             body: params.toString(),
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
-        .then(() => {
-            alert("Berhasil dihapus");
+        .then(res => res.text())
+        .then(res => {
+            alert("Pengumuman berhasil disimpan!");
+            document.getElementById("judul").value = "";
+            document.getElementById("gambar").value = "";
+            document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
+            document.getElementById("btnSimpan").disabled = false;
+            toggleForm();
             loadData();
+        })
+        .catch(err => {
+            alert("Gagal menyimpan");
+            document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
+            document.getElementById("btnSimpan").disabled = false;
         });
     }
-}
 
-// Jalankan loadData saat pertama kali buka
-loadData();
+    function hapus(judul) {
+        if(confirm("Hapus pengumuman: " + judul + "?")) {
+            let params = new URLSearchParams();
+            params.append("sheet", "Pengumuman");
+            params.append("action", "delete");
+            params.append("judul", judul);
+
+            fetch(API, {
+                method: "POST",
+                body: params.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(() => {
+                alert("Berhasil dihapus");
+                loadData();
+            });
+        }
+    }
+
+    loadData();
 </script>
 </body>
 </html>
