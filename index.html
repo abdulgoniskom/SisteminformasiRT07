@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi RT 07</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
-        body { background:#f1f4f9; display:flex; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
+        body { background:#f1f4f9; display:flex; min-height: 100vh; }
         
+        /* SIDEBAR */
         .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; z-index: 1000; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size: 18px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size: 14px; }
         .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
         
-        .main { margin-left:220px; width:100%; min-height: 100vh; }
+        /* MAIN CONTENT */
+        .main { margin-left:220px; width:100%; display: flex; flex-direction: column; }
         
-        /* HEADER PERBAIKAN: JUDUL DI TENAH */
+        /* HEADER - JUDUL DI TENGAH */
         header { 
             background:white; 
             padding:15px 30px; 
@@ -25,6 +28,7 @@
             position: sticky;
             top: 0;
             z-index: 900;
+            min-height: 70px;
         }
 
         header h2 { 
@@ -33,6 +37,7 @@
             font-size: 18px; 
             color: #2c3e50;
             margin: 0;
+            line-height: 1.2;
         }
 
         .ketua-rt { 
@@ -42,32 +47,60 @@
             position: absolute; 
             right: 30px; 
             background: #e3f2fd;
-            padding: 5px 12px;
+            padding: 6px 15px;
             border-radius: 20px;
+            white-space: nowrap;
         }
 
-        /* Running Text */
+        /* RUNNING TEXT */
         .running-text { background: #f2994a; color: white; padding: 10px; font-weight: bold; }
 
-        .container { padding:30px; }
-        .cards { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
-        .card { flex:1; min-width:200px; padding:20px; border-radius:10px; color:white; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+        /* CONTAINER CARDS */
+        .container { padding:20px; flex-grow: 1; }
+        .cards { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .card { flex:1; min-width:200px; padding:20px; border-radius:10px; color:white; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
         .card:nth-child(1){background:#2f80ed;}
         .card:nth-child(2){background:#27ae60;}
         .card:nth-child(3){background:#eb5757;}
         .card:nth-child(4){background:#f2994a;}
-        .card h3 { font-size:12px; margin-bottom:10px; opacity: 0.9; text-transform: uppercase; }
+        .card h3 { font-size:11px; margin-bottom:10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
         .card p { font-size:22px; font-weight:bold; }
         
-        .chart-box { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
-        .mini-calendar { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-top:30px; }
+        /* CHART & CALENDAR */
+        .chart-box { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .mini-calendar { background:white; padding:15px; border-radius:10px; border: 1px solid #eee; margin-top:25px; }
         .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top: 10px;}
         .day { background:#f7f9fc; padding:8px; border-radius:5px; font-size:12px; text-align:center; color: #555; }
         .today { background: #2f80ed; color: white; font-weight: bold; }
 
+        /* RESPONSIVE UNTUK HP */
         @media (max-width: 768px) {
-            header h2 { font-size: 14px; padding-right: 80px; text-align: left; }
-            .ketua-rt { font-size: 10px; right: 10px; padding: 3px 8px; }
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            
+            header { 
+                flex-direction: column; 
+                padding: 15px; 
+                height: auto; 
+                text-align: center;
+            }
+
+            header h2 { 
+                font-size: 15px; 
+                margin-bottom: 10px; 
+                width: 100%;
+                order: 1;
+            }
+
+            .ketua-rt { 
+                position: static; 
+                font-size: 11px; 
+                order: 2;
+                margin: 0 auto;
+            }
+
+            .container { padding: 15px; }
+            .card { min-width: 100%; }
         }
     </style>
 </head>
@@ -117,11 +150,13 @@
         </div>
 
         <div class="chart-box">
-            <h3 style="margin-bottom: 15px; font-size: 16px;">Grafik Kas RT (Pemasukan vs Pengeluaran)</h3>
-            <canvas id="kasChart" style="max-height: 300px;"></canvas>
+            <h3 style="margin-bottom: 15px; font-size: 16px; color: #2c3e50;">📊 Grafik Kas RT (Pemasukan vs Pengeluaran)</h3>
+            <div style="position: relative; height:300px;">
+                <canvas id="kasChart"></canvas>
+            </div>
             
             <div class="mini-calendar">
-                <h3 style="font-size: 14px;">Kalender Hari Ini</h3>
+                <h3 style="font-size: 14px; color: #2c3e50;">📅 Kalender Hari Ini</h3>
                 <div class="calendar-grid" id="miniCalendar"></div>
             </div>
         </div>
@@ -129,7 +164,7 @@
 </div>
 
 <script>
-// API URLS
+// --- KONFIGURASI API (PERINTAH TETAP SAMA) ---
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
@@ -140,6 +175,7 @@ function rupiah(angka) {
     return "Rp " + Number(angka).toLocaleString("id-ID");
 }
 
+// 1. Ambil Jumlah Warga
 function loadWargaCount() {
     fetch(API_WARGA + "?sheet=Data_Warga")
         .then(res => res.json())
@@ -148,6 +184,7 @@ function loadWargaCount() {
         });
 }
 
+// 2. Ambil Data Kas RT
 function loadKasRT() {
     fetch(API + "?sheet=Kas_RT")
         .then(res => res.json())
@@ -162,7 +199,7 @@ function loadKasRT() {
                 totalKeluar += k;
 
                 let tgl = new Date(d.tanggal);
-                if(tgl.getMonth() === sekarang.getMonth() && tgl.getFullYear() === sekarang.getFullYear()) {
+                if(!isNaN(tgl) && tgl.getMonth() === sekarang.getMonth() && tgl.getFullYear() === sekarang.getFullYear()) {
                     keluarBulanIni += k;
                 }
             });
@@ -173,6 +210,7 @@ function loadKasRT() {
         });
 }
 
+// 3. Ambil Kas Agustusan
 function loadKasAgustusan() {
     fetch(API + "?sheet=Kas_Agustusan")
         .then(res => res.json())
@@ -185,6 +223,7 @@ function loadKasAgustusan() {
         });
 }
 
+// 4. Update Grafik Chart.js
 function updateGrafik(data) {
     let bulanMasuk = Array(12).fill(0);
     let bulanKeluar = Array(12).fill(0);
@@ -216,6 +255,7 @@ function updateGrafik(data) {
     });
 }
 
+// 5. Mini Kalender
 function loadMiniCalendar() {
     let now = new Date();
     let days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -229,6 +269,7 @@ function loadMiniCalendar() {
     document.getElementById("miniCalendar").innerHTML = html;
 }
 
+// 6. Running Text dari Pengumuman
 function loadRunningText() {
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman")
         .then(res => res.json())
@@ -241,6 +282,7 @@ function loadRunningText() {
         .catch(err => console.error("Gagal muat running text:", err));
 }
 
+// Jalankan semua fungsi saat halaman terbuka
 window.onload = () => {
     loadWargaCount();
     loadKasRT();
