@@ -112,7 +112,7 @@
     // AMBIL DATA
     async function loadArsip() {
         try {
-            const res = await fetch(API + "?sheet=Arsip");
+            const res = await fetch(API + "?sheet=Arsip RT 07");
             allData = await res.json();
             renderTable(allData);
             document.getElementById('loading').style.display = 'none';
