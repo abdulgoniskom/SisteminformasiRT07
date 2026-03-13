@@ -99,7 +99,7 @@ function rupiah(angka) {
 
 /* 1. LOAD JUMLAH WARGA (Dinamis dari Sheet Data_Warga) */
 function loadWargaCount() {
-    fetch(API + "?sheet=Data_Warga")
+    fetch(API + "?sheet=" + encodeURIComponent("Data Warga RT 07"))
         .then(res => res.json())
         .then(data => {
             document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
