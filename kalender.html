@@ -3,64 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender Kegiatan RT 07</title>
+    <title>Kalender Kegiatan RT 07 - RT 07 RW 09</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-        body { background:#f1f4f9; display:flex; overflow-x: hidden; }
+        /* CSS SINKRON DENGAN ARSIP & WARGA */
+        * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+        body { background:#eef2f7; display:flex; overflow-x: hidden; }
 
-        /* SIDEBAR */
         .sidebar { 
             width:220px; background:#2c3e50; height:100vh; color:white; 
-            position:fixed; transition: 0.3s; z-index: 1000; 
+            position:fixed; transition: 0.3s; z-index: 1000; left: 0;
         }
+        .sidebar.closed { left: -220px; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
-        .sidebar a:hover, .active { background:#34495e; border-left: 4px solid #1abc9c; }
+        .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
+        .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
         
-        /* MAIN CONTENT */
-        .main { margin-left:220px; width:100%; transition: 0.3s; min-width: 0; }
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
+        .main.expanded { margin-left: 0; }
+
         header { 
-            background:white; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); 
+            background:#2f80ed; color:white; padding:15px; 
             display:flex; justify-content:space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 900;
+        }
+        .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; }
+
+        .container { padding:20px; max-width:1100px; margin:auto; }
+        .card { background:white; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+        
+        /* CALENDAR TABLE */
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #month-year { font-weight: bold; font-size: 20px; color: #2c3e50; }
+        
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: #f7f9fc; padding: 10px; border: 1px solid #ddd; color: #2f80ed; font-size: 13px; }
+        td { border: 1px solid #ddd; height: 110px; vertical-align: top; padding: 5px; background: #fff; position: relative; }
+        
+        .date-num { font-weight: bold; font-size: 14px; color: #555; }
+        .today { background: #e3f2fd !important; border: 2px solid #2f80ed !important; }
+        .event-item { 
+            font-size: 10px; padding: 3px 5px; border-radius: 3px; 
+            margin-top: 5px; color: white; background: #eb5757; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        
+        /* LIST DETAIL BAWAH */
+        .detail-box { margin-top: 30px; border-top: 2px solid #ddd; padding-top: 20px; }
+        .detail-item { 
+            padding: 12px; background: #f9f9f9; border-left: 5px solid #2f80ed; 
+            margin-bottom: 10px; border-radius: 5px;
         }
 
-        .menu-btn { display: none; font-size: 24px; cursor: pointer; color: #2c3e50; }
-        .btn-login { padding: 8px 15px; border: none; border-radius: 5px; background: #2f80ed; color: white; cursor: pointer; }
-
-        .container { padding:15px; }
-        .admin-panel { 
-            background: #fff; padding: 15px; border-radius: 10px; 
-            margin-bottom: 20px; display: none; border: 1px dashed #eb5757;
-        }
-        .btn-add { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%; }
-
-        /* KALENDER */
-        .calendar-box { 
-            background: white; padding: 15px; border-radius: 10px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; 
-        }
-        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        #month-year { font-weight: bold; font-size: 18px; }
-        .btn-nav { background: #eee; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th { background: #f7f9fc; padding: 10px; border: 1px solid #ddd; font-size: 13px; }
-        td { border: 1px solid #ddd; height: 100px; vertical-align: top; padding: 5px; width: 14.28%; }
-        
-        .date-num { font-weight: bold; font-size: 14px; }
-        .today { background: #e3f2fd; border: 2px solid #2f80ed !important; }
-        .event-item { font-size: 11px; padding: 4px; border-radius: 3px; margin-top: 4px; color: white; background: #eb5757; line-height: 1.2; }
-        
-        /* DETAIL BOX DI BAWAH KALENDER */
-        .detail-box { margin-top: 20px; padding-top: 20px; border-top: 2px solid #f1f4f9; }
-        .detail-item { padding: 10px; background: #f9f9f9; border-left: 4px solid #eb5757; margin-bottom: 8px; border-radius: 4px; }
+        .btn { padding:8px 15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; }
+        .btn-nav { background:#2f80ed; color:white; }
+        .btn-login { background: rgba(255,255,255,0.2); border: 1px solid white; color:white; font-size: 12px; }
+        .btn-add { background:#27ae60; color:white; width: 100%; margin-bottom: 15px; }
 
         @media (max-width: 768px) {
             .sidebar { left: -220px; }
             .sidebar.open { left: 0; }
             .main { margin-left: 0; }
-            .menu-btn { display: block; }
-            td { height: 80px; }
+            td { height: 75px; }
         }
     </style>
 </head>
@@ -77,38 +81,42 @@
     <a href="struktur.html">Struktur</a>
 </div>
 
-<div class="main">
+<div class="main" id="mainContent">
     <header>
-        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-        <h2 style="font-size: 16px;">Kalender RT 07</h2>
-        <button class="btn-login" id="authBtn" onclick="handleAuth()">Login Admin</button>
+        <div style="display: flex; align-items: center;">
+            <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+            <h2 style="font-size: 16px;">Kalender Kegiatan RT 07</h2>
+        </div>
+        <button class="btn btn-login" id="authBtn" onclick="handleAuth()">Login Admin</button>
     </header>
 
     <div class="container">
-        <div class="admin-panel" id="adminPanel">
-            <h4 style="margin-bottom:10px">Panel Administrator</h4>
-            <button class="btn-add" onclick="inputKegiatan()">+ Tambah Kegiatan Baru</button>
+        <div id="adminPanel" style="display:none;">
+            <button class="btn btn-add" onclick="inputKegiatan()">+ Tambah Kegiatan Baru</button>
         </div>
 
-        <div class="calendar-box">
+        <div class="card">
             <div class="calendar-nav">
-                <button class="btn-nav" onclick="moveMonth(-1)">←</button>
+                <button class="btn btn-nav" onclick="moveMonth(-1)">❮</button>
                 <div id="month-year"></div>
-                <button class="btn-nav" onclick="moveMonth(1)">→</button>
+                <button class="btn btn-nav" onclick="moveMonth(1)">❯</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Min</th><th>Sen</th><th>Sel</th><th>Rab</th><th>Kam</th><th>Jum</th><th>Sab</th>
-                    </tr>
-                </thead>
-                <tbody id="calendarBody"></tbody>
-            </table>
+            
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Min</th><th>Sen</th><th>Sel</th><th>Rab</th><th>Kam</th><th>Jum</th><th>Sab</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendarBody"></tbody>
+                </table>
+            </div>
 
             <div class="detail-box">
-                <h4 style="margin-bottom: 10px; color: #2c3e50;">📋 Daftar Detail Kegiatan Bulan Ini</h4>
+                <h4 style="margin-bottom: 15px; color: #2c3e50;">📋 Daftar Kegiatan Bulan Ini</h4>
                 <div id="list-detail">
-                    <p style="color: #999; font-size: 13px;">Memuat data...</p>
+                    <p style="color: #999; font-size: 13px;">Memuat data dari Google Sheets...</p>
                 </div>
             </div>
         </div>
@@ -116,14 +124,22 @@
 </div>
 
 <script>
+    // URL SCRIPT BAPAK
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwiUg77Qg3ntKP5ZCPI8vPzD1Gb0wGoI5XI3HKVO2XREJfPEv99wBicC_yvlgx9kjU/exec'; 
     
     let date = new Date();
-    let eventsData = {};
+    let eventsArray = []; 
     let isAdmin = (localStorage.getItem('rt07_admin_kalender') === 'true');
 
     function toggleSidebar() {
-        document.getElementById("mySidebar").classList.toggle("open");
+        const sidebar = document.getElementById("mySidebar");
+        const main = document.getElementById("mainContent");
+        if (window.innerWidth > 768) {
+            sidebar.classList.toggle("closed");
+            main.classList.toggle("expanded");
+        } else {
+            sidebar.classList.toggle("open");
+        }
     }
 
     function handleAuth() {
@@ -148,10 +164,12 @@
     async function fetchEvents() {
         try {
             const response = await fetch(scriptURL);
-            eventsData = await response.json();
+            const data = await response.json();
+            // Pastikan data yang diambil disimpan ke eventsArray
+            eventsArray = Array.isArray(data) ? data : [];
             renderCalendar();
         } catch (e) { 
-            console.error("Error:", e);
+            console.error("Gagal Ambil Data:", e);
             renderCalendar();
         }
     }
@@ -179,15 +197,22 @@
             let cell = document.createElement("td");
             let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             
-            let today = new Date();
-            if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            if (d === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) {
                 cell.classList.add('today');
             }
 
             let html = `<span class="date-num">${d}</span>`;
-            if (eventsData[tglKey]) {
-                html += `<div class="event-item"><b>${eventsData[tglKey].kegiatan}</b></div>`;
-            }
+            
+            // LOGIKA FILTER: Mencari kegiatan yang tanggalnya sama dengan kotak kalender
+            const kegiatanHariIni = eventsArray.filter(ev => {
+                let tglEvent = ev.tanggal.split('T')[0]; // Menangani format 2026-03-13T...
+                return tglEvent === tglKey;
+            });
+
+            kegiatanHariIni.forEach(ev => {
+                html += `<div class="event-item" title="${ev.kegiatan}"><b>${ev.kegiatan}</b></div>`;
+            });
+
             cell.innerHTML = html;
             row.appendChild(cell);
         }
@@ -200,30 +225,33 @@
     function updateDetailList() {
         const listContainer = document.getElementById("list-detail");
         listContainer.innerHTML = "";
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        let adaData = false;
+        const curMonth = date.getMonth() + 1;
+        const curYear = date.getFullYear();
 
-        for (let tgl in eventsData) {
-            const [eYear, eMonth, eDay] = tgl.split('-').map(Number);
-            if (eYear === year && eMonth === month) {
-                adaData = true;
-                const item = eventsData[tgl];
+        // Ambil kegiatan hanya untuk bulan yang sedang tampil
+        const filterBulan = eventsArray.filter(ev => {
+            let parts = ev.tanggal.split('T')[0].split('-');
+            return parseInt(parts[1]) === curMonth && parseInt(parts[0]) === curYear;
+        });
+
+        if (filterBulan.length > 0) {
+            filterBulan.forEach(item => {
                 const div = document.createElement("div");
                 div.className = "detail-item";
                 div.innerHTML = `
                     <div style="display: flex; justify-content: space-between;">
                         <strong>${item.kegiatan}</strong>
-                        <span style="font-size: 12px; color: #666;">📅 ${tgl}</span>
+                        <span style="font-size: 11px; color: #2f80ed;">📅 ${item.tanggal.split('T')[0]}</span>
                     </div>
-                    <div style="font-size: 13px; color: #555; margin-top: 4px;">
-                        📍 Lokasi: ${item.lokasi} | 🏷️ Kategori: ${item.kategori || '-'}
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                        📍 ${item.lokasi || 'Lokasi tidak diatur'} | 🏷️ ${item.kategori || 'Umum'}
                     </div>
                 `;
                 listContainer.appendChild(div);
-            }
+            });
+        } else {
+            listContainer.innerHTML = "<p style='color: #999; font-size: 13px;'>Tidak ada kegiatan di bulan ini.</p>";
         }
-        if (!adaData) listContainer.innerHTML = "<p style='color: #999; font-size: 13px;'>Tidak ada kegiatan di bulan ini.</p>";
     }
 
     function moveMonth(v) {
@@ -238,15 +266,19 @@
         const kat = prompt("Kategori:");
 
         if (tgl && keg) {
-            alert("Menyimpan...");
-            await fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
-            });
-            location.reload();
+            alert("Sedang menyimpan ke Google Sheets...");
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
+                });
+                alert("Data berhasil masuk GSheet!");
+                location.reload();
+            } catch (e) { alert("Gagal koneksi ke server."); }
         }
     }
 
+    // JALANKAN AMBIL DATA
     fetchEvents();
 </script>
 </body>
