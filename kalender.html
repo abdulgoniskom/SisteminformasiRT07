@@ -100,6 +100,13 @@
                     </tr>
                 </thead>
                 <tbody id="calendarBody"></tbody>
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <div id="detail-kegiatan">
+                <h4 style="margin-bottom: 10px; color: #2c3e50;">📋 Daftar Detail Kegiatan</h4>
+                <div id="list-detail">
+                    <p style="color: #999; font-size: 13px;">Pilih bulan untuk melihat daftar kegiatan.</p>
+                </div>
+            </div>
             </table>
         </div>
     </div>
@@ -158,53 +165,49 @@
     }
 
     function renderCalendar() {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-        document.getElementById("month-year").innerText = months[month] + " " + year;
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const lastDate = new Date(year, month + 1, 0).getDate();
-        const tbody = document.getElementById("calendarBody");
-        tbody.innerHTML = "";
-
-        let row = document.createElement("tr");
+        // ... kode yang sudah ada (looping pembuatan tanggal) ...
         
-        // Kotak kosong di awal bulan
-        for (let i = 0; i < firstDay; i++) {
-            row.appendChild(document.createElement("td"));
-        }
-
-        for (let d = 1; d <= lastDate; d++) {
-            if ((firstDay + d - 1) % 7 === 0 && d !== 1) {
-                tbody.appendChild(row);
-                row = document.createElement("tr");
-            }
-            
-            let cell = document.createElement("td");
-            let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            
-            // Cek hari ini
-            let today = new Date();
-            if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                cell.classList.add('today');
-            }
-
-            let html = `<span class="date-num">${d}</span>`;
-            if (eventsData[tglKey]) {
-                html += `<div class="event-item"><b>${eventsData[tglKey].kegiatan}</b><br>📍 ${eventsData[tglKey].lokasi}</div>`;
-            }
-            cell.innerHTML = html;
-            row.appendChild(cell);
-        }
-        
-        // Kotak kosong di akhir bulan agar baris lengkap
-        while (row.children.length < 7) {
-            row.appendChild(document.createElement("td"));
-        }
         tbody.appendChild(row);
+
+        // TAMBAHKAN LOGIKA INI DI AKHIR FUNGSI renderCalendar
+        updateDetailList();
     }
 
+    function updateDetailList() {
+        const listContainer = document.getElementById("list-detail");
+        listContainer.innerHTML = ""; // Reset isi
+
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        let adaData = false;
+
+        // Cari data yang sesuai dengan bulan dan tahun yang sedang tampil
+        for (let tgl dalam eventsData) {
+            const [eYear, eMonth, eDay] = tgl.split('-');
+            
+            if (parseInt(eYear) === year && parseInt(eMonth) === month) {
+                adaData = true;
+                const item = eventsData[tgl];
+                
+                const div = document.createElement("div");
+                div.style = "padding: 10px; background: #f9f9f9; border-left: 4px solid #eb5757; margin-bottom: 8px; border-radius: 4px;";
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong>${item.kegiatan}</strong>
+                        <span style="font-size: 12px; color: #666;">📅 ${tgl}</span>
+                    </div>
+                    <div style="font-size: 13px; color: #555; margin-top: 4px;">
+                        📍 Lokasi: ${item.lokasi} | 🏷️ Kategori: ${item.kategori || '-'}
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            }
+        }
+
+        if (!adaData) {
+            listContainer.innerHTML = "<p style='color: #999; font-size: 13px;'>Tidak ada kegiatan di bulan ini.</p>";
+        }
+    }
     function moveMonth(v) {
         date.setMonth(date.getMonth() + v);
         renderCalendar();
