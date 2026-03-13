@@ -102,15 +102,59 @@ tr:hover{ background:#f1f1f1; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbzNwfgwO8RxRquTeG-lKTxAbYcVXS7YwnL4dAu56_DXsQHU1rY2cB-B4Novp6hVvzab/exec"; 
 let dataWarga = [];
 let isAdmin = false;
 
+// 1. FUNGSI LOGIN (Yang tadi hilang)
+function tampilkanLogin(){ 
+    document.getElementById("loginModal").style.display="flex"; 
+}
+
+function loginAdmin(){
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+    
+    // Sesuaikan username & password di sini
+    if(user === "admin" && pass === "admin123"){
+        isAdmin = true;
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("btnTambah").style.display = "inline-block"; // Munculkan tombol tambah
+        tampilkanData(); // Refresh tabel agar tombol edit/hapus muncul
+        alert("Login Berhasil! Sekarang Anda bisa menambah/mengedit data.");
+    } else { 
+        alert("Username atau password salah!"); 
+    }
+}
+
+// 2. FUNGSI MODAL TAMBAH & EDIT (Yang tadi hilang)
+function tambahWarga(){
+    document.getElementById("formTitle").innerText = "Tambah Warga";
+    document.getElementById("rowId").value = "";
+    document.getElementById("namaWarga").value = "";
+    document.getElementById("alamatWarga").value = "";
+    document.getElementById("formModal").style.display = "flex";
+}
+
+function prepareEdit(index){
+    const item = dataWarga[index];
+    document.getElementById("formTitle").innerText = "Edit Warga";
+    document.getElementById("rowId").value = item.row_id;
+    document.getElementById("namaWarga").value = item.nama;
+    document.getElementById("alamatWarga").value = item.alamat;
+    document.getElementById("statusWarga").value = item.status;
+    document.getElementById("formModal").style.display = "flex";
+}
+
+// 3. FUNGSI DATA (Ambil & Tampil)
 async function ambilData(){
-    // Pastikan nama sheet di URL sesuai dengan nama tab di GSheet (misal: Data_Warga)
-    const res = await fetch(API_URL + "?sheet=Data_Warga");
-    dataWarga = await res.json();
-    tampilkanData();
+    try {
+        const res = await fetch(API_URL + "?sheet=Data_Warga");
+        dataWarga = await res.json();
+        tampilkanData();
+    } catch (e) {
+        console.log("Gagal ambil data");
+    }
 }
 
 function tampilkanData(){
@@ -134,7 +178,7 @@ function tampilkanData(){
     });
 }
 
-// Fungsi Simpan (Tambah/Edit)
+// 4. FUNGSI SIMPAN & HAPUS
 async function submitForm(){
     const rowId = document.getElementById("rowId").value;
     const action = rowId ? "update" : "insert";
@@ -147,9 +191,13 @@ async function submitForm(){
         status: document.getElementById("statusWarga").value
     };
     
+    // Tampilkan loading sederhana
+    document.querySelector("#formModal button").innerText = "Menyimpan...";
+    
     await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-    document.getElementById("formModal").style.display="none";
-    ambilData(); // Refresh data
+    document.getElementById("formModal").style.display = "none";
+    document.querySelector("#formModal button").innerText = "Simpan";
+    ambilData(); 
 }
 
 async function hapusWarga(row_id){
@@ -159,18 +207,16 @@ async function hapusWarga(row_id){
         ambilData();
     }
 }
-    
-// FUNGSI CETAK PDF DENGAN TANDA TANGAN
+
+// 5. CETAK PDF
 function cetakPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const tgl = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
 
-    // Judul Tengah
     doc.setFontSize(16);
     doc.text("Data Warga RT 07 RW 09 Bumi Indah City", 105, 20, { align: "center" });
 
-    // Tabel
     const rows = dataWarga.map((w,i)=>[i+1, w.nama, w.alamat, w.status]);
     doc.autoTable({ 
         head:[["No","Nama","Alamat","Status"]], 
@@ -180,18 +226,14 @@ function cetakPDF(){
         headStyles: { fillColor: [26, 188, 156] }
     });
 
-    // Tanda Tangan (Footer)
     const finalY = doc.lastAutoTable.finalY + 20;
     doc.setFontSize(11);
     doc.text(`Tangerang, ${tgl}`, 140, finalY);
-    
     doc.text("Mengetahui,", 30, finalY + 10);
     doc.text("Sekretaris,", 140, finalY + 10);
-    
     doc.setFont(undefined, 'bold');
     doc.text("MUHAMMAD ZAINUDIN", 30, finalY + 35);
     doc.text("ARIS MUNANDAR", 140, finalY + 35);
-    
     doc.setFont(undefined, 'normal');
     doc.text("Ketua RT 07", 30, finalY + 40);
     doc.text("Sekretaris RT 07", 140, finalY + 40);
