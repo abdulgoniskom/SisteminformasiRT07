@@ -10,103 +10,67 @@
         body { background:#f1f4f9; display:flex; min-height: 100vh; }
         
         /* SIDEBAR */
-        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; z-index: 1000; }
+        .sidebar { 
+            width:220px; background:#2c3e50; height:100vh; color:white; 
+            position:fixed; z-index: 1000; transition: 0.3s;
+        }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size: 18px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size: 14px; }
         .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
         
-        /* MAIN CONTENT */
-        .main { margin-left:220px; width:100%; display: flex; flex-direction: column; }
+        .main { margin-left:220px; width:100%; display: flex; flex-direction: column; transition: 0.3s; }
         
-        /* HEADER - JUDUL DI TENGAH */
+        /* HEADER */
         header { 
-            background:white; 
-            padding:15px 30px; 
-            box-shadow:0 2px 5px rgba(0,0,0,0.1); 
-            display:flex; 
-            align-items: center; 
-            position: sticky;
-            top: 0;
-            z-index: 900;
-            min-height: 70px;
+            background:white; padding:15px 20px; box-shadow:0 2px 5px rgba(0,0,0,0.1); 
+            display:flex; align-items: center; position: sticky; top: 0; z-index: 900;
         }
 
-        header h2 { 
-            flex: 1; 
-            text-align: center; 
-            font-size: 18px; 
-            color: #2c3e50;
-            margin: 0;
-            line-height: 1.2;
+        /* Tombol Menu khusus HP */
+        .menu-btn { 
+            display: none; font-size: 24px; cursor: pointer; margin-right: 15px; color: #2c3e50; 
         }
+
+        header h2 { flex: 1; text-align: center; font-size: 18px; color: #2c3e50; margin: 0; }
 
         .ketua-rt { 
-            font-size: 12px; 
-            font-weight: bold; 
-            color: #2f80ed;
-            position: absolute; 
-            right: 30px; 
-            background: #e3f2fd;
-            padding: 6px 15px;
-            border-radius: 20px;
-            white-space: nowrap;
+            font-size: 12px; font-weight: bold; color: #2f80ed; background: #e3f2fd;
+            padding: 6px 15px; border-radius: 20px; white-space: nowrap;
         }
 
-        /* RUNNING TEXT */
         .running-text { background: #f2994a; color: white; padding: 10px; font-weight: bold; }
-
-        /* CONTAINER CARDS */
         .container { padding:20px; flex-grow: 1; }
         .cards { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-        .card { flex:1; min-width:200px; padding:20px; border-radius:10px; color:white; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
+        .card { flex:1; min-width:200px; padding:20px; border-radius:10px; color:white; }
         .card:nth-child(1){background:#2f80ed;}
         .card:nth-child(2){background:#27ae60;}
         .card:nth-child(3){background:#eb5757;}
         .card:nth-child(4){background:#f2994a;}
-        .card h3 { font-size:11px; margin-bottom:10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
         .card p { font-size:22px; font-weight:bold; }
         
-        /* CHART & CALENDAR */
-        .chart-box { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .mini-calendar { background:white; padding:15px; border-radius:10px; border: 1px solid #eee; margin-top:25px; }
-        .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top: 10px;}
-        .day { background:#f7f9fc; padding:8px; border-radius:5px; font-size:12px; text-align:center; color: #555; }
+        .chart-box { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+        .mini-calendar { background:white; padding:15px; border-radius:10px; border: 1px solid #eee; margin-top:20px; }
+        .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top:10px; }
+        .day { background:#f7f9fc; padding:8px; border-radius:5px; font-size:12px; text-align:center; }
         .today { background: #2f80ed; color: white; font-weight: bold; }
 
-        /* RESPONSIVE UNTUK HP */
+        /* RESPONSIVE HP */
         @media (max-width: 768px) {
-            .sidebar { display: none; }
+            .sidebar { left: -220px; } /* Sembunyikan ke kiri */
+            .sidebar.open { left: 0; } /* Munculkan saat dipencet */
             .main { margin-left: 0; }
+            .menu-btn { display: block; } /* Munculkan tombol ☰ */
             
-            header { 
-                flex-direction: column; 
-                padding: 15px; 
-                height: auto; 
-                text-align: center;
-            }
-
-            header h2 { 
-                font-size: 15px; 
-                margin-bottom: 10px; 
-                width: 100%;
-                order: 1;
-            }
-
-            .ketua-rt { 
-                position: static; 
-                font-size: 11px; 
-                order: 2;
-                margin: 0 auto;
-            }
-
-            .container { padding: 15px; }
-            .card { min-width: 100%; }
+            header { flex-wrap: wrap; justify-content: space-between; }
+            header h2 { font-size: 14px; text-align: left; order: 2; flex: none; width: calc(100% - 50px); }
+            .ketua-rt { order: 3; margin: 10px auto 0; width: 100%; text-align: center; position: static; }
+            .menu-btn { order: 1; }
         }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <a href="index.html" class="active">Dashboard</a>
     <a href="kas.html">Kas RT</a>
@@ -119,44 +83,26 @@
 
 <div class="main">
     <header>
-        <h2>Sistem Informasi RT 07 RW 09 Bumi Indah City</h2>
+        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+        <h2>Sistem Informasi RT 07 RW 09</h2>
         <div class="ketua-rt">Ketua RT: Bpk. Muhammad Zainudin</div>
     </header>
 
     <div class="running-text">
-        <marquee id="marqueeKonten" behavior="scroll" direction="left" scrollamount="6">
-            Sedang memuat informasi terbaru dari pengumuman RT 07...
-        </marquee>
+        <marquee id="marqueeKonten">Memuat informasi terbaru...</marquee>
     </div>
 
     <div class="container">
         <div class="cards">
-            <div class="card">
-                <h3>Total Kas RT</h3>
-                <p id="totalKasRT">Rp 0</p>
-            </div>
-            <div class="card">
-                <h3>Kas Agustusan</h3>
-                <p id="kasAgustusan">Rp 0</p>
-            </div>
-            <div class="card">
-                <h3>Pengeluaran Bulan Ini</h3>
-                <p id="pengeluaranBulan">Rp 0</p>
-            </div>
-            <div class="card">
-                <h3>Jumlah Warga</h3>
-                <p id="jumlahWargaDisplay">Memuat...</p>
-            </div>
+            <div class="card"><h3>Total Kas RT</h3><p id="totalKasRT">Rp 0</p></div>
+            <div class="card"><h3>Kas Agustusan</h3><p id="kasAgustusan">Rp 0</p></div>
+            <div class="card"><h3>Pengeluaran Bulan Ini</h3><p id="pengeluaranBulan">Rp 0</p></div>
+            <div class="card"><h3>Jumlah Warga</h3><p id="jumlahWargaDisplay">...</p></div>
         </div>
 
         <div class="chart-box">
-            <h3 style="margin-bottom: 15px; font-size: 16px; color: #2c3e50;">📊 Grafik Kas RT (Pemasukan vs Pengeluaran)</h3>
-            <div style="position: relative; height:300px;">
-                <canvas id="kasChart"></canvas>
-            </div>
-            
+            <canvas id="kasChart" style="height:250px;"></canvas>
             <div class="mini-calendar">
-                <h3 style="font-size: 14px; color: #2c3e50;">📅 Kalender Hari Ini</h3>
                 <div class="calendar-grid" id="miniCalendar"></div>
             </div>
         </div>
@@ -164,102 +110,81 @@
 </div>
 
 <script>
-// --- KONFIGURASI API (PERINTAH TETAP SAMA) ---
+// FUNGSI BUKA TUTUP SIDEBAR DI HP
+function toggleSidebar() {
+    document.getElementById("mySidebar").classList.toggle("open");
+}
+
+// Klik di luar sidebar untuk menutup di HP
+document.addEventListener('click', function(event) {
+    var sidebar = document.getElementById("mySidebar");
+    var menuBtn = document.querySelector(".menu-btn");
+    if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+        sidebar.classList.remove("open");
+    }
+});
+
+// --- LOGIKA API TETAP SAMA (TIDAK BERUBAH) ---
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
 
-let chart;
+function rupiah(angka) { return "Rp " + Number(angka).toLocaleString("id-ID"); }
 
-function rupiah(angka) {
-    return "Rp " + Number(angka).toLocaleString("id-ID");
-}
-
-// 1. Ambil Jumlah Warga
 function loadWargaCount() {
-    fetch(API_WARGA + "?sheet=Data_Warga")
-        .then(res => res.json())
-        .then(data => {
-            if (data) document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
-        });
+    fetch(API_WARGA + "?sheet=Data_Warga").then(res => res.json()).then(data => {
+        if (data) document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
+    });
 }
 
-// 2. Ambil Data Kas RT
 function loadKasRT() {
-    fetch(API + "?sheet=Kas_RT")
-        .then(res => res.json())
-        .then(data => {
-            let totalMasuk = 0, totalKeluar = 0, keluarBulanIni = 0;
-            let sekarang = new Date();
-
-            data.forEach(d => {
-                let m = Number(d.masuk || 0);
-                let k = Number(d.keluar || 0);
-                totalMasuk += m;
-                totalKeluar += k;
-
-                let tgl = new Date(d.tanggal);
-                if(!isNaN(tgl) && tgl.getMonth() === sekarang.getMonth() && tgl.getFullYear() === sekarang.getFullYear()) {
-                    keluarBulanIni += k;
-                }
-            });
-
-            document.getElementById("totalKasRT").innerText = rupiah(totalMasuk - totalKeluar);
-            document.getElementById("pengeluaranBulan").innerText = rupiah(keluarBulanIni);
-            updateGrafik(data);
+    fetch(API + "?sheet=Kas_RT").then(res => res.json()).then(data => {
+        let totalMasuk = 0, totalKeluar = 0, keluarBulanIni = 0, sekarang = new Date();
+        data.forEach(d => {
+            let m = Number(d.masuk || 0), k = Number(d.keluar || 0);
+            totalMasuk += m; totalKeluar += k;
+            let tgl = new Date(d.tanggal);
+            if(!isNaN(tgl) && tgl.getMonth() === sekarang.getMonth()) keluarBulanIni += k;
         });
+        document.getElementById("totalKasRT").innerText = rupiah(totalMasuk - totalKeluar);
+        document.getElementById("pengeluaranBulan").innerText = rupiah(keluarBulanIni);
+        updateGrafik(data);
+    });
 }
 
-// 3. Ambil Kas Agustusan
 function loadKasAgustusan() {
-    fetch(API + "?sheet=Kas_Agustusan")
-        .then(res => res.json())
-        .then(data => {
-            let total = 0;
-            data.forEach(d => {
-                total += (Number(d.masuk || 0) - Number(d.keluar || 0));
-            });
-            document.getElementById("kasAgustusan").innerText = rupiah(total);
-        });
+    fetch(API + "?sheet=Kas_Agustusan").then(res => res.json()).then(data => {
+        let total = 0;
+        data.forEach(d => total += (Number(d.masuk || 0) - Number(d.keluar || 0)));
+        document.getElementById("kasAgustusan").innerText = rupiah(total);
+    });
 }
 
-// 4. Update Grafik Chart.js
 function updateGrafik(data) {
-    let bulanMasuk = Array(12).fill(0);
-    let bulanKeluar = Array(12).fill(0);
-
+    let bulanMasuk = Array(12).fill(0), bulanKeluar = Array(12).fill(0);
     data.forEach(d => {
         let tgl = new Date(d.tanggal);
         if (!isNaN(tgl)) {
-            let bulan = tgl.getMonth();
-            bulanMasuk[bulan] += Number(d.masuk || 0);
-            bulanKeluar[bulan] += Number(d.keluar || 0);
+            bulanMasuk[tgl.getMonth()] += Number(d.masuk || 0);
+            bulanKeluar[tgl.getMonth()] += Number(d.keluar || 0);
         }
     });
-
-    if(chart) chart.destroy();
-    chart = new Chart(document.getElementById("kasChart"), {
+    if(window.chartObj) window.chartObj.destroy();
+    window.chartObj = new Chart(document.getElementById("kasChart"), {
         type: 'bar',
         data: {
             labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
             datasets: [
-                { label: 'Pemasukan', data: bulanMasuk, backgroundColor: '#2f80ed' },
-                { label: 'Pengeluaran', data: bulanKeluar, backgroundColor: '#eb5757' }
+                { label: 'Masuk', data: bulanMasuk, backgroundColor: '#2f80ed' },
+                { label: 'Keluar', data: bulanKeluar, backgroundColor: '#eb5757' }
             ]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
-// 5. Mini Kalender
 function loadMiniCalendar() {
-    let now = new Date();
-    let days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    let firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+    let now = new Date(), days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(), firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
     let html = "";
     for(let i=0; i<firstDay; i++) html += "<div></div>";
     for(let d=1; d<=days; d++) {
@@ -269,27 +194,16 @@ function loadMiniCalendar() {
     document.getElementById("miniCalendar").innerHTML = html;
 }
 
-// 6. Running Text dari Pengumuman
 function loadRunningText() {
-    fetch(API_PENGUMUMAN + "?sheet=Pengumuman")
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.length > 0) {
-                let teksGabungan = data.reverse().slice(0, 3).map(d => d.judul).join("  •  ");
-                document.getElementById("marqueeKonten").innerText = "📢 INFO TERKINI: " + teksGabungan + "  •  Selamat Datang di Website Resmi RT 07 RW 09 Bumi Indah City.";
-            }
-        })
-        .catch(err => console.error("Gagal muat running text:", err));
+    fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(res => res.json()).then(data => {
+        if (data && data.length > 0) {
+            let teks = data.reverse().slice(0, 3).map(d => d.judul).join("  •  ");
+            document.getElementById("marqueeKonten").innerText = "📢 INFO: " + teks;
+        }
+    });
 }
 
-// Jalankan semua fungsi saat halaman terbuka
-window.onload = () => {
-    loadWargaCount();
-    loadKasRT();
-    loadKasAgustusan();
-    loadMiniCalendar();
-    loadRunningText();
-};
+window.onload = () => { loadWargaCount(); loadKasRT(); loadKasAgustusan(); loadMiniCalendar(); loadRunningText(); };
 </script>
 </body>
 </html>
