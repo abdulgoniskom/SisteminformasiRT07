@@ -76,7 +76,78 @@
 
 <script>
 // URL API Khusus Pengumuman Bapak
-const API = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec"; 
+const API = "const SHEET_NAME = "Pengumuman";
+
+function doGet(e){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  
+  const data = sheet.getDataRange().getValues();
+  const result = [];
+  const headers = data[0];
+  
+  for(let i=1;i<data.length;i++){
+    let rowObj = {};
+    for(let j=0;j<headers.length;j++){
+      let value = data[i][j];
+      
+      // Jika kolom gambar, ubah link Drive jadi direct link
+      if(headers[j].toLowerCase() === "gambar" && value && typeof value === "string"){
+        value = convertDriveLink(value);
+      }
+      rowObj[headers[j]] = value;
+    }
+    result.push(rowObj);
+  }
+  
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function convertDriveLink(link){
+  const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if(match && match[1]){
+    return "https://drive.google.com/uc?export=view&id=" + match[1];
+  }
+  return link;
+}
+
+function doPost(e){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const params = e.parameter;
+  const action = params.action; // Kita tambah parameter aksi (insert atau delete)
+  const judul = params.judul || "";
+  const gambar = params.gambar || "";
+
+  // LOGIKA SIMPAN (INSERT)
+  if (action === "insert") {
+    if(!judul) return ContentService.createTextOutput("Gagal: Judul kosong");
+    sheet.appendRow([judul, gambar]);
+    return ContentService.createTextOutput("success");
+  }
+
+  // LOGIKA HAPUS (DELETE)
+  if (action === "delete") {
+    const data = sheet.getDataRange().getValues();
+    // Cari baris yang judulnya sama
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] == judul) { // Asumsi Judul ada di kolom A (index 0)
+        sheet.deleteRow(i + 1);
+        return ContentService.createTextOutput("success");
+      }
+    }
+    return ContentService.createTextOutput("Gagal: Data tidak ditemukan");
+  }
+
+  // Fallback jika action tidak dikenal (untuk kodingan lama Bapak)
+  if(!action && judul){
+    sheet.appendRow([judul, gambar]);
+    return ContentService.createTextOutput("success");
+  }
+
+  return ContentService.createTextOutput("Aksi tidak dikenal");
+}"; 
 let isAdmin = false;
 
 function login(){
