@@ -8,7 +8,7 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
         body { background:#f1f4f9; display:flex; overflow-x: hidden; }
 
-        /* SIDEBAR RESPONSIF */
+        /* SIDEBAR */
         .sidebar { 
             width:220px; background:#2c3e50; height:100vh; color:white; 
             position:fixed; transition: 0.3s; z-index: 1000; 
@@ -17,7 +17,7 @@
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
         .sidebar a:hover, .active { background:#34495e; border-left: 4px solid #1abc9c; }
         
-        /* MAIN CONTENT RESPONSIF */
+        /* MAIN CONTENT */
         .main { margin-left:220px; width:100%; transition: 0.3s; min-width: 0; }
         header { 
             background:white; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); 
@@ -25,33 +25,39 @@
         }
 
         .menu-btn { display: none; font-size: 24px; cursor: pointer; color: #2c3e50; }
-        .container { padding:15px; }
+        .btn-login { padding: 8px 15px; border: none; border-radius: 5px; background: #2f80ed; color: white; cursor: pointer; }
 
-        /* TABEL KALENDER AGAR BISA DI-SCROLL DI HP */
+        .container { padding:15px; }
+        .admin-panel { 
+            background: #fff; padding: 15px; border-radius: 10px; 
+            margin-bottom: 20px; display: none; border: 1px dashed #eb5757;
+        }
+        .btn-add { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%; }
+
+        /* KALENDER */
         .calendar-box { 
             background: white; padding: 15px; border-radius: 10px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; 
         }
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         #month-year { font-weight: bold; font-size: 18px; }
+        .btn-nav { background: #eee; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
         
-        table { width: 100%; border-collapse: collapse; min-width: 500px; } /* Paksa lebar minimal agar tidak penyet */
-        th { background: #f7f9fc; padding: 8px; border: 1px solid #ddd; font-size: 13px; }
-        td { border: 1px solid #ddd; height: 80px; vertical-align: top; padding: 5px; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { background: #f7f9fc; padding: 10px; border: 1px solid #ddd; font-size: 13px; }
+        td { border: 1px solid #ddd; height: 100px; vertical-align: top; padding: 5px; width: 14.28%; }
         
         .date-num { font-weight: bold; font-size: 14px; }
         .today { background: #e3f2fd; border: 2px solid #2f80ed !important; }
-        .event-item { font-size: 10px; padding: 3px; border-radius: 3px; margin-top: 2px; color: white; background: #eb5757; word-break: break-all; }
+        .event-item { font-size: 11px; padding: 4px; border-radius: 3px; margin-top: 4px; color: white; background: #eb5757; line-height: 1.2; }
         
-        /* KHUSUS TAMPILAN HP (DI BAWAH 768px) */
+        /* RESPONSIVE MOBILE */
         @media (max-width: 768px) {
-            .sidebar { left: -220px; } /* Sembunyikan sidebar ke kiri */
-            .sidebar.open { left: 0; } /* Munculkan saat tombol diklik */
+            .sidebar { left: -220px; }
+            .sidebar.open { left: 0; }
             .main { margin-left: 0; }
-            .menu-btn { display: block; } /* Munculkan tombol garis tiga */
-            
-            #month-year { font-size: 16px; }
-            .btn-nav { padding: 5px 10px; font-size: 12px; }
+            .menu-btn { display: block; }
+            td { height: 80px; }
         }
     </style>
 </head>
@@ -69,31 +75,9 @@
 <div class="main">
     <header>
         <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-        <h2 id="titleHeader" style="font-size: 16px;">Kalender RT 07</h2>
-        <button class="btn-login" id="authBtn" onclick="handleAuth()">Login</button>
+        <h2 style="font-size: 16px;">Kalender RT 07</h2>
+        <button class="btn-login" id="authBtn" onclick="handleAuth()">Login Admin</button>
     </header>
-    ```
-
----
-
-### 3. Tambahkan Script Toggle Sidebar
-Tambahkan fungsi ini di dalam tag `<script>` Bapak:
-
-```javascript
-    function toggleSidebar() {
-        document.getElementById("mySidebar").classList.toggle("open");
-    }
-
-    // Klik di luar sidebar untuk menutup saat di HP
-    document.addEventListener('click', function(event) {
-        var sidebar = document.getElementById('mySidebar');
-        var btn = document.querySelector('.menu-btn');
-        if (window.innerWidth <= 768 && !sidebar.contains(event.target) && event.target !== btn) {
-            sidebar.classList.remove('open');
-        }
-    });    
-
-</header>
 
     <div class="container">
         <div class="admin-panel" id="adminPanel">
@@ -103,11 +87,11 @@ Tambahkan fungsi ini di dalam tag `<script>` Bapak:
 
         <div class="calendar-box">
             <div class="calendar-nav">
-                <button class="btn-nav" onclick="moveMonth(-1)">← Bulan Lalu</button>
+                <button class="btn-nav" onclick="moveMonth(-1)">←</button>
                 <div id="month-year"></div>
-                <button class="btn-nav" onclick="moveMonth(1)">Bulan Depan →</button>
+                <button class="btn-nav" onclick="moveMonth(1)">→</button>
             </div>
-            <table id="calendarTable">
+            <table>
                 <thead>
                     <tr>
                         <th>Min</th><th>Sen</th><th>Sel</th><th>Rab</th><th>Kam</th><th>Jum</th><th>Sab</th>
@@ -120,12 +104,25 @@ Tambahkan fungsi ini di dalam tag `<script>` Bapak:
 </div>
 
 <script>
-    // PENTING: Paste URL Web App Kalender Bapak di sini
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwiUg77Qg3ntKP5ZCPI8vPzD1Gb0wGoI5XI3HKVO2XREJfPEv99wBicC_yvlgx9kjU/exec'; 
     
     let date = new Date();
     let eventsData = {};
     let isAdmin = (localStorage.getItem('rt07_admin_kalender') === 'true');
+
+    // --- FUNGSI UI & SIDEBAR ---
+    function toggleSidebar() {
+        document.getElementById("mySidebar").classList.toggle("open");
+    }
+
+    // Klik di luar sidebar untuk menutup di HP
+    document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('mySidebar');
+        const btn = document.querySelector('.menu-btn');
+        if (window.innerWidth <= 768 && !sidebar.contains(e.target) && e.target !== btn) {
+            sidebar.classList.remove('open');
+        }
+    });
 
     function handleAuth() {
         if (isAdmin) {
@@ -136,7 +133,7 @@ Tambahkan fungsi ini di dalam tag `<script>` Bapak:
             if (pass === "123") {
                 localStorage.setItem('rt07_admin_kalender', 'true');
                 location.reload();
-            } else { alert("Salah!"); }
+            } else { alert("Password Salah!"); }
         }
     }
 
@@ -146,13 +143,15 @@ Tambahkan fungsi ini di dalam tag `<script>` Bapak:
         document.getElementById('authBtn').style.background = "#eb5757";
     }
 
+    // --- FUNGSI KALENDER ---
     async function fetchEvents() {
         try {
             const response = await fetch(scriptURL);
             eventsData = await response.json();
             renderCalendar();
         } catch (e) { 
-            alert("Gagal menyambung ke server. Pastikan URL API benar dan sudah di-Deploy sebagai 'Anyone'."); 
+            console.error("Gagal mengambil data:", e);
+            renderCalendar(); // Tetap render meski data kosong
         }
     }
 
@@ -168,24 +167,38 @@ Tambahkan fungsi ini di dalam tag `<script>` Bapak:
         tbody.innerHTML = "";
 
         let row = document.createElement("tr");
-        for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
+        
+        // Kotak kosong di awal bulan
+        for (let i = 0; i < firstDay; i++) {
+            row.appendChild(document.createElement("td"));
+        }
 
         for (let d = 1; d <= lastDate; d++) {
             if ((firstDay + d - 1) % 7 === 0 && d !== 1) {
                 tbody.appendChild(row);
                 row = document.createElement("tr");
             }
+            
             let cell = document.createElement("td");
             let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             
-            if (tglKey === new Date().toISOString().split('T')[0]) cell.classList.add('today');
+            // Cek hari ini
+            let today = new Date();
+            if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                cell.classList.add('today');
+            }
 
             let html = `<span class="date-num">${d}</span>`;
             if (eventsData[tglKey]) {
-                html += `<div class="event-item"><b>${eventsData[tglKey].kegiatan}</b><br><small>📍 ${eventsData[tglKey].lokasi}</small></div>`;
+                html += `<div class="event-item"><b>${eventsData[tglKey].kegiatan}</b><br>📍 ${eventsData[tglKey].lokasi}</div>`;
             }
             cell.innerHTML = html;
             row.appendChild(cell);
+        }
+        
+        // Kotak kosong di akhir bulan agar baris lengkap
+        while (row.children.length < 7) {
+            row.appendChild(document.createElement("td"));
         }
         tbody.appendChild(row);
     }
@@ -196,21 +209,26 @@ Tambahkan fungsi ini di dalam tag `<script>` Bapak:
     }
 
     async function inputKegiatan() {
-        const tgl = prompt("Tanggal (Format: YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+        const tgl = prompt("Tanggal (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
         const keg = prompt("Nama Kegiatan:");
         const lok = prompt("Lokasi:");
         const kat = prompt("Kategori (Rapat/Umum/Bakti):");
 
         if (tgl && keg) {
-            alert("Sedang menyimpan...");
-            await fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
-            });
-            location.reload();
+            alert("Sedang menyimpan... Mohon tunggu.");
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
+                });
+                location.reload();
+            } catch (e) {
+                alert("Gagal menyimpan. Cek koneksi atau izin Google Script Bapak.");
+            }
         }
     }
 
+    // Jalankan saat pertama kali buka
     fetchEvents();
 </script>
 </body>
