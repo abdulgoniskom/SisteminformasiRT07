@@ -1,47 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Warga RT 07</title>
-<style>
-/* CSS DASAR */
-body { margin:0; font-family:Arial, sans-serif; background:#eef2f7; }
-.sidebar { width: 220px; background: #2c3e50; height: 100vh; color: white; position: fixed; }
-.sidebar h2 { text-align: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 18px; }
-.sidebar a { display: block; color: white; padding: 15px; text-decoration: none; font-size: 14px; }
-.sidebar a:hover, .sidebar a.active { background: #34495e; border-left: 4px solid #1abc9c; }
-.content { margin-left: 220px; padding: 30px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Warga RT 07 - RT 07 RW 09</title>
+    <style>
+        /* CSS DASAR (Konsisten dengan Arsip & Kas) */
+        * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+        body { background:#eef2f7; display:flex; overflow-x: hidden; }
 
-/* JUDUL TENGAH */
-h1 { color:#2c3e50; margin-bottom:20px; text-align: center; }
+        /* SIDEBAR */
+        .sidebar { 
+            width:220px; background:#2c3e50; height:100vh; color:white; 
+            position:fixed; transition: 0.3s; z-index: 1000; left: 0;
+        }
+        .sidebar.closed { left: -220px; }
+        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
+        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
+        .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
+        .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
+        
+        /* AREA UTAMA */
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
+        .main.expanded { margin-left: 0; }
 
-.table-container{ max-width:100%; overflow-x:auto; }
-table{ width:100%; border-collapse:collapse; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); min-width:400px; }
-th, td{ padding:12px; border-bottom:1px solid #ddd; text-align:left; font-size: 14px; }
-th{ background:#1abc9c; color:white; }
-tr:hover{ background:#f1f1f1; }
+        header { 
+            background:#2f80ed; color:white; padding:15px; 
+            display:flex; justify-content:space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 900;
+        }
+        .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; }
 
-.btn{ padding:8px 14px; margin-right:5px; border:none; border-radius:4px; cursor:pointer; color:white; font-size: 12px; }
-.btn-add{background:#1abc9c;}
-.btn-edit{background:#3498db;}
-.btn-delete{background:#e74c3c;}
-.btn-pdf{background:#e67e22; margin-bottom:10px;}
+        /* KONTEN */
+        .container { padding:20px; max-width:1100px; margin:auto; }
+        .card { 
+            background:white; padding:15px; border-radius:10px; 
+            margin-bottom:20px; box-shadow:0 4px 8px rgba(0,0,0,0.1); 
+        }
 
-.modal{ display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
-.modal-content{ background:white; padding:20px; border-radius:8px; width:300px; text-align:center; }
-.modal-content input, .modal-content select{ width:90%; padding:8px; margin:8px 0; border:1px solid #ccc; border-radius:4px; }
-.modal-content button{ background:#1abc9c; border:none; color:white; padding:10px 15px; border-radius:4px; cursor:pointer; margin-top:10px; }
+        /* SEARCH & TOOLBAR */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .search-box { padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; width: 250px; outline: none; }
+        .search-box:focus { border-color: #2f80ed; }
 
-@media screen and (max-width:768px){
-    .sidebar{width:60px;} .sidebar h2{display:none;} .content{margin-left:60px;padding:10px;}
-    .sidebar button { font-size: 10px; padding: 2px; }
-}
-</style>
+        /* TABEL */
+        .table-container { overflow-x: auto; }
+        table { width:100%; border-collapse:collapse; background:white; min-width:600px; }
+        th, td { padding:12px; border-bottom:1px solid #ddd; text-align:left; font-size: 13px; }
+        th { background:#2f80ed; color:white; text-align: center; }
+        tr:hover { background:#f5f9ff; }
+
+        /* TOMBOL */
+        .btn { padding:8px 14px; border:none; border-radius:4px; cursor:pointer; color:white; font-size: 12px; font-weight: bold; }
+        .btn-add { background:#1abc9c; }
+        .btn-edit { background:#3498db; }
+        .btn-delete { background:#e74c3c; }
+        .btn-pdf { background:#e67e22; }
+        .btn-login { background: rgba(255,255,255,0.2); border: 1px solid white; width: 80%; margin: 20px auto; display: block; }
+
+        /* MODAL */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; }
+        .modal-content { background:white; padding:20px; border-radius:8px; width:320px; text-align:center; }
+        .modal-content input, .modal-content select { width: 100%; padding:10px; margin:10px 0; border:1px solid #ccc; border-radius:4px; }
+        .modal-content button { background:#2f80ed; border:none; color:white; padding:10px 20px; border-radius:4px; cursor:pointer; width: 100%; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .sidebar { left: -220px; }
+            .sidebar.open { left: 0; }
+            .main { margin-left: 0; }
+            .search-box { width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="kas.html">Kas RT</a>
@@ -50,31 +83,46 @@ tr:hover{ background:#f1f1f1; }
     <a href="kalender.html">Kalender</a>
     <a href="arsip.html">Arsip</a>
     <a href="struktur.html">Struktur</a>
-    <button onclick="tampilkanLogin()" style="margin: 10px; padding: 5px; cursor: pointer; width: 80%;">Login Admin</button>
+    <button class="btn btn-login" id="adminToggle" onclick="tampilkanLogin()">Login Admin</button>
 </div>
 
-<div class="content">
-    <h1>Data Warga RT 07 RW 09</h1>
-    <div style="text-align: center;">
-        <button id="btnTambah" class="btn btn-add" style="display:none;" onclick="tambahWarga()">Tambah Warga</button>
-        <button class="btn btn-pdf" onclick="cetakPDF()">Cetak PDF</button>
-    </div>
-    <br>
-    <div class="table-container">
-        <table id="tabelWarga">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>Alamat</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>
-            </tbody>
-        </table>
+<div class="main" id="mainContent">
+    <header>
+        <div style="display: flex; align-items: center;">
+            <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+            <h2 style="font-size: 16px;">Data Warga RT 07 RW 09 Bumi Indah City</h2>
+        </div>
+        <div id="statusAdmin" style="font-size: 12px; background: #1abc9c; padding: 5px 10px; border-radius: 4px; display: none;">Mode Admin Aktif</div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="toolbar">
+                <input type="text" id="cariNama" class="search-box" placeholder="Cari Nama Warga..." onkeyup="filterWarga()">
+                
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnTambah" class="btn btn-add" style="display:none;" onclick="tambahWarga()">+ Tambah Warga</button>
+                    <button class="btn btn-pdf" onclick="cetakPDF()">🧾 Cetak PDF</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="tabelWarga">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">No</th>
+                            <th>Nama Lengkap</th>
+                            <th>Alamat / Blok</th>
+                            <th>Status Warga</th>
+                            <th id="thAksi" style="display:none;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiTabel">
+                        <tr><td colspan="5" style="text-align:center;">Memuat data warga...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -82,22 +130,22 @@ tr:hover{ background:#f1f1f1; }
     <div class="modal-content">
         <h3 id="formTitle">Tambah Warga</h3>
         <input type="hidden" id="rowId">
-        <input type="text" id="namaWarga" placeholder="Nama Warga"><br>
-        <input type="text" id="alamatWarga" placeholder="Alamat"><br>
+        <input type="text" id="namaWarga" placeholder="Nama Lengkap">
+        <input type="text" id="alamatWarga" placeholder="Alamat / No. Rumah">
         <select id="statusWarga">
             <option value="Warga Tetap">Warga Tetap</option>
             <option value="Warga Sementara">Warga Sementara</option>
         </select>
-        <button onclick="submitForm()">Simpan</button>
+        <button id="btnSimpan" onclick="submitForm()">Simpan Data</button>
     </div>
 </div>
 
 <div id="loginModal" class="modal">
     <div class="modal-content">
-        <h3>Login Admin</h3>
-        <input type="text" id="username" placeholder="Username"><br>
-        <input type="password" id="password" placeholder="Password"><br>
-        <button onclick="loginAdmin()">Login</button>
+        <h3>Login Pengurus</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="loginAdmin()">Masuk</button>
     </div>
 </div>
 
@@ -105,14 +153,22 @@ tr:hover{ background:#f1f1f1; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-// URL API YANG SUDAH TERBUKTI BERHASIL
 const API_URL = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec"; 
 let dataWarga = [];
 let isAdmin = false;
 
-function tampilkanLogin(){ 
-    document.getElementById("loginModal").style.display="flex"; 
+function toggleSidebar() {
+    const sidebar = document.getElementById("mySidebar");
+    const main = document.getElementById("mainContent");
+    if (window.innerWidth > 768) {
+        sidebar.classList.toggle("closed");
+        main.classList.toggle("expanded");
+    } else {
+        sidebar.classList.toggle("open");
+    }
 }
+
+function tampilkanLogin(){ document.getElementById("loginModal").style.display="flex"; }
 
 function loginAdmin(){
     const user = document.getElementById("username").value;
@@ -121,29 +177,12 @@ function loginAdmin(){
         isAdmin = true;
         document.getElementById("loginModal").style.display = "none";
         document.getElementById("btnTambah").style.display = "inline-block";
+        document.getElementById("thAksi").style.display = "table-cell";
+        document.getElementById("statusAdmin").style.display = "block";
+        document.getElementById("adminToggle").innerText = "Logout Admin";
+        document.getElementById("adminToggle").onclick = () => location.reload();
         tampilkanData();
-        alert("Login Berhasil!");
-    } else { 
-        alert("Username atau password salah!"); 
-    }
-}
-
-function tambahWarga(){
-    document.getElementById("formTitle").innerText = "Tambah Warga";
-    document.getElementById("rowId").value = "";
-    document.getElementById("namaWarga").value = "";
-    document.getElementById("alamatWarga").value = "";
-    document.getElementById("formModal").style.display = "flex";
-}
-
-function prepareEdit(index){
-    const item = dataWarga[index];
-    document.getElementById("formTitle").innerText = "Edit Warga";
-    document.getElementById("rowId").value = item.row_id;
-    document.getElementById("namaWarga").value = item.nama;
-    document.getElementById("alamatWarga").value = item.alamat;
-    document.getElementById("statusWarga").value = item.status;
-    document.getElementById("formModal").style.display = "flex";
+    } else { alert("Username atau password salah!"); }
 }
 
 async function ambilData(){
@@ -152,56 +191,83 @@ async function ambilData(){
         dataWarga = await res.json();
         tampilkanData();
     } catch (e) {
-        console.error("Gagal ambil data:", e);
-        document.querySelector("#tabelWarga tbody").innerHTML = "<tr><td colspan='5' style='text-align:center; color:red;'>Gagal memuat data. Periksa koneksi atau URL API.</td></tr>";
+        document.querySelector("#isiTabel").innerHTML = "<tr><td colspan='5' style='text-align:center; color:red;'>Gagal memuat data.</td></tr>";
     }
 }
 
-function tampilkanData(){
-    const tbody = document.querySelector("#tabelWarga tbody");
+// FITUR PENCARIAN (Penting!)
+function filterWarga() {
+    const keyword = document.getElementById("cariNama").value.toLowerCase();
+    const filteredData = dataWarga.filter(warga => 
+        warga.nama.toLowerCase().includes(keyword) || 
+        warga.alamat.toLowerCase().includes(keyword)
+    );
+    tampilkanData(filteredData);
+}
+
+function tampilkanData(dataManual = null){
+    const list = dataManual || dataWarga;
+    const tbody = document.getElementById("isiTabel");
     tbody.innerHTML = "";
-    if (dataWarga.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Tidak ada data.</td></tr>";
-        return;
-    }
-    dataWarga.forEach((warga, index) => {
+    
+    list.forEach((warga, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${index+1}</td>
+            <td style="text-align:center;">${index+1}</td>
             <td>${warga.nama || ''}</td>
             <td>${warga.alamat || ''}</td>
-            <td>${warga.status || ''}</td>
-            <td>
-                ${isAdmin ? `
-                    <button class="btn btn-edit" onclick="prepareEdit(${index})">Edit</button>
+            <td style="text-align:center;">${warga.status || ''}</td>
+            ${isAdmin ? `
+                <td style="text-align:center;">
+                    <button class="btn btn-edit" onclick="prepareEdit(${dataWarga.indexOf(warga)})">Edit</button>
                     <button class="btn btn-delete" onclick="hapusWarga(${warga.row_id})">Hapus</button>
-                ` : '-'}
-            </td>
+                </td>
+            ` : `<td style="display:none;"></td>`}
         `;
         tbody.appendChild(row);
     });
 }
 
+function tambahWarga(){
+    document.getElementById("formTitle").innerText = "Tambah Warga Baru";
+    document.getElementById("rowId").value = "";
+    document.getElementById("namaWarga").value = "";
+    document.getElementById("alamatWarga").value = "";
+    document.getElementById("formModal").style.display = "flex";
+}
+
+function prepareEdit(index){
+    const item = dataWarga[index];
+    document.getElementById("formTitle").innerText = "Edit Data Warga";
+    document.getElementById("rowId").value = item.row_id;
+    document.getElementById("namaWarga").value = item.nama;
+    document.getElementById("alamatWarga").value = item.alamat;
+    document.getElementById("statusWarga").value = item.status;
+    document.getElementById("formModal").style.display = "flex";
+}
+
 async function submitForm(){
     const rowId = document.getElementById("rowId").value;
-    const action = rowId ? "update" : "insert";
+    const btn = document.getElementById("btnSimpan");
     const payload = {
         sheet: "Data_Warga",
-        action: action,
+        action: rowId ? "update" : "insert",
         row_id: rowId,
         nama: document.getElementById("namaWarga").value,
         alamat: document.getElementById("alamatWarga").value,
         status: document.getElementById("statusWarga").value
     };
-    document.querySelector("#formModal button").innerText = "Menyimpan...";
+    btn.innerText = "Proses Menyimpan...";
+    btn.disabled = true;
     await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
     document.getElementById("formModal").style.display = "none";
-    document.querySelector("#formModal button").innerText = "Simpan";
+    btn.innerText = "Simpan Data";
+    btn.disabled = false;
     ambilData(); 
 }
 
 async function hapusWarga(row_id){
-    if(confirm("Hapus data warga ini?")){
+    if(confirm("Apakah Anda yakin ingin menghapus data warga ini?")){
         const payload = { sheet: "Data_Warga", action: "delete", row_id: row_id };
         await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
         ambilData();
@@ -212,14 +278,12 @@ function cetakPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const tgl = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
-    const pageWidth = doc.internal.pageSize.getWidth(); // Definisi lebar halaman
+    const pageWidth = doc.internal.pageSize.getWidth();
 
     doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
     doc.text("DATA WARGA RT 07 RW 09", 105, 15, { align: "center" });
-    doc.setFontSize(12);
-    doc.text("Bumi Indah City - Tangerang", 105, 22, { align: "center" });
-    doc.setLineWidth(0.5);
+    doc.setFontSize(11);
+    doc.text("Perumahan Bumi Indah City - Tangerang", 105, 22, { align: "center" });
     doc.line(20, 25, 190, 25);
 
     const rows = dataWarga.map((w,i)=>[i+1, w.nama, w.alamat, w.status]);
@@ -227,40 +291,22 @@ function cetakPDF(){
         head:[["No","Nama Lengkap","Alamat / Blok","Status Warga"]], 
         body:rows, 
         startY: 30,
-        theme: 'grid',
-        headStyles: { fillColor: [26, 188, 156], halign: 'center' },
-        styles: { fontSize: 10, cellPadding: 3 }
+        headStyles: { fillColor: [47, 128, 237], halign: 'center' }
     });
 
-    // Menentukan posisi Y setelah tabel selesai
-    let ttdY = doc.lastAutoTable.finalY + 15;
-    
-    // Cek jika ttdY terlalu dekat dengan bawah kertas, pindah halaman baru
-    if (ttdY > 240) { 
-        doc.addPage(); 
-        ttdY = 20; 
-    }
+    let ttdY = doc.lastAutoTable.finalY + 20;
+    if (ttdY > 250) { doc.addPage(); ttdY = 20; }
 
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-    
-    // Teks Tanggal di kanan atas tanda tangan
-    doc.text(`Tangerang, ${tgl}`, pageWidth - 14, ttdY, { align: "right" });
-
-    // Tanda Tangan Ketua RT (Kiri)
+    doc.text(`Tangerang, ${tgl}`, pageWidth - 20, ttdY, { align: "right" });
     doc.text("Mengetahui,", 20, ttdY + 10);
-    doc.text("Ketua RT 07", 20, ttdY + 20);
-    doc.setFont(undefined, 'bold');
-    doc.text("( Muhammad Zainudin )", 20, ttdY + 45);
+    doc.text("Ketua RT 07", 20, ttdY + 18);
+    doc.text("( Muhammad Zainudin )", 20, ttdY + 40);
+    doc.text("Sekretariat RT 07", pageWidth - 20, ttdY + 18, { align: "right" });
+    doc.text("( Aris Munandar )", pageWidth - 20, ttdY + 40, { align: "right" });
 
-    // Tanda Tangan Sekretaris (Kanan)
-    doc.setFont(undefined, 'normal');
-    doc.text("Sekretariat RT 07", pageWidth - 20, ttdY + 20, { align: "right" });
-    doc.setFont(undefined, 'bold');
-    doc.text("( Aris Munandar )", pageWidth - 20, ttdY + 45, { align: "right" });
-
-    doc.save(`Data_Warga_RT07_${tgl.replace(/ /g, '_')}.pdf`);
+    doc.save(`Data_Warga_RT07.pdf`);
 }
+
 window.onclick = e => { if(e.target.classList.contains("modal")) e.target.style.display="none"; }
 ambilData();
 </script>
