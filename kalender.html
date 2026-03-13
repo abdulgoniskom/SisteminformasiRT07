@@ -3,205 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengumuman RT 07 - Admin Panel</title>
+    <title>Kalender Kegiatan RT 07</title>
     <style>
-        /* CSS DASAR */
-        *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-        body{ background:#eef2f7; display:flex; }
-
-        /* SIDEBAR */
-        .sidebar{ width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; }
-        .sidebar h2{ text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
-        .sidebar a{ display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
-        .sidebar a:hover{ background:#34495e; border-left: 4px solid #1abc9c; }
-        .active{ background:#34495e; border-left: 4px solid #1abc9c; }
-
-        /* MAIN CONTENT */
-        .main{ margin-left:220px; width:100%; }
-        header{ background:#2f80ed; color:white; padding:15px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
+        body { background:#f1f4f9; display:flex; }
+        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; }
+        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
+        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
+        .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
+        .active { background:#34495e; border-left: 4px solid #1abc9c; }
         
-        .container{ padding:20px; max-width:900px; margin:auto; }
+        .main { margin-left:220px; width:100%; }
+        header { background:white; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items: center; }
+        .container { padding:20px; }
+
+        .calendar-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #month-year { font-weight: bold; font-size: 20px; }
         
-        /* TOMBOL ATAS */
-        .top-bar{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        button{ background:#2f80ed; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; font-weight: bold; }
-        button:hover{ background:#1f6fd1; }
-        .btn-logout{ background: #eb5757; }
-
-        /* FORM INPUT */
-        .form-box{ display:none; background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .form-box h3{ margin-bottom: 15px; color: #2c3e50; border-bottom: 2px solid #f2994a; display: inline-block; }
-        input{ width:100%; padding:12px; margin:10px 0; border: 1px solid #ddd; border-radius: 5px; }
-
-        /* KARTU PENGUMUMAN */
-        .card{ background:white; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); position: relative; animation: fadeIn 0.5s; }
-        .card img{ max-width:100%; border-radius:5px; margin-bottom:10px; display: block; max-height: 300px; object-fit: cover; }
-        .card h3{ margin:0; font-size: 18px; color: #2c3e50; line-height: 1.4; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: #f7f9fc; padding: 10px; border: 1px solid #ddd; }
+        td { border: 1px solid #ddd; height: 100px; vertical-align: top; padding: 5px; }
         
-        /* TOMBOL HAPUS */
-        .btn-delete {
-            background: #e74c3c; color: white; border: none; padding: 6px 12px; 
-            border-radius: 4px; cursor: pointer; position: absolute; top: 15px; right: 15px; font-size: 12px;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* RESPONSIVE HP */
-        @media (max-width:768px){
-            .sidebar{ width:70px; } .sidebar h2, .sidebar span { display:none; }
-            .main{ margin-left:70px; }
-            header h2 { font-size: 18px; }
-        }
+        .date-num { font-weight: bold; margin-bottom: 5px; display: block; }
+        .today { background: #e3f2fd; border: 2px solid #2f80ed !important; }
+        .event-item { font-size: 11px; padding: 4px; border-radius: 3px; margin-top: 3px; color: white; background: #eb5757; }
+        
+        .admin-panel { margin-bottom: 15px; display: none; background: #fff3e0; padding: 15px; border-radius: 8px; border: 1px solid #ffe0b2; }
+        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-nav { background: #2c3e50; color: white; }
+        .btn-add { background: #27ae60; color: white; }
+        .btn-login { background: #f2994a; color: white; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>RT 07</h2>
+    <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="kas.html">Kas RT</a>
     <a href="warga.html">Data Warga</a>
-    <a href="pengumuman.html" class="active">Pengumuman</a>
-    <a href="kalender.html">Kalender</a>
+    <a href="pengumuman.html">Pengumuman</a>
+    <a href="kalender.html" class="active">Kalender</a>
     <a href="arsip.html">Arsip</a>
     <a href="struktur.html">Struktur</a>
 </div>
 
 <div class="main">
-    <header><h2>Pengelolaan Pengumuman</h2></header>
+    <header>
+        <h2>Kalender Kegiatan</h2>
+        <button class="btn-login" id="authBtn" onclick="handleAuth()">Login Admin</button>
+    </header>
+
     <div class="container">
-
-        <div class="top-bar">
-            <div id="statusInfo" style="font-weight: bold; color: #7f8c8d;">Mode: Warga</div>
-            <button id="authBtn" onclick="handleAuth()">Login Admin</button>
+        <div class="admin-panel" id="adminPanel">
+            <h4 style="margin-bottom:10px">Panel Administrator</h4>
+            <button class="btn-add" onclick="inputKegiatan()">+ Tambah Kegiatan Baru</button>
         </div>
 
-        <div class="form-box" id="formInput">
-            <h3>Buat Pengumuman Baru</h3>
-            <input type="text" id="judul" placeholder="Ketik isi pengumuman/informasi di sini...">
-            <input type="text" id="gambar" placeholder="Link Gambar Google Drive (Kosongkan jika tidak ada)">
-            <button id="btnSimpan" onclick="simpan()" style="width: 100%; background: #27ae60;">Publikasikan Sekarang</button>
+        <div class="calendar-box">
+            <div class="calendar-nav">
+                <button class="btn-nav" onclick="moveMonth(-1)">← Bulan Lalu</button>
+                <div id="month-year"></div>
+                <button class="btn-nav" onclick="moveMonth(1)">Bulan Depan →</button>
+            </div>
+            <table id="calendarTable">
+                <thead>
+                    <tr>
+                        <th>Min</th><th>Sen</th><th>Sel</th><th>Rab</th><th>Kam</th><th>Jum</th><th>Sab</th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody"></tbody>
+            </table>
         </div>
-
-        <div id="listPengumuman">
-            <p style="text-align: center; padding: 20px;">Memuat informasi...</p>
-        </div>
-
     </div>
 </div>
 
 <script>
-// PENTING: Ganti dengan URL Web App Apps Script khusus Pengumuman Bapak
-const API = "https://script.google.com/macros/s/AKfycbxUgsRBttcAHJye9WJZolA5Ptzy5NHpsgfB0XtVAjmtsD3BK5uDDk0jQ2-preCJaIs/exec"; 
+    // PENTING: Paste URL Web App Kalender Bapak di sini
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwiUg77Qg3ntKP5ZCPI8vPzD1Gb0wGoI5XI3HKVO2XREJfPEv99wBicC_yvlgx9kjU/exec'; 
+    
+    let date = new Date();
+    let eventsData = {};
+    let isAdmin = (localStorage.getItem('rt07_admin_kalender') === 'true');
 
-let isAdmin = (localStorage.getItem('admin_pengumuman') === 'true');
-
-// Fungsi Auth (Login/Logout)
-function handleAuth() {
-    if (isAdmin) {
-        localStorage.removeItem('admin_pengumuman');
-        location.reload();
-    } else {
-        let p = prompt("Masukkan Password Admin:");
-        if(p === "12345") { // Ganti password sesuai keinginan Bapak
-            localStorage.setItem('admin_pengumuman', 'true');
-            alert("Selamat Datang, Pak RT!");
+    function handleAuth() {
+        if (isAdmin) {
+            localStorage.removeItem('rt07_admin_kalender');
             location.reload();
         } else {
-            alert("Password Salah!");
+            let pass = prompt("Password Admin Kalender:");
+            if (pass === "123") {
+                localStorage.setItem('rt07_admin_kalender', 'true');
+                location.reload();
+            } else { alert("Salah!"); }
         }
     }
-}
 
-// Cek tampilan saat halaman dimuat
-function checkView() {
     if (isAdmin) {
-        document.getElementById("formInput").style.display = "block";
-        document.getElementById("authBtn").innerText = "Logout Admin";
-        document.getElementById("authBtn").classList.add("btn-logout");
-        document.getElementById("statusInfo").innerText = "Mode: Administrator";
-        document.getElementById("statusInfo").style.color = "#27ae60";
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('authBtn').innerText = "Logout Admin";
+        document.getElementById('authBtn').style.background = "#eb5757";
     }
-}
 
-// Ambil data pengumuman
-function loadData(){
-    fetch(API + "?sheet=Pengumuman")
-    .then(res => res.json())
-    .then(data => {
-        let reversedData = [...data].reverse(); 
-        let html = "";
-        if(reversedData.length === 0) {
-            html = "<p style='text-align:center; color:#95a5a6;'>Belum ada pengumuman yang diterbitkan.</p>";
+    async function fetchEvents() {
+        try {
+            const response = await fetch(scriptURL);
+            eventsData = await response.json();
+            renderCalendar();
+        } catch (e) { 
+            alert("Gagal menyambung ke server. Pastikan URL API benar dan sudah di-Deploy sebagai 'Anyone'."); 
         }
-        reversedData.forEach((d) => {
-            html += `
-                <div class="card">
-                    ${isAdmin ? `<button class="btn-delete" onclick="hapus('${d.judul}')">Hapus</button>` : ""}
-                    ${d.gambar ? `<img src="${d.gambar}" alt="gambar">` : ""}
-                    <h3>${d.judul}</h3>
-                </div>`;
-        });
-        document.getElementById("listPengumuman").innerHTML = html;
-    })
-    .catch(err => {
-        document.getElementById("listPengumuman").innerHTML = "Gagal menyambung ke server.";
-    });
-}
-
-// Simpan data
-function simpan(){
-    let judul = document.getElementById("judul").value.trim();
-    let gambar = document.getElementById("gambar").value.trim();
-    
-    if(!judul){ alert("Judul pengumuman tidak boleh kosong!"); return; }
-
-    document.getElementById("btnSimpan").innerText = "Sedang Mengirim...";
-    document.getElementById("btnSimpan").disabled = true;
-
-    let params = new URLSearchParams();
-    params.append("action", "insert");
-    params.append("judul", judul);
-    params.append("gambar", gambar);
-
-    fetch(API, {
-        method: "POST",
-        body: params.toString(),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    .then(res => res.text())
-    .then(res => {
-        alert("Pengumuman berhasil dipublikasikan!");
-        location.reload();
-    })
-    .catch(err => {
-        alert("Terjadi kesalahan saat menyimpan.");
-        document.getElementById("btnSimpan").innerText = "Publikasikan Sekarang";
-        document.getElementById("btnSimpan").disabled = false;
-    });
-}
-
-// Hapus data
-function hapus(judul) {
-    if(confirm("Apakah Bapak yakin ingin menghapus pengumuman ini?\n\n\"" + judul + "\"")) {
-        let params = new URLSearchParams();
-        params.append("action", "delete");
-        params.append("judul", judul);
-
-        fetch(API, {
-            method: "POST",
-            body: params.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        })
-        .then(() => {
-            alert("Pengumuman telah dihapus.");
-            loadData();
-        });
     }
-}
 
-checkView();
-loadData();
+    function renderCalendar() {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+        document.getElementById("month-year").innerText = months[month] + " " + year;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        const tbody = document.getElementById("calendarBody");
+        tbody.innerHTML = "";
+
+        let row = document.createElement("tr");
+        for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
+
+        for (let d = 1; d <= lastDate; d++) {
+            if ((firstDay + d - 1) % 7 === 0 && d !== 1) {
+                tbody.appendChild(row);
+                row = document.createElement("tr");
+            }
+            let cell = document.createElement("td");
+            let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            
+            if (tglKey === new Date().toISOString().split('T')[0]) cell.classList.add('today');
+
+            let html = `<span class="date-num">${d}</span>`;
+            if (eventsData[tglKey]) {
+                html += `<div class="event-item"><b>${eventsData[tglKey].kegiatan}</b><br><small>📍 ${eventsData[tglKey].lokasi}</small></div>`;
+            }
+            cell.innerHTML = html;
+            row.appendChild(cell);
+        }
+        tbody.appendChild(row);
+    }
+
+    function moveMonth(v) {
+        date.setMonth(date.getMonth() + v);
+        renderCalendar();
+    }
+
+    async function inputKegiatan() {
+        const tgl = prompt("Tanggal (Format: YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+        const keg = prompt("Nama Kegiatan:");
+        const lok = prompt("Lokasi:");
+        const kat = prompt("Kategori (Rapat/Umum/Bakti):");
+
+        if (tgl && keg) {
+            alert("Sedang menyimpan...");
+            await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
+            });
+            location.reload();
+        }
+    }
+
+    fetchEvents();
 </script>
 </body>
 </html>
