@@ -90,7 +90,9 @@ header{ background:white; padding:15px 30px; box-shadow:0 2px 5px rgba(0,0,0,0.1
             <div class="card"><h3>Total Kas RT</h3><p id="totalKasRT">Rp 0</p></div>
             <div class="card"><h3>Kas Agustusan</h3><p id="kasAgustusan">Rp 0</p></div>
             <div class="card"><h3>Pengeluaran Bulan Ini</h3><p id="pengeluaranBulan">Rp 0</p></div>
-            <div class="card"><h3>Jumlah Warga</h3><p>95 Orang</p></div>
+            <div class="card">
+    <h3>Jumlah Warga</h3>
+    <p id="jumlahWargaDisplay">Memuat...</p> </div>
         </div>
 
         <div class="chart-box">
@@ -217,6 +219,29 @@ function loadDashboard(){
 
 loadDashboard();
 setInterval(loadDashboard, 10000); // Refresh tiap 10 detik
+    async function loadWargaCount() {
+    // Gunakan URL API yang sama dengan yang ada di warga.html
+    const API_WARGA = "https://script.google.com/macros/s/AKfycbyLsVhXF5_RExerCEuZjFhOSn48zfGcdsAh8a38k5OPphG3AMUEyvvHRJAWMttCEn0V/exec";
+    
+    try {
+        const res = await fetch(API_WARGA);
+        const data = await res.json();
+        
+        // Update angka di dashboard
+        const display = document.getElementById("jumlahWargaDisplay");
+        if (display) {
+            display.innerText = data.length + " Orang";
+        }
+    } catch (e) {
+        console.error("Gagal memuat jumlah warga", e);
+    }
+}
+
+// Tambahkan pemanggilan fungsi ini di dalam loadDashboard Anda
+function loadDashboard() {
+    // ... fungsi kas lainnya ...
+    loadWargaCount(); // Panggil fungsi penghitung warga
+}
 </script>
 
 </body>
