@@ -1,120 +1,184 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pengumuman RT</title>
-<style>
-body{font-family:Arial;margin:0;background:#eef2f7;}
-.sidebar{width:160px;background:#2c3e50;color:white;height:100vh;position:fixed;left:0;top:0;}
-.sidebar h2{text-align:center;padding:12px;font-size:16px;}
-.sidebar a{display:block;color:white;padding:10px;text-decoration:none;font-size:14px;}
-.sidebar a:hover{background:#34495e;}
-.main{margin-left:160px;}
-header{background:#2f80ed;color:white;padding:15px;text-align:center;}
-.container{padding:20px;max-width:900px;margin:auto;}
-.card{background:white;padding:15px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-.card img{max-width:100%;border-radius:5px;margin-bottom:10px;}
-.card h3{margin:0 0 5px 0;}
-button{background:#2f80ed;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}
-button:hover{background:#1f6fd1;}
-.formInput{display:none;margin-top:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-input{width:100%;padding:8px;margin:5px 0;}
-@media (max-width:768px){.sidebar{width:120px;}.main{margin-left:120px;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumuman RT 07</title>
+    <style>
+        body{font-family:Arial, sans-serif; margin:0; background:#eef2f7;}
+        .sidebar{width:220px; background:#2c3e50; color:white; height:100vh; position:fixed; left:0; top:0;}
+        .sidebar h2{text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px;}
+        .sidebar a{display:block; color:white; padding:15px; text-decoration:none; font-size:14px;}
+        .sidebar a:hover{background:#34495e; border-left: 4px solid #1abc9c;}
+        
+        .main{margin-left:220px;}
+        header{background:#2f80ed; color:white; padding:15px; text-align:center;}
+        
+        .container{padding:20px; max-width:900px; margin:auto;}
+        .card{background:white; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); position: relative;}
+        .card img{max-width:100%; border-radius:5px; margin-bottom:10px; display: block;}
+        .card h3{margin:0; font-size: 18px; color: #2c3e50;}
+        
+        /* Tombol Hapus */
+        .btn-delete {
+            background: #e74c3c; color: white; border: none; padding: 5px 10px; 
+            border-radius: 4px; cursor: pointer; position: absolute; top: 15px; right: 15px;
+        }
+
+        button{background:#2f80ed; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;}
+        button:hover{background:#1f6fd1;}
+        
+        .formInput{display:none; margin-top:20px; background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+        input{width:100%; padding:10px; margin:10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
+
+        @media (max-width:768px){
+            .sidebar{width:70px;} .sidebar h2{display:none;}
+            .main{margin-left:70px;}
+        }
+    </style>
 </head>
 <body>
 
 <div class="sidebar">
-<h2>RT 07 RW 09</h2>
-<a href="index.html">Dashboard</a>
-<a href="kas.html">Kas RT</a>
-<a href="warga.html">Data Warga</a>
-<a href="pengumuman.html">Pengumuman</a>
-<a href="kalender.html">Kalender</a>
-<a href="arsip.html">Arsip</a>
-<a href="struktur.html">Struktur</a>
+    <h2>RT 07 RW 09</h2>
+    <a href="index.html">Dashboard</a>
+    <a href="kas.html">Kas RT</a>
+    <a href="warga.html">Data Warga</a>
+    <a href="pengumuman.html">Pengumuman</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="arsip.html">Arsip</a>
+    <a href="struktur.html">Struktur</a>
 </div>
 
 <div class="main">
-<header><h2>Pengumuman RT 07</h2></header>
-<div class="container">
+    <header><h2>Pengumuman RT 07</h2></header>
+    <div class="container">
 
-<div id="listPengumuman"></div>
+        <div style="text-align:right; margin-bottom:15px;">
+            <button id="btnLogin" onclick="login()">Login Admin</button>
+            <button id="btnTambah" style="display:none;" onclick="toggleForm()">+ Tambah Pengumuman</button>
+        </div>
 
-<div style="text-align:right;margin-bottom:10px;">
-<button onclick="login()">Login Admin</button>
-</div>
+        <div class="formInput" id="formInput">
+            <h3>Buat Pengumuman Baru</h3>
+            <p style="font-size: 12px; color: #666;">* Judul akan muncul otomatis di tulisan berjalan halaman depan.</p>
+            <input type="text" id="judul" placeholder="Ketik isi pengumuman di sini...">
+            <input type="text" id="gambar" placeholder="Link Gambar/Banner (Boleh dikosongkan)">
+            <button id="btnSimpan" onclick="simpan()">Simpan & Publikasikan</button>
+        </div>
 
-<div class="formInput" id="formInput">
-<h3>Tambah Pengumuman</h3>
-<input type="text" id="judul" placeholder="Judul pengumuman">
-<input type="text" id="gambar" placeholder="Link gambar/banner">
-<button onclick="simpan()">Simpan</button>
-</div>
+        <div id="listPengumuman">
+            <p style="text-align: center;">Memuat data...</p>
+        </div>
 
-</div>
+    </div>
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec"; // ganti dengan URL Web App Apps Script
+// URL API Khusus Pengumuman Bapak
+const API = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec"; 
+let isAdmin = false;
 
 function login(){
-  let u=prompt("Username");
-  let p=prompt("Password");
-  if(u=="admin" && p=="12345"){
-    document.getElementById("formInput").style.display="block";
-  } else {
-    alert("Login gagal");
-  }
+    let u = prompt("Username");
+    let p = prompt("Password");
+    if(u == "admin" && p == "12345"){
+        isAdmin = true;
+        document.getElementById("formInput").style.display = "block";
+        document.getElementById("btnTambah").style.display = "inline-block";
+        document.getElementById("btnLogin").style.display = "none";
+        loadData(); // Reload untuk memunculkan tombol hapus
+        alert("Login Berhasil!");
+    } else {
+        alert("Login gagal");
+    }
+}
+
+function toggleForm() {
+    const f = document.getElementById("formInput");
+    f.style.display = f.style.display === "none" ? "block" : "none";
 }
 
 function loadData(){
-  fetch(API+"?sheet=Pengumuman")
-  .then(res=>res.json())
-  .then(data=>{
-    data = data.reverse(); // terbaru di atas
-    let html="";
-    data.forEach(d=>{
-      html += `<div class="card">
-        ${d.gambar?`<img src="${d.gambar}" alt="${d.judul}">`:""}
-        <h3>${d.judul}</h3>
-      </div>`;
+    fetch(API + "?sheet=Pengumuman")
+    .then(res => res.json())
+    .then(data => {
+        let reversedData = [...data].reverse(); 
+        let html = "";
+        if(reversedData.length === 0) {
+            html = "<p style='text-align:center;'>Tidak ada pengumuman saat ini.</p>";
+        }
+        reversedData.forEach((d) => {
+            html += `
+                <div class="card">
+                    ${isAdmin ? `<button class="btn-delete" onclick="hapus('${d.judul}')">Hapus</button>` : ""}
+                    ${d.gambar ? `<img src="${d.gambar}" alt="banner">` : ""}
+                    <h3>${d.judul}</h3>
+                </div>`;
+        });
+        document.getElementById("listPengumuman").innerHTML = html;
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById("listPengumuman").innerHTML = "Gagal memuat pengumuman.";
     });
-    document.getElementById("listPengumuman").innerHTML=html;
-  })
-  .catch(err=>console.log(err));
 }
 
 function simpan(){
-  let judul = document.getElementById("judul").value.trim();
-  let gambar = document.getElementById("gambar").value.trim();
-  if(!judul || !gambar){alert("Judul dan Gambar harus diisi!"); return;}
+    let judul = document.getElementById("judul").value.trim();
+    let gambar = document.getElementById("gambar").value.trim();
+    
+    if(!judul){ alert("Isi pengumuman wajib diisi!"); return; }
 
-  let form = new FormData();
-  form.append("sheet","Pengumuman");
-  form.append("judul", judul);
-  form.append("gambar", gambar);
+    document.getElementById("btnSimpan").innerText = "Menyimpan...";
 
-  fetch(API,{method:"POST",body:form})
-  .then(res=>res.text())
-  .then(res=>{
-    if(res=="success"){
-      alert("Pengumuman berhasil disimpan");
-      document.getElementById("judul").value="";
-      document.getElementById("gambar").value="";
-      loadData();
-    } else {
-      alert("Gagal menyimpan pengumuman: "+res);
-    }
-  })
-  .catch(err=>{
-    console.log(err);
-    alert("Gagal menyimpan pengumuman");
-  });
+    // Format URLSearchParams agar terbaca oleh e.parameter Apps Script
+    let params = new URLSearchParams();
+    params.append("sheet", "Pengumuman");
+    params.append("action", "insert");
+    params.append("judul", judul);
+    params.append("gambar", gambar);
+
+    fetch(API, {
+        method: "POST",
+        body: params.toString(),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+    .then(res => res.text())
+    .then(res => {
+        alert("Pengumuman berhasil disimpan!");
+        document.getElementById("judul").value = "";
+        document.getElementById("gambar").value = "";
+        document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
+        toggleForm();
+        loadData();
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Gagal menyimpan");
+        document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
+    });
 }
 
-// load pengumuman saat halaman dibuka
+function hapus(judul) {
+    if(confirm("Hapus pengumuman: " + judul + "?")) {
+        let params = new URLSearchParams();
+        params.append("sheet", "Pengumuman");
+        params.append("action", "delete");
+        params.append("judul", judul);
+
+        fetch(API, {
+            method: "POST",
+            body: params.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .then(() => {
+            alert("Berhasil dihapus");
+            loadData();
+        });
+    }
+}
+
 loadData();
 </script>
 </body>
