@@ -212,6 +212,7 @@ function cetakPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const tgl = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+    const pageWidth = doc.internal.pageSize.getWidth(); // Definisi lebar halaman
 
     doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
@@ -231,24 +232,35 @@ function cetakPDF(){
         styles: { fontSize: 10, cellPadding: 3 }
     });
 
-    let finalY = doc.lastAutoTable.finalY + 15;
-    if (finalY > 240) { doc.addPage(); finalY = 20; }
+    // Menentukan posisi Y setelah tabel selesai
+    let ttdY = doc.lastAutoTable.finalY + 15;
+    
+    // Cek jika ttdY terlalu dekat dengan bawah kertas, pindah halaman baru
+    if (ttdY > 240) { 
+        doc.addPage(); 
+        ttdY = 20; 
+    }
 
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
-    doc.text(`Tangerang, ${tgl}`, 140, finalY);
     
-   doc.text("Mengetahui,",14,ttdY+10);
+    // Teks Tanggal di kanan atas tanda tangan
+    doc.text(`Tangerang, ${tgl}`, pageWidth - 14, ttdY, { align: "right" });
 
-doc.text("Ketua RT 07",14,ttdY+20);
-doc.text("(Muhammad Zainudin)",14,ttdY+40);
+    // Tanda Tangan Ketua RT (Kiri)
+    doc.text("Mengetahui,", 20, ttdY + 10);
+    doc.text("Ketua RT 07", 20, ttdY + 20);
+    doc.setFont(undefined, 'bold');
+    doc.text("( Muhammad Zainudin )", 20, ttdY + 45);
 
-doc.text("Sekretariat RT 07",pageWidth-14,ttdY+20,{align:"right"});
-doc.text("(Aris Munandar)",pageWidth-14,ttdY+40,{align:"right"});
+    // Tanda Tangan Sekretaris (Kanan)
+    doc.setFont(undefined, 'normal');
+    doc.text("Sekretariat RT 07", pageWidth - 20, ttdY + 20, { align: "right" });
+    doc.setFont(undefined, 'bold');
+    doc.text("( Aris Munandar )", pageWidth - 20, ttdY + 45, { align: "right" });
 
-    doc.save(`Data_Warga_RT07_${tgl}.pdf`);
+    doc.save(`Data_Warga_RT07_${tgl.replace(/ /g, '_')}.pdf`);
 }
-
 window.onclick = e => { if(e.target.classList.contains("modal")) e.target.style.display="none"; }
 ambilData();
 </script>
