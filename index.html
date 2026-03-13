@@ -81,6 +81,7 @@
 </div>
 
 <script>
+// URL API yang sudah terbukti jalan di data warga
 const API = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 let chart;
 
@@ -88,9 +89,11 @@ function rupiah(angka) {
     return "Rp " + Number(angka).toLocaleString("id-ID");
 }
 
-// Fungsi pembantu agar tidak pusing huruf besar/kecil di kolom Sheet
-function getValue(obj, key) {
-    return Number(obj[key] || obj[key.charAt(0).toUpperCase() + key.slice(1)] || 0);
+// FUNGSI KUNCI: Supaya tidak pusing Masuk/masuk atau Keluar/keluar
+function ambilNilai(obj, key) {
+    let keyBesar = key.charAt(0).toUpperCase() + key.slice(1); // Jadi 'Masuk'
+    let keyKecil = key.toLowerCase(); // Jadi 'masuk'
+    return Number(obj[keyBesar] || obj[keyKecil] || 0);
 }
 
 /* 1. LOAD JUMLAH WARGA */
@@ -104,7 +107,7 @@ function loadWargaCount() {
         });
 }
 
-/* 2. TOTAL KAS RT & PENGELUARAN BULAN INI */
+/* 2. TOTAL KAS RT & PENGELUARAN */
 function loadKasRT() {
     fetch(API + "?sheet=Kas_RT")
         .then(res => res.json())
@@ -114,23 +117,28 @@ function loadKasRT() {
             let tahunSekarang = new Date().getFullYear();
 
             data.forEach(d => {
-                let m = getValue(d, "masuk");
-                let k = getValue(d, "keluar");
+                let m = ambilNilai(d, "masuk");
+                let k = ambilNilai(d, "keluar");
                 totalMasuk += m;
                 totalKeluar += k;
 
-                let tgl = new Date(d.tanggal || d.Tanggal);
-                if(tgl.getMonth() === bulanSekarang && tgl.getFullYear() === tahunSekarang) {
-                    keluarBulanIni += k;
+                // Cek pengeluaran bulan ini (kolom 'tanggal' atau 'Tanggal')
+                let tglRaw = d.tanggal || d.Tanggal;
+                if (tglRaw) {
+                    let tgl = new Date(tglRaw);
+                    if(tgl.getMonth() === bulanSekarang && tgl.getFullYear() === tahunSekarang) {
+                        keluarBulanIni += k;
+                    }
                 }
             });
 
             document.getElementById("totalKasRT").innerText = rupiah(totalMasuk - totalKeluar);
             document.getElementById("pengeluaranBulan").innerText = rupiah(keluarBulanIni);
             
-            // Update Grafik setelah data Kas RT beres
+            // Update Grafik otomatis setelah data Kas RT ditarik
             updateGrafik(data);
-        });
+        })
+        .catch(err => console.error("Gagal Kas RT:", err));
 }
 
 /* 3. KAS AGUSTUSAN */
@@ -140,10 +148,11 @@ function loadKasAgustusan() {
         .then(data => {
             let total = 0;
             data.forEach(d => {
-                total += (getValue(d, "masuk") - getValue(d, "keluar"));
+                total += (ambilNilai(d, "masuk") - ambilNilai(d, "keluar"));
             });
             document.getElementById("kasAgustusan").innerText = rupiah(total);
-        });
+        })
+        .catch(err => console.error("Gagal Kas Agustusan:", err));
 }
 
 /* 4. GRAFIK KAS */
@@ -152,11 +161,14 @@ function updateGrafik(data) {
     let bulanKeluar = Array(12).fill(0);
 
     data.forEach(d => {
-        let tgl = new Date(d.tanggal || d.Tanggal);
-        if (!isNaN(tgl)) {
-            let bulan = tgl.getMonth();
-            bulanMasuk[bulan] += getValue(d, "masuk");
-            bulanKeluar[bulan] += getValue(d, "keluar");
+        let tglRaw = d.tanggal || d.Tanggal;
+        if (tglRaw) {
+            let tgl = new Date(tglRaw);
+            if (!isNaN(tgl)) {
+                let bulan = tgl.getMonth();
+                bulanMasuk[bulan] += ambilNilai(d, "masuk");
+                bulanKeluar[bulan] += ambilNilai(d, "keluar");
+            }
         }
     });
 
@@ -170,7 +182,11 @@ function updateGrafik(data) {
                 { label: 'Pengeluaran', data: bulanKeluar, backgroundColor: '#eb5757' }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
     });
 }
 
@@ -189,15 +205,13 @@ function loadMiniCalendar() {
     document.getElementById("miniCalendar").innerHTML = html;
 }
 
-// Jalankan semua fungsi
-function init() {
+// Jalankan semua saat halaman dibuka
+document.addEventListener("DOMContentLoaded", () => {
     loadWargaCount();
     loadKasRT();
     loadKasAgustusan();
     loadMiniCalendar();
-}
-
-window.onload = init;
+});
 </script>
 </body>
 </html>
