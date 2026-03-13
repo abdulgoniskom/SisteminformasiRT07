@@ -51,7 +51,10 @@
         .today { background: #e3f2fd; border: 2px solid #2f80ed !important; }
         .event-item { font-size: 11px; padding: 4px; border-radius: 3px; margin-top: 4px; color: white; background: #eb5757; line-height: 1.2; }
         
-        /* RESPONSIVE MOBILE */
+        /* DETAIL BOX DI BAWAH KALENDER */
+        .detail-box { margin-top: 20px; padding-top: 20px; border-top: 2px solid #f1f4f9; }
+        .detail-item { padding: 10px; background: #f9f9f9; border-left: 4px solid #eb5757; margin-bottom: 8px; border-radius: 4px; }
+
         @media (max-width: 768px) {
             .sidebar { left: -220px; }
             .sidebar.open { left: 0; }
@@ -100,14 +103,14 @@
                     </tr>
                 </thead>
                 <tbody id="calendarBody"></tbody>
-                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-            <div id="detail-kegiatan">
-                <h4 style="margin-bottom: 10px; color: #2c3e50;">📋 Daftar Detail Kegiatan</h4>
+            </table>
+
+            <div class="detail-box">
+                <h4 style="margin-bottom: 10px; color: #2c3e50;">📋 Daftar Detail Kegiatan Bulan Ini</h4>
                 <div id="list-detail">
-                    <p style="color: #999; font-size: 13px;">Pilih bulan untuk melihat daftar kegiatan.</p>
+                    <p style="color: #999; font-size: 13px;">Memuat data...</p>
                 </div>
             </div>
-            </table>
         </div>
     </div>
 </div>
@@ -119,19 +122,9 @@
     let eventsData = {};
     let isAdmin = (localStorage.getItem('rt07_admin_kalender') === 'true');
 
-    // --- FUNGSI UI & SIDEBAR ---
     function toggleSidebar() {
         document.getElementById("mySidebar").classList.toggle("open");
     }
-
-    // Klik di luar sidebar untuk menutup di HP
-    document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('mySidebar');
-        const btn = document.querySelector('.menu-btn');
-        if (window.innerWidth <= 768 && !sidebar.contains(e.target) && e.target !== btn) {
-            sidebar.classList.remove('open');
-        }
-    });
 
     function handleAuth() {
         if (isAdmin) {
@@ -152,45 +145,72 @@
         document.getElementById('authBtn').style.background = "#eb5757";
     }
 
-    // --- FUNGSI KALENDER ---
     async function fetchEvents() {
         try {
             const response = await fetch(scriptURL);
             eventsData = await response.json();
             renderCalendar();
         } catch (e) { 
-            console.error("Gagal mengambil data:", e);
-            renderCalendar(); // Tetap render meski data kosong
+            console.error("Error:", e);
+            renderCalendar();
         }
     }
 
     function renderCalendar() {
-        // ... kode yang sudah ada (looping pembuatan tanggal) ...
-        
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+        document.getElementById("month-year").innerText = months[month] + " " + year;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        const tbody = document.getElementById("calendarBody");
+        tbody.innerHTML = "";
+
+        let row = document.createElement("tr");
+        for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
+
+        for (let d = 1; d <= lastDate; d++) {
+            if ((firstDay + d - 1) % 7 === 0 && d !== 1) {
+                tbody.appendChild(row);
+                row = document.createElement("tr");
+            }
+            
+            let cell = document.createElement("td");
+            let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            
+            let today = new Date();
+            if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                cell.classList.add('today');
+            }
+
+            let html = `<span class="date-num">${d}</span>`;
+            if (eventsData[tglKey]) {
+                html += `<div class="event-item"><b>${eventsData[tglKey].kegiatan}</b></div>`;
+            }
+            cell.innerHTML = html;
+            row.appendChild(cell);
+        }
+        while (row.children.length < 7) row.appendChild(document.createElement("td"));
         tbody.appendChild(row);
 
-        // TAMBAHKAN LOGIKA INI DI AKHIR FUNGSI renderCalendar
         updateDetailList();
     }
 
     function updateDetailList() {
         const listContainer = document.getElementById("list-detail");
-        listContainer.innerHTML = ""; // Reset isi
-
+        listContainer.innerHTML = "";
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
         let adaData = false;
 
-        // Cari data yang sesuai dengan bulan dan tahun yang sedang tampil
-        for (let tgl dalam eventsData) {
-            const [eYear, eMonth, eDay] = tgl.split('-');
-            
-            if (parseInt(eYear) === year && parseInt(eMonth) === month) {
+        for (let tgl in eventsData) {
+            const [eYear, eMonth, eDay] = tgl.split('-').map(Number);
+            if (eYear === year && eMonth === month) {
                 adaData = true;
                 const item = eventsData[tgl];
-                
                 const div = document.createElement("div");
-                div.style = "padding: 10px; background: #f9f9f9; border-left: 4px solid #eb5757; margin-bottom: 8px; border-radius: 4px;";
+                div.className = "detail-item";
                 div.innerHTML = `
                     <div style="display: flex; justify-content: space-between;">
                         <strong>${item.kegiatan}</strong>
@@ -203,11 +223,9 @@
                 listContainer.appendChild(div);
             }
         }
-
-        if (!adaData) {
-            listContainer.innerHTML = "<p style='color: #999; font-size: 13px;'>Tidak ada kegiatan di bulan ini.</p>";
-        }
+        if (!adaData) listContainer.innerHTML = "<p style='color: #999; font-size: 13px;'>Tidak ada kegiatan di bulan ini.</p>";
     }
+
     function moveMonth(v) {
         date.setMonth(date.getMonth() + v);
         renderCalendar();
@@ -217,23 +235,18 @@
         const tgl = prompt("Tanggal (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
         const keg = prompt("Nama Kegiatan:");
         const lok = prompt("Lokasi:");
-        const kat = prompt("Kategori (Rapat/Umum/Bakti):");
+        const kat = prompt("Kategori:");
 
         if (tgl && keg) {
-            alert("Sedang menyimpan... Mohon tunggu.");
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
-                });
-                location.reload();
-            } catch (e) {
-                alert("Gagal menyimpan. Cek koneksi atau izin Google Script Bapak.");
-            }
+            alert("Menyimpan...");
+            await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
+            });
+            location.reload();
         }
     }
 
-    // Jalankan saat pertama kali buka
     fetchEvents();
 </script>
 </body>
