@@ -3,60 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Warga RT</title>
+<title>Data Warga RT 07</title>
 <style>
+/* CSS DASAR */
 body { margin:0; font-family:Arial, sans-serif; background:#eef2f7; }
-/* Update CSS di warga.html agar sama dengan index.html */
-.sidebar { 
-    width: 220px; /* Samakan lebarnya */
-    background: #2c3e50; 
-    height: 100vh; 
-    color: white; 
-    position: fixed; 
-}
-.sidebar h2 { 
-    text-align: center; 
-    padding: 20px; 
-    border-bottom: 1px solid rgba(255,255,255,0.2); 
-    font-size: 18px; 
-}
-.sidebar a { 
-    display: block; 
-    color: white; 
-    padding: 15px; 
-    text-decoration: none; 
-    font-size: 14px; 
-}
-.sidebar a:hover, .sidebar a.active { 
-    background: #34495e; 
-    border-left: 4px solid #1abc9c; 
-}
-.content { 
-    margin-left: 220px; /* Sesuaikan dengan lebar sidebar */
-    padding: 30px; 
-}h1{ color:#2c3e50; margin-bottom:20px; }
+.sidebar { width: 220px; background: #2c3e50; height: 100vh; color: white; position: fixed; }
+.sidebar h2 { text-align: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 18px; }
+.sidebar a { display: block; color: white; padding: 15px; text-decoration: none; font-size: 14px; }
+.sidebar a:hover, .sidebar a.active { background: #34495e; border-left: 4px solid #1abc9c; }
+.content { margin-left: 220px; padding: 30px; }
+
+/* JUDUL TENGAH */
+h1 { color:#2c3e50; margin-bottom:20px; text-align: center; }
+
 .table-container{ max-width:100%; overflow-x:auto; }
 table{ width:100%; border-collapse:collapse; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); min-width:400px; }
 th, td{ padding:12px; border-bottom:1px solid #ddd; text-align:left; }
 th{ background:#1abc9c; color:white; }
 tr:hover{ background:#f1f1f1; }
+
 .btn{ padding:8px 14px; margin-right:5px; border:none; border-radius:4px; cursor:pointer; color:white; }
 .btn-add{background:#1abc9c;}
 .btn-edit{background:#3498db;}
 .btn-delete{background:#e74c3c;}
 .btn-pdf{background:#e67e22; margin-bottom:10px;}
-/* Modals */
+
 .modal{ display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
 .modal-content{ background:white; padding:20px; border-radius:8px; width:300px; text-align:center; }
 .modal-content input, .modal-content select{ width:90%; padding:8px; margin:8px 0; border:1px solid #ccc; border-radius:4px; }
 .modal-content button{ background:#1abc9c; border:none; color:white; padding:10px 15px; border-radius:4px; cursor:pointer; margin-top:10px; }
-.modal-content button:hover{ background:#16a085; }
+
 @media screen and (max-width:768px){
-    .sidebar{width:60px;}
-    .sidebar h2{display:none;}
-    .sidebar a{font-size:12px;padding:10px 8px;}
-    .sidebar button{width:50px;font-size:10px;margin:10px;}
-    .content{margin-left:60px;padding:10px;}
+    .sidebar{width:60px;} .sidebar h2{display:none;} .content{margin-left:60px;padding:10px;}
 }
 </style>
 </head>
@@ -71,14 +49,16 @@ tr:hover{ background:#f1f1f1; }
     <a href="kalender.html">Kalender</a>
     <a href="arsip.html">Arsip</a>
     <a href="struktur.html">Struktur</a>
-    <button onclick="tampilkanLogin()">Login Admin</button>
+    <button onclick="tampilkanLogin()" style="margin: 10px; padding: 5px; cursor: pointer; width: 80%;">Login Admin</button>
 </div>
 
 <div class="content">
-    <h1>Data Warga RT</h1>
-    <button id="btnTambah" class="btn btn-add" style="display:none;" onclick="tambahWarga()">Tambah Warga</button>
-    <button class="btn btn-pdf" onclick="cetakPDF()">Cetak PDF</button>
-    <br><br>
+    <h1>Data Warga RT 07 RW 09</h1>
+    <div style="text-align: center;">
+        <button id="btnTambah" class="btn btn-add" style="display:none;" onclick="tambahWarga()">Tambah Warga</button>
+        <button class="btn btn-pdf" onclick="cetakPDF()">Cetak PDF</button>
+    </div>
+    <br>
     <div class="table-container">
         <table id="tabelWarga">
             <thead>
@@ -95,20 +75,10 @@ tr:hover{ background:#f1f1f1; }
     </div>
 </div>
 
-<!-- Modal Login Admin -->
-<div id="loginModal" class="modal">
-    <div class="modal-content">
-        <h3>Login Admin</h3>
-        <input type="text" id="username" placeholder="Username"><br>
-        <input type="password" id="password" placeholder="Password"><br>
-        <button onclick="loginAdmin()">Login</button>
-    </div>
-</div>
-
-<!-- Modal Tambah/Edit Warga -->
 <div id="formModal" class="modal">
     <div class="modal-content">
         <h3 id="formTitle">Tambah Warga</h3>
+        <input type="hidden" id="rowId">
         <input type="text" id="namaWarga" placeholder="Nama Warga"><br>
         <input type="text" id="alamatWarga" placeholder="Alamat"><br>
         <select id="statusWarga">
@@ -119,95 +89,50 @@ tr:hover{ background:#f1f1f1; }
     </div>
 </div>
 
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3>Login Admin</h3>
+        <input type="text" id="username" placeholder="Username"><br>
+        <input type="password" id="password" placeholder="Password"><br>
+        <button onclick="loginAdmin()">Login</button>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwpp0MdF6z7WEHLkmDhf5WL-8OzptT4gTU0jp6pwA0EbFF1bUoug1EXKMWqoH0af48L/exec"; // ganti dengan Web App URL
+const API_URL = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec"; 
 let dataWarga = [];
 let isAdmin = false;
-let editIndex = null;
 
-// tampilkan data di tabel
+async function ambilData(){
+    const res = await fetch(API_URL + "?sheet=Data_Warga");
+    dataWarga = await res.json();
+    tampilkanData();
+}
+
 function tampilkanData(){
     const tbody = document.querySelector("#tabelWarga tbody");
     tbody.innerHTML = "";
-    dataWarga.forEach((warga,index)=>{
+    dataWarga.forEach((warga, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${index+1}</td>
-            <td>${warga.nama}</td>
-            <td>${warga.alamat}</td>
-            <td>${warga.status}</td>
+            <td>${warga.nama || ''}</td>
+            <td>${warga.alamat || ''}</td>
+            <td>${warga.status || ''}</td>
             <td>
-                ${isAdmin ? `<button class="btn btn-edit" onclick="editWarga(${index})">Edit</button>
-                <button class="btn btn-delete" onclick="hapusWarga(${index})">Hapus</button>` : ''}
+                ${isAdmin ? `
+                    <button class="btn btn-edit" onclick="prepareEdit(${index})">Edit</button>
+                    <button class="btn btn-delete" onclick="hapusWarga(${warga.row_id})">Hapus</button>
+                ` : '-'}
             </td>
         `;
         tbody.appendChild(row);
     });
 }
 
-// ambil data dari Google Sheet
-async function ambilData(){
-    const res = await fetch(API_URL);
-    dataWarga = await res.json();
-    tampilkanData();
-}
-
-// tampilkan modal login admin
-function tampilkanLogin(){
-    document.getElementById("loginModal").style.display="flex";
-}
-
-// tambah warga (hanya admin)
-function tambahWarga(){
-    if(!isAdmin) return;
-    editIndex = null;
-    document.getElementById("formTitle").innerText = "Tambah Warga";
-    document.getElementById("namaWarga").value = "";
-    document.getElementById("alamatWarga").value = "";
-    document.getElementById("statusWarga").value = "Warga Tetap";
-    document.getElementById("formModal").style.display="flex";
-}
-
-// edit warga (hanya admin)
-function editWarga(index){
-    if(!isAdmin) return;
-    editIndex = index;
-    document.getElementById("formTitle").innerText = "Edit Warga";
-    document.getElementById("namaWarga").value = dataWarga[index].nama;
-    document.getElementById("alamatWarga").value = dataWarga[index].alamat;
-    document.getElementById("statusWarga").value = dataWarga[index].status;
-    document.getElementById("formModal").style.display="flex";
-}
-
-// submit form tambah/edit
-async function submitForm(){
-    const nama = document.getElementById("namaWarga").value.trim();
-    const alamat = document.getElementById("alamatWarga").value.trim();
-    const status = document.getElementById("statusWarga").value;
-    if(!nama || !alamat) return alert("Nama dan Alamat wajib diisi!");
-    
-    if(editIndex === null){
-        await fetch(API_URL, {method:"POST", body: JSON.stringify({nama, alamat, status})});
-    } else {
-        await fetch(API_URL, {method:"PUT", body: JSON.stringify({no: editIndex+1, nama, alamat, status})});
-    }
-    document.getElementById("formModal").style.display="none";
-    ambilData();
-}
-
-// hapus warga
-async function hapusWarga(index){
-    if(!isAdmin) return;
-    if(confirm("Yakin hapus data ini?")){
-        await fetch(API_URL, {method:"DELETE", body: JSON.stringify({no:index+1})});
-        ambilData();
-    }
-}
-
-// login admin
 function loginAdmin(){
     const user = document.getElementById("username").value;
     const pass = document.getElementById("password").value;
@@ -215,34 +140,96 @@ function loginAdmin(){
         isAdmin = true;
         document.getElementById("loginModal").style.display="none";
         document.getElementById("btnTambah").style.display="inline-block";
-        ambilData();
+        tampilkanData();
         alert("Login berhasil!");
-    } else {
-        alert("Username atau password salah!");
+    } else { alert("Username atau password salah!"); }
+}
+
+function tampilkanLogin(){ document.getElementById("loginModal").style.display="flex"; }
+
+function tambahWarga(){
+    document.getElementById("formTitle").innerText = "Tambah Warga";
+    document.getElementById("rowId").value = "";
+    document.getElementById("namaWarga").value = "";
+    document.getElementById("alamatWarga").value = "";
+    document.getElementById("formModal").style.display="flex";
+}
+
+function prepareEdit(index){
+    const item = dataWarga[index];
+    document.getElementById("formTitle").innerText = "Edit Warga";
+    document.getElementById("rowId").value = item.row_id;
+    document.getElementById("namaWarga").value = item.nama;
+    document.getElementById("alamatWarga").value = item.alamat;
+    document.getElementById("statusWarga").value = item.status;
+    document.getElementById("formModal").style.display="flex";
+}
+
+async function submitForm(){
+    const rowId = document.getElementById("rowId").value;
+    const action = rowId ? "update" : "insert";
+    const payload = {
+        sheet: "Data_Warga",
+        action: action,
+        row_id: rowId,
+        nama: document.getElementById("namaWarga").value,
+        alamat: document.getElementById("alamatWarga").value,
+        status: document.getElementById("statusWarga").value
+    };
+    await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+    document.getElementById("formModal").style.display="none";
+    ambilData();
+}
+
+async function hapusWarga(row_id){
+    if(confirm("Hapus data warga ini?")){
+        const payload = { sheet: "Data_Warga", action: "delete", row_id: row_id };
+        await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+        ambilData();
     }
 }
 
-// cetak PDF
+// FUNGSI CETAK PDF DENGAN TANDA TANGAN
 function cetakPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    const tgl = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+    // Judul Tengah
     doc.setFontSize(16);
-    doc.text("Data Warga RT 07 RW 09",14,20);
+    doc.text("Data Warga RT 07 RW 09 Bumi Indah City", 105, 20, { align: "center" });
+
+    // Tabel
     const rows = dataWarga.map((w,i)=>[i+1, w.nama, w.alamat, w.status]);
-    doc.autoTable({head:[["No","Nama","Alamat","Status"]], body:rows, startY:30, styles:{fontSize:10}});
-    doc.save("Data_Warga.pdf");
+    doc.autoTable({ 
+        head:[["No","Nama","Alamat","Status"]], 
+        body:rows, 
+        startY:30,
+        theme: 'grid',
+        headStyles: { fillColor: [26, 188, 156] }
+    });
+
+    // Tanda Tangan (Footer)
+    const finalY = doc.lastAutoTable.finalY + 20;
+    doc.setFontSize(11);
+    doc.text(`Tangerang, ${tgl}`, 140, finalY);
+    
+    doc.text("Mengetahui,", 30, finalY + 10);
+    doc.text("Sekretaris,", 140, finalY + 10);
+    
+    doc.setFont(undefined, 'bold');
+    doc.text("MUHAMMAD ZAINUDIN", 30, finalY + 35);
+    doc.text("ARIS MUNANDAR", 140, finalY + 35);
+    
+    doc.setFont(undefined, 'normal');
+    doc.text("Ketua RT 07", 30, finalY + 40);
+    doc.text("Sekretaris RT 07", 140, finalY + 40);
+
+    doc.save(`Data_Warga_RT07_${tgl}.pdf`);
 }
 
-// tutup modal jika klik luar
-window.onclick = function(e){
-    if(e.target.classList.contains("modal")){
-        e.target.style.display="none";
-    }
-}
-
-// ambil data saat halaman dibuka
+window.onclick = e => { if(e.target.classList.contains("modal")) e.target.style.display="none"; }
 ambilData();
 </script>
-
 </body>
 </html>
