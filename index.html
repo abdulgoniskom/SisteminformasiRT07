@@ -99,16 +99,22 @@ function rupiah(angka) {
 
 /* 1. LOAD JUMLAH WARGA (Dinamis dari Sheet Data_Warga) */
 function loadWargaCount() {
-    fetch(API + "?sheet=" + encodeURIComponent("Data Warga RT 07"))
+    // Pastikan nama sheet ini SAMA dengan yang ada di warga.html
+    fetch(API + "?sheet=Data_Warga")
         .then(res => res.json())
         .then(data => {
-            document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
+            // Karena data berupa array, .length akan menghitung jumlah baris/warga
+            if (data && data.length) {
+                document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
+            } else {
+                document.getElementById("jumlahWargaDisplay").innerText = "0 Orang";
+            }
         })
         .catch(err => {
+            console.error("Gagal memuat jumlah warga:", err);
             document.getElementById("jumlahWargaDisplay").innerText = "Error";
         });
 }
-
 /* 2. TOTAL KAS RT */
 function loadKasRT() {
     fetch(API + "?sheet=Kas_RT")
@@ -116,14 +122,13 @@ function loadKasRT() {
         .then(data => {
             let masuk = 0, keluar = 0;
             data.forEach(d => {
+                // Menggunakan huruf kecil 'masuk' dan 'keluar' sesuai standar Super API
                 masuk += Number(d.masuk || 0);
                 keluar += Number(d.keluar || 0);
             });
             document.getElementById("totalKasRT").innerText = rupiah(masuk - keluar);
         });
-}
-
-/* 3. KAS AGUSTUSAN */
+}/* 3. KAS AGUSTUSAN */
 function loadKasAgustusan() {
     fetch(API + "?sheet=Kas_Agustusan")
         .then(res => res.json())
