@@ -89,21 +89,20 @@
 </div>
 
 <script>
-// API URL Utama Anda
-const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
+// URL API DISAMAKAN DENGAN WARGA.HTML AGAR DATA MUNCUL
+const API = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 let chart;
 
 function rupiah(angka) {
     return "Rp " + Number(angka).toLocaleString("id-ID");
 }
 
-/* 1. LOAD JUMLAH WARGA (Dinamis dari Sheet Data_Warga) */
+/* 1. LOAD JUMLAH WARGA */
 function loadWargaCount() {
-    // Pastikan nama sheet ini SAMA dengan yang ada di warga.html
     fetch(API + "?sheet=Data_Warga")
         .then(res => res.json())
         .then(data => {
-            // Karena data berupa array, .length akan menghitung jumlah baris/warga
+            console.log("Data Warga:", data);
             if (data && data.length) {
                 document.getElementById("jumlahWargaDisplay").innerText = data.length + " Orang";
             } else {
@@ -111,10 +110,10 @@ function loadWargaCount() {
             }
         })
         .catch(err => {
-            console.error("Gagal memuat jumlah warga:", err);
             document.getElementById("jumlahWargaDisplay").innerText = "Error";
         });
 }
+
 /* 2. TOTAL KAS RT */
 function loadKasRT() {
     fetch(API + "?sheet=Kas_RT")
@@ -122,14 +121,14 @@ function loadKasRT() {
         .then(data => {
             let masuk = 0, keluar = 0;
             data.forEach(d => {
-                // Menggunakan huruf kecil 'masuk' dan 'keluar' sesuai standar Super API
                 masuk += Number(d.masuk || 0);
                 keluar += Number(d.keluar || 0);
             });
             document.getElementById("totalKasRT").innerText = rupiah(masuk - keluar);
         });
 }
-    /* 3. KAS AGUSTUSAN */
+
+/* 3. KAS AGUSTUSAN */
 function loadKasAgustusan() {
     fetch(API + "?sheet=Kas_Agustusan")
         .then(res => res.json())
@@ -171,9 +170,11 @@ function loadGrafikDashboard() {
 
             data.forEach(d => {
                 let tgl = new Date(d.tanggal);
-                let bulan = tgl.getMonth();
-                bulanMasuk[bulan] += Number(d.masuk || 0);
-                bulanKeluar[bulan] += Number(d.keluar || 0);
+                if (!isNaN(tgl)) {
+                    let bulan = tgl.getMonth();
+                    bulanMasuk[bulan] += Number(d.masuk || 0);
+                    bulanKeluar[bulan] += Number(d.keluar || 0);
+                }
             });
 
             if(chart) chart.destroy();
@@ -186,7 +187,11 @@ function loadGrafikDashboard() {
                         { label: 'Pengeluaran', data: bulanKeluar, backgroundColor: '#eb5757' }
                     ]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } } 
+                }
             });
         });
 }
@@ -206,7 +211,6 @@ function loadMiniCalendar() {
     document.getElementById("miniCalendar").innerHTML = html;
 }
 
-/* LOAD SEMUA */
 function loadDashboard() {
     loadWargaCount();
     loadKasRT();
@@ -216,8 +220,11 @@ function loadDashboard() {
     loadMiniCalendar();
 }
 
-loadDashboard();
-setInterval(loadDashboard, 10000); // Update tiap 10 detik
+// Jalankan saat halaman dibuka
+document.addEventListener("DOMContentLoaded", loadDashboard);
+
+// Update otomatis tiap 30 detik agar tidak berat
+setInterval(loadDashboard, 30000); 
 </script>
 </body>
 </html>
