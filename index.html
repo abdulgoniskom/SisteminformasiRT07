@@ -47,7 +47,11 @@
         <h2>Sistem Informasi RT 07 RW 09 Bumi Indah City</h2>
         <div style="font-size: 14px; font-weight: bold;">Ketua RT : Bapak Muhammad Zainudin</div>
     </header>
-
+<div class="running-text" style="background: #f2994a; color: white; padding: 10px; font-weight: bold;">
+    <marquee id="marqueeKonten" behavior="scroll" direction="left" scrollamount="6">
+        Sedang memuat informasi terbaru dari pengumuman RT 07...
+    </marquee>
+</div>
     <div class="container">
         <div class="cards">
             <div class="card">
@@ -189,6 +193,26 @@ window.onload = () => {
     loadKasAgustusan();
     loadMiniCalendar();
 };
+    /* FUNGSI AMBIL PENGUMUMAN UNTUK RUNNING TEXT */
+function loadRunningText() {
+    // Pastikan URL API ini sama dengan yang di pengumuman.html
+    const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
+    
+    fetch(API_PENGUMUMAN + "?sheet=Pengumuman")
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                // Ambil 3 judul pengumuman terbaru saja, gabungkan dengan tanda •
+                let teksGabungan = data.reverse().slice(0, 3).map(d => d.judul).join("  •  ");
+                
+                // Masukkan ke dalam marquee
+                document.getElementById("marqueeKonten").innerText = "📢 INFO TERKINI: " + teksGabungan + "  •  Selamat Datang di Website Resmi RT 07 RW 09 Bumi Indah City.";
+            }
+        })
+        .catch(err => {
+            console.error("Gagal muat running text:", err);
+        });
+}
 </script>
 </body>
 </html>
