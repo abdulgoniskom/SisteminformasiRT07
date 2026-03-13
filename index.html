@@ -128,7 +128,8 @@ function loadKasRT() {
             });
             document.getElementById("totalKasRT").innerText = rupiah(masuk - keluar);
         });
-}/* 3. KAS AGUSTUSAN */
+}
+    /* 3. KAS AGUSTUSAN */
 function loadKasAgustusan() {
     fetch(API + "?sheet=Kas_Agustusan")
         .then(res => res.json())
