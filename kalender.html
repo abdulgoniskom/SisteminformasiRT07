@@ -6,54 +6,94 @@
     <title>Kalender Kegiatan RT 07</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-        body { background:#f1f4f9; display:flex; }
-        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; }
+        body { background:#f1f4f9; display:flex; overflow-x: hidden; }
+
+        /* SIDEBAR RESPONSIF */
+        .sidebar { 
+            width:220px; background:#2c3e50; height:100vh; color:white; 
+            position:fixed; transition: 0.3s; z-index: 1000; 
+        }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
-        .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
-        .active { background:#34495e; border-left: 4px solid #1abc9c; }
+        .sidebar a:hover, .active { background:#34495e; border-left: 4px solid #1abc9c; }
         
-        .main { margin-left:220px; width:100%; }
-        header { background:white; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items: center; }
-        .container { padding:20px; }
+        /* MAIN CONTENT RESPONSIF */
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-width: 0; }
+        header { 
+            background:white; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); 
+            display:flex; justify-content:space-between; align-items: center; 
+        }
 
-        .calendar-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        #month-year { font-weight: bold; font-size: 20px; }
+        .menu-btn { display: none; font-size: 24px; cursor: pointer; color: #2c3e50; }
+        .container { padding:15px; }
+
+        /* TABEL KALENDER AGAR BISA DI-SCROLL DI HP */
+        .calendar-box { 
+            background: white; padding: 15px; border-radius: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; 
+        }
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        #month-year { font-weight: bold; font-size: 18px; }
         
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #f7f9fc; padding: 10px; border: 1px solid #ddd; }
-        td { border: 1px solid #ddd; height: 100px; vertical-align: top; padding: 5px; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; } /* Paksa lebar minimal agar tidak penyet */
+        th { background: #f7f9fc; padding: 8px; border: 1px solid #ddd; font-size: 13px; }
+        td { border: 1px solid #ddd; height: 80px; vertical-align: top; padding: 5px; }
         
-        .date-num { font-weight: bold; margin-bottom: 5px; display: block; }
+        .date-num { font-weight: bold; font-size: 14px; }
         .today { background: #e3f2fd; border: 2px solid #2f80ed !important; }
-        .event-item { font-size: 11px; padding: 4px; border-radius: 3px; margin-top: 3px; color: white; background: #eb5757; }
+        .event-item { font-size: 10px; padding: 3px; border-radius: 3px; margin-top: 2px; color: white; background: #eb5757; word-break: break-all; }
         
-        .admin-panel { margin-bottom: 15px; display: none; background: #fff3e0; padding: 15px; border-radius: 8px; border: 1px solid #ffe0b2; }
-        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
-        .btn-nav { background: #2c3e50; color: white; }
-        .btn-add { background: #27ae60; color: white; }
-        .btn-login { background: #f2994a; color: white; }
+        /* KHUSUS TAMPILAN HP (DI BAWAH 768px) */
+        @media (max-width: 768px) {
+            .sidebar { left: -220px; } /* Sembunyikan sidebar ke kiri */
+            .sidebar.open { left: 0; } /* Munculkan saat tombol diklik */
+            .main { margin-left: 0; }
+            .menu-btn { display: block; } /* Munculkan tombol garis tiga */
+            
+            #month-year { font-size: 16px; }
+            .btn-nav { padding: 5px 10px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="kas.html">Kas RT</a>
     <a href="warga.html">Data Warga</a>
     <a href="pengumuman.html">Pengumuman</a>
     <a href="kalender.html" class="active">Kalender</a>
-    <a href="arsip.html">Arsip</a>
-    <a href="struktur.html">Struktur</a>
 </div>
 
 <div class="main">
     <header>
-        <h2>Kalender Kegiatan</h2>
-        <button class="btn-login" id="authBtn" onclick="handleAuth()">Login Admin</button>
+        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+        <h2 id="titleHeader" style="font-size: 16px;">Kalender RT 07</h2>
+        <button class="btn-login" id="authBtn" onclick="handleAuth()">Login</button>
     </header>
+    ```
+
+---
+
+### 3. Tambahkan Script Toggle Sidebar
+Tambahkan fungsi ini di dalam tag `<script>` Bapak:
+
+```javascript
+    function toggleSidebar() {
+        document.getElementById("mySidebar").classList.toggle("open");
+    }
+
+    // Klik di luar sidebar untuk menutup saat di HP
+    document.addEventListener('click', function(event) {
+        var sidebar = document.getElementById('mySidebar');
+        var btn = document.querySelector('.menu-btn');
+        if (window.innerWidth <= 768 && !sidebar.contains(event.target) && event.target !== btn) {
+            sidebar.classList.remove('open');
+        }
+    });    
+
+</header>
 
     <div class="container">
         <div class="admin-panel" id="adminPanel">
