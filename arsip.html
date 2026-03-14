@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arsip Digital RT 07</title>
     <style>
+        /* CSS TETAP SAMA SEPERTI SEBELUMNYA */
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
         body { background:#f1f4f9; display:flex; overflow-x: hidden; }
 
-        /* SIDEBAR IDENTIK DENGAN KALENDER */
         .sidebar { 
             width:220px; background:#2c3e50; height:100vh; color:white; 
             position:fixed; transition: 0.3s; z-index: 1000; 
@@ -17,7 +17,6 @@
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
         .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
         
-        /* MAIN CONTENT RESPONSIF */
         .main { margin-left:220px; width:100%; transition: 0.3s; min-width: 0; }
         header { 
             background:white; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); 
@@ -27,11 +26,9 @@
         .menu-btn { display: none; font-size: 24px; cursor: pointer; color: #2c3e50; padding: 0 10px; }
         .container { padding:20px; }
 
-        /* TOMBOL LOGIN/LOGOUT */
         .btn-login { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; background: #f2994a; color: white; }
         .btn-logout { background: #eb5757; color: white; }
 
-        /* STYLE KHUSUS ARSIP */
         .folder-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .folder { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
         .folder:hover { border-color: #2f80ed; background: #f0f7ff; }
@@ -53,7 +50,6 @@
 
         .btn-view { color: #2f80ed; text-decoration: none; font-weight: bold; font-size: 13px; }
 
-        /* RESPONSIVE HP (IDENTIK KALENDER) */
         @media (max-width: 768px) {
             .sidebar { left: -220px; }
             .sidebar.open { left: 0; }
@@ -118,35 +114,46 @@
 </div>
 
 <script>
-    // PENTING: Gunakan URL API Arsip Bapak
-    const API = "https://script.google.com/macros/s/AKfycbz2zMa4ELr76mfmg8egQLohWWddKiDyk9sEtICzHA4N9IVIZvG90KvhFtGOwRYI5HSx/exec"; 
+    const API = "https://script.google.com/macros/s/AKfycbzITxZolfJLMaCs5yltIXI8s8wEiQjKU3Cj1HnTltlNuWw7adGacptyT6hlHg2brU-J/exec"; // Pastikan ganti dengan URL Web App hasil Deploy terbaru
     let allData = [];
-    let isAdmin = (localStorage.getItem('rt07_admin') === 'true');
+    let isAdmin = (sessionStorage.getItem('rt07_admin') === 'true');
 
-    // FUNGSI TOGGLE SIDEBAR (SAMA DENGAN KALENDER)
     function toggleSidebar() {
         document.getElementById("mySidebar").classList.toggle("open");
     }
 
-    // FUNGSI LOGIN (SAMA DENGAN KALENDER)
-    function handleAuth() {
+    // --- FUNGSI LOGIN AMAN (SERVER SIDE) ---
+    async function handleAuth() {
         if (isAdmin) {
-            localStorage.removeItem('rt07_admin');
+            sessionStorage.removeItem('rt07_admin');
             alert("Anda telah logout.");
             location.reload();
         } else {
-            const pass = prompt("Masukkan Password Admin:");
-            if (pass === "123") {
-                localStorage.setItem('rt07_admin', 'true');
-                alert("Login Berhasil!");
-                location.reload();
-            } else {
-                alert("Password Salah!");
+            const u = prompt("Username Admin:");
+            const p = prompt("Password Admin:");
+            if (!u || !p) return;
+
+            try {
+                const res = await fetch(API, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "login", username: u, password: p })
+                });
+                const hasil = await res.json();
+                
+                if(hasil.status === "success") {
+                    sessionStorage.setItem('rt07_admin', 'true');
+                    alert("Login Berhasil! Selamat bekerja Pak Admin.");
+                    location.reload();
+                } else {
+                    alert("Username atau Password Salah!");
+                }
+            } catch(e) {
+                alert("Gagal koneksi ke server login.");
             }
         }
     }
 
-    // TAMPILAN JIKA ADMIN
+    // CEK STATUS ADMIN SAAT LOAD
     if (isAdmin) {
         document.getElementById('adminBtn').style.display = 'block';
         document.getElementById('authBtn').innerText = "Logout Admin";
@@ -155,7 +162,6 @@
         document.getElementById('statusInfo').style.color = "#27ae60";
     }
 
-    // AMBIL DATA
     async function loadArsip() {
         try {
             const res = await fetch(API + "?sheet=Arsip RT 07");
@@ -206,23 +212,32 @@
         let jenis = prompt("Jenis File (PDF/IMG/DOC):");
 
         if(nama && link) {
-            document.getElementById('adminBtn').innerText = "Menyimpan...";
+            const btn = document.getElementById('adminBtn');
+            btn.innerText = "Menyimpan...";
+            btn.disabled = true;
+
+            const payload = { 
+                tanggal: tgl, 
+                nama: nama, 
+                kategori: kat, 
+                link: link, 
+                jenis: jenis 
+            };
+
             try {
-                // Catatan: Gunakan URLSearchParams jika POST Bapak menggunakan doPOST standar
                 await fetch(API, {
                     method: 'POST',
-                    body: JSON.stringify({ tanggal: tgl, nama: nama, kategori: kat, link: link, jenis: jenis })
+                    body: JSON.stringify(payload)
                 });
                 alert("Dokumen berhasil diarsipkan!");
                 location.reload();
             } catch (e) {
-                alert("Data dikirim ke sistem."); // Kadang CORS terbaca error tapi data masuk
+                alert("Berhasil dikirim.");
                 location.reload();
             }
         }
     }
 
-    // Tutup sidebar jika klik di luar (untuk HP)
     document.addEventListener('click', function(event) {
         var sidebar = document.getElementById('mySidebar');
         var btn = document.querySelector('.menu-btn');
