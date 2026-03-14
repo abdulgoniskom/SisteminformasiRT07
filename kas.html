@@ -343,8 +343,8 @@
         startY: 55,
         theme: 'grid',
         headStyles: { 
-            fillColor: [47, 128, 237], // Warna biru sesuai header Anda
-            textColor: 255, 
+            fillColor: [47, 128, 237], 
+            textColor: [255, 255, 255], // Pastikan tulisan judul SEMUA PUTIH
             halign: 'center',
             fontStyle: 'bold' 
         },
@@ -357,13 +357,14 @@
         },
         styles: { fontSize: 9, cellPadding: 3 },
         didParseCell: function (data) {
-            // Memberikan warna merah jika ada pengeluaran (opsional)
-            if (data.column.index === 3 && data.cell.text[0] !== "-") {
-                data.cell.styles.textColor = [231, 76, 60];
+            // Logika: JIKA ini baris BODY (bukan header) DAN kolom KELUAR (indeks 3)
+            if (data.section === 'body' && data.column.index === 3) {
+                if (data.cell.text[0] !== "-") { // Jika ada nominalnya (bukan strip)
+                    data.cell.styles.textColor = [231, 76, 60]; // Ubah isi datanya jadi MERAH
+                }
             }
         }
     });
-
     // --- 4. RINGKASAN TOTAL ---
     let finalY = doc.lastAutoTable.finalY + 10;
     doc.setFont("helvetica", "bold");
