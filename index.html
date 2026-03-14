@@ -25,8 +25,39 @@
         header h2 { font-size: 18px; color: #2c3e50; text-align: center; }
         .ketua-rt { font-size: 12px; font-weight: bold; color: #2f80ed; position: absolute; right: 30px; }
 
-        .running-text { background: #f2994a; color: white; padding: 10px; font-weight: bold; font-size: 13px; }
-        
+        /* CONTAINER RUNNING TEXT */
+.running-text { 
+    background: #f2994a; 
+    color: white; 
+    padding: 8px 0; /* Padding atas bawah saja */
+    font-weight: bold; 
+    font-size: 13px; 
+    overflow: hidden; /* Sembunyikan teks yang keluar jalur */
+    white-space: nowrap; /* Paksa teks jadi satu baris */
+    display: flex;
+    align-items: center;
+}
+
+/* ANIMASI HALUS */
+.marquee-container {
+    display: inline-block;
+    padding-left: 100%; /* Mulai dari luar layar kanan */
+    animation: jalan-terus 20s linear infinite; /* 20 detik, makin besar makin lambat/nyaman */
+}
+
+@keyframes jalan-terus {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+/* Pause saat disentuh (HP) atau di-hover (Laptop) agar mudah dibaca */
+.running-text:hover .marquee-container {
+    animation-play-state: paused;
+}
+
+@media (max-width: 768px) {
+    .running-text { font-size: 11px; padding: 6px 0; }
+}
         /* CONTAINER & CARDS */
         .container { padding:20px; }
         .cards { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -87,9 +118,8 @@
     </header>
 
     <div class="running-text">
-        <marquee id="marqueeKonten" behavior="scroll" direction="left" scrollamount="5">
-            Sedang memuat informasi terbaru...
-        </marquee>
+    <div class="marquee-container" id="marqueeKonten">
+        📢 Sedang memuat informasi terbaru...
     </div>
 
     <div class="container">
@@ -199,12 +229,13 @@ function loadMiniCalendar() {
 function loadRunningText() {
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(res => res.json()).then(data => {
         if (data && data.length > 0) {
-            let teks = data.reverse().slice(0, 3).map(d => d.judul).join("  •  ");
-            document.getElementById("marqueeKonten").innerText = "📢 INFO: " + teks;
+            // Ambil 3 pengumuman terbaru, gabungkan dengan separator yang jelas
+            let teks = data.reverse().slice(0, 3).map(d => d.judul).join(" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ");
+            document.getElementById("marqueeKonten").innerHTML = "📢 INFO TERBARU: " + teks + " &nbsp;&nbsp;&nbsp; ";
         }
     });
 }
-
+    
 window.onload = () => { loadWargaCount(); loadKasRT(); loadKasAgustusan(); loadMiniCalendar(); loadRunningText(); };
 </script>
 </body>
