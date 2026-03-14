@@ -93,7 +93,7 @@
 
         <div class="formInput" id="formInput">
             <h3>Buat Pengumuman Baru</h3>
-            <input type="text" id="judul" placeholder="Ketik isi pengumuman di sini...">
+            <input type="text" id="inputPengumuman" placeholder="Ketik isi pengumuman lengkap di sini...">
             <input type="text" id="gambar" placeholder="Link Gambar (Boleh Kosong)">
             <button id="btnSimpan" class="btn-action" style="width: 100%;" onclick="simpan()">Simpan & Publikasikan</button>
         </div>
@@ -105,8 +105,7 @@
 </div>
 
 <script>
-    // --- GANTI URL INI DENGAN URL WEB APP BAPAK ---
-    const API = "https://script.google.com/macros/s/AKfycbyImGAFo6rFekEM89KmOrzev6SQVDVPLheB7ymvnwgnOURsI416sDBpuXK9HFD873E/exec"; 
+    const API = "https://script.google.com/macros/s/AKfycbzIYL-43_HiqVo0pjvRMvXJKPBcEgE0IkEAofUBMCsv7i1Z-EpoH_XPKppqDnohayY/exec"; 
     
     let isAdmin = (sessionStorage.getItem('rt07_admin') === 'true');
 
@@ -171,7 +170,7 @@
                     ${isAdmin ? `<button class="btn-delete" onclick="hapus('${item.judul}')">Hapus</button>` : ''}
                     ${item.gambar ? `<img src="${item.gambar}" onerror="this.style.display='none'">` : ''}
                     <h3>${item.judul}</h3>
-                    <small style="color:#999; font-size:11px;">${item.tanggal || ''}</small>
+                    <p style="font-size:14px; color:#555; margin-top:5px;">${item.konten || ''}</p>
                 </div>`;
             });
             listDiv.innerHTML = html;
@@ -180,39 +179,36 @@
         }
     }
 
-    // --- PERBAIKAN FUNGSI SIMPAN ---
     async function simpan() {
-        let judul = document.getElementById("judul").value.trim();
-        let gambar = document.getElementById("gambar").value.trim();
-        if(!judul) return alert("Isi pengumuman wajib diisi!");
+        let teksLengkap = document.getElementById("inputPengumuman").value.trim();
+        let linkGambar = document.getElementById("gambar").value.trim();
+        
+        if(!teksLengkap) return alert("Isi pengumuman wajib diisi!");
 
         const btn = document.getElementById("btnSimpan");
-        const originalText = btn.innerText;
-        
-        // Visual feedback agar admin tahu proses sedang jalan
         btn.innerText = "Sedang Menyimpan...";
         btn.disabled = true;
 
+        // Judul diambil dari 40 karakter pertama teks
+        let judulSingkat = teksLengkap.length > 40 ? teksLengkap.substring(0, 40) + "..." : teksLengkap;
+
         try {
-            // Menggunakan mode no-cors karena Google Apps Script sering menyebabkan CORS error 
-            // meskipun data sebenarnya masuk dengan sukses.
             await fetch(API, { 
                 method: "POST", 
                 mode: "no-cors",
                 body: JSON.stringify({ 
                     action: "insert", 
                     sheet: "Pengumuman", 
-                    judul: judul, 
-                    gambar: gambar 
+                    judul: judulSingkat,
+                    gambar: linkGambar,
+                    konten: teksLengkap
                 }) 
             });
             
-            // Karena no-cors tidak bisa membaca respon, kita beri jeda sedikit lalu reload
-            alert("Pengumuman berhasil diproses!");
+            alert("Pengumuman berhasil terbit!");
             location.reload();
         } catch(e) { 
-            console.error("Error:", e);
-            alert("Data sedang dikirim ke sistem."); 
+            alert("Data sedang dikirim."); 
             location.reload(); 
         }
     }
@@ -230,7 +226,7 @@
                 }) 
             });
             alert("Permintaan hapus terkirim.");
-            setTimeout(loadData, 2000); // Reload data setelah 2 detik
+            setTimeout(loadData, 2000);
         } catch(e) { loadData(); }
     }
 
