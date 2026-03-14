@@ -9,21 +9,68 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background:#f4f7f6; display:flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* --- SIDEBAR --- */
-        .sidebar { width:200px; background:#2c3e50; color:white; position:fixed; height:100vh; z-index: 1000; }
-        .sidebar h2 { text-align:center; padding:25px 10px; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-menu { list-style: none; }
-        .sidebar-menu a { 
-            display:block; 
-            color:#bdc3c7; 
-            padding:15px 25px; 
-            text-decoration:none; 
-            font-size: 13px; 
-            transition: 0.3s; 
-            border-left: 4px solid transparent;
-            cursor: pointer;
-        }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background:#34495e; color: #1abc9c; border-left: 4px solid #1abc9c; }
+       /* --- SIDEBAR DESKTOP --- */
+.sidebar { 
+    width: 200px; 
+    background: #2c3e50; 
+    color: white; 
+    position: fixed; 
+    height: 100vh; 
+    z-index: 1000; 
+}
+
+.sidebar h2 { 
+    text-align: center; 
+    padding: 20px 10px; 
+    font-size: 16px; 
+    background: #1a252f; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
+}
+
+.sidebar-menu a { 
+    display: block; 
+    color: #ffffff; 
+    padding: 12px 20px; /* Ukuran kotak diperkecil agar tidak terlalu besar */
+    text-decoration: none; 
+    font-size: 14px; 
+    transition: 0.3s; 
+    border-left: 4px solid transparent;
+    cursor: pointer;
+}
+
+.sidebar-menu a:hover, .sidebar-menu a.active { 
+    background: #34495e; 
+    border-left: 4px solid #3498db; 
+}
+
+/* --- OPTIMASI KHUSUS TAMPILAN HP --- */
+@media (max-width: 768px) {
+    .sidebar { 
+        width: 65px; /* Sidebar jadi lebih ramping di HP */
+    } 
+
+    .sidebar h2 { 
+        display: none; /* Sembunyikan judul RT di HP agar hemat ruang */
+    }
+
+    .sidebar-menu a { 
+        padding: 15px 5px; /* Kotak menu lebih ringkas */
+        text-align: center; 
+        font-size: 9px; /* Tulisan kecil tapi tetap rapi */
+        border-left: none;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .sidebar-menu a.active {
+        background: #3498db; /* Warna blok penuh untuk menu aktif di HP */
+        color: white;
+    }
+
+    .main { 
+        margin-left: 65px; 
+        width: calc(100% - 65px); 
+    }
+}
         
         /* --- MAIN AREA --- */
         .main { margin-left:200px; width:calc(100% - 200px); display: flex; flex-direction: column; min-height: 100vh; }
@@ -74,6 +121,7 @@
 <div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <div class="sidebar-menu">
+        <a onclick="showSection('dashboard')" class="active">Dashboard</a>
         <a href="index.html">Dashboard</a>
         <a href="kas.html">Kas RT</a>
         <a href="warga.html">Data Warga</a>
