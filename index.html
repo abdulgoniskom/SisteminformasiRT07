@@ -7,125 +7,106 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background:#f0f2f5; display:flex; overflow-x: hidden; }
+        body { background:#f4f7f6; display:flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* SIDEBAR - HANYA TULISAN */
-        .sidebar { width:200px; background:#2c3e50; height:100vh; color:white; position:fixed; z-index: 1000; }
-        .sidebar h2 { text-align:center; padding:20px; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar a { display:block; color:#ecf0f1; padding:15px 25px; text-decoration:none; font-size: 14px; transition: 0.3s; }
-        .sidebar a:hover, .sidebar a.active { background:#34495e; color: #1abc9c; }
+        /* SIDEBAR - BERSIH TULISAN */
+        .sidebar { width:200px; background:#2c3e50; color:white; position:fixed; height:100vh; z-index: 1000; }
+        .sidebar h2 { text-align:center; padding:25px 10px; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar a { display:block; color:#bdc3c7; padding:15px 25px; text-decoration:none; font-size: 13px; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background:#34495e; color: #1abc9c; border-left: 4px solid #1abc9c; }
         
-        .main { margin-left:200px; width:calc(100% - 200px); min-height: 100vh; display: flex; flex-direction: column; }
+        /* MAIN AREA */
+        .main { margin-left:200px; width:calc(100% - 200px); display: flex; flex-direction: column; min-height: 100vh; }
         
         /* HEADER */
-        header { 
-            background:white; padding:15px 25px; display:flex; align-items: center; justify-content: space-between; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-        }
-        header h2 { font-size: 15px; color: #333; }
-        .ketua-rt { font-size: 11px; font-weight: bold; color: #2f80ed; }
+        header { background:white; padding:15px 25px; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        header h2 { font-size: 15px; color: #333; font-weight: 700; }
+        .ketua { font-size: 11px; color: #2f80ed; font-weight: bold; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
 
-        /* RUNNING TEXT */
-        .running-text-bg { background: #f39c12; color: white; padding: 10px 0; font-size: 12px; font-weight: 600; overflow: hidden; }
-        #marqueeText { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scroll 20s linear infinite; -webkit-animation: scroll 20s linear infinite; }
-        @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-        @-webkit-keyframes scroll { from { -webkit-transform: translateX(0); } to { -webkit-transform: translateX(-100%); } }
+        /* RUNNING TEXT - ORANGE */
+        .running-box { background: #f2994a; color: white; padding: 10px 0; font-size: 12px; font-weight: 600; overflow: hidden; }
+        #marquee { display: inline-block; white-space: nowrap; padding-left: 100%; animation: jln 25s linear infinite; -webkit-animation: jln 25s linear infinite; }
+        @keyframes jln { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        @-webkit-keyframes jln { from { -webkit-transform: translateX(0); } to { -webkit-transform: translateX(-100%); } }
         
-        /* KOTAK WARNA WARNI COMPACT */
-        .container { padding:20px; }
-        .cards-container { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; 
-            margin-bottom: 20px; 
-        }
+        /* CARDS - WARNA WARNI COMPACT */
+        .container { padding: 20px; flex-grow: 1; }
+        .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         
-        .card { 
-            padding: 15px; 
-            border-radius: 8px; 
-            color: white; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: left;
-        }
-        .card h3 { font-size: 10px; text-transform: uppercase; margin-bottom: 5px; opacity: 0.9; }
-        .card p { font-size: 15px; font-weight: bold; }
+        .card { padding: 18px 15px; border-radius: 12px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
+        .card h3 { font-size: 10px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.9; letter-spacing: 0.5px; }
+        .card p { font-size: 16px; font-weight: 800; }
         
-        /* Warna Awal */
-        .c-blue { background: #2f80ed; }
-        .c-green { background: #27ae60; }
-        .c-red { background: #eb5757; }
-        .c-orange { background: #f2994a; }
+        .bg-blue { background: #3498db; }
+        .bg-green { background: #2ecc71; }
+        .bg-red { background: #e74c3c; }
+        .bg-purple { background: #9b59b6; }
 
         /* CHART BOX */
-        .chart-container { background:white; padding:15px; border-radius:8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .chart-container h4 { font-size: 13px; margin-bottom: 15px; color: #555; }
+        .white-box { background:white; padding:20px; border-radius:12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .white-box h4 { margin-bottom: 20px; font-size: 13px; color: #7f8c8d; text-transform: uppercase; }
 
         /* RESPONSIVE HP */
         @media (max-width: 768px) {
             .sidebar { width: 60px; }
             .sidebar h2, .sidebar a { font-size: 0; padding: 20px 0; text-align: center; }
-            .sidebar a::before { content: "•"; font-size: 20px; color: white; } /* Pengganti tulisan di HP agar rapi */
+            .sidebar a::before { content: "•"; font-size: 20px; color: white; } 
             .main { margin-left: 60px; width: calc(100% - 60px); }
             header h2 { font-size: 12px; }
             .container { padding: 10px; }
-            
-            .cards-container { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .card { 
-                padding: 12px 8px; 
-                aspect-ratio: 1.3 / 1; 
-                display: flex; 
-                flex-direction: column; 
-                justify-content: center; 
-            }
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .card { padding: 15px 10px; text-align: left; }
+            .card p { font-size: 13px; }
             .card h3 { font-size: 9px; }
-            .card p { font-size: 12px; }
         }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>RT 07</h2>
+    <h2>RT 07 RW 09</h2>
     <a href="#" class="active">Dashboard</a>
     <a href="#">Kas RT</a>
     <a href="#">Data Warga</a>
     <a href="#">Pengumuman</a>
     <a href="#">Kalender</a>
+    <a href="#">Arsip</a>
+    <a href="#">Struktur</a>
 </div>
 
 <div class="main">
     <header>
-        <h2>Sistem Informasi RT 07</h2>
-        <div class="ketua-rt">Ketua: Zainudin</div>
+        <h2>Sistem Informasi RT 07 RW 09</h2>
+        <div class="ketua">Ketua: Bpk. Muhammad Zainudin</div>
     </header>
 
-    <div class="running-text-bg">
-        <div id="marqueeText">📢 Memuat pengumuman... silahkan tunggu sejenak.</div>
+    <div class="running-box">
+        <div id="marquee">📢 Memuat pengumuman terbaru...</div>
     </div>
 
     <div class="container">
-        <div class="cards-container">
-            <div class="card c-blue">
+        <div class="cards-grid">
+            <div class="card bg-blue">
                 <h3>Total Kas RT</h3>
                 <p id="totalKasRT">Rp 0</p>
             </div>
-            <div class="card c-green">
+            <div class="card bg-green">
                 <h3>Kas Agustusan</h3>
                 <p id="kasAgustusan">Rp 0</p>
             </div>
-            <div class="card c-red">
+            <div class="card bg-red">
                 <h3>Pengeluaran</h3>
                 <p id="pengeluaranBulan">Rp 0</p>
             </div>
-            <div class="card c-orange">
+            <div class="card bg-purple">
                 <h3>Total Warga</h3>
                 <p id="jumlahWargaDisplay">0 Orang</p>
             </div>
         </div>
 
-        <div class="chart-container">
+        <div class="white-box">
             <h4>Grafik Keuangan</h4>
-            <div style="height: 240px;"><canvas id="myChart"></canvas></div>
+            <div style="height: 250px;"><canvas id="kasChart"></canvas></div>
         </div>
     </div>
 </div>
@@ -139,12 +120,12 @@ let chart;
 const formatRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
 async function fetchData() {
-    // Data Warga
+    // Ambil Data Warga
     fetch(API_WARGA + "?sheet=Data_Warga").then(r => r.json()).then(d => {
         document.getElementById("jumlahWargaDisplay").innerText = (d.length || 0) + " Orang";
     });
 
-    // Data Kas
+    // Ambil Data Kas RT
     fetch(API + "?sheet=Kas_RT").then(r => r.json()).then(d => {
         let masuk = 0, keluar = 0, blnIni = 0, skr = new Date();
         d.forEach(i => {
@@ -158,17 +139,17 @@ async function fetchData() {
         updateChart(d);
     });
 
-    // Data Agustusan
+    // Ambil Data Agustusan
     fetch(API + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
         let total = 0; d.forEach(i => total += (Number(i.masuk||0) - Number(i.keluar||0)));
         document.getElementById("kasAgustusan").innerText = formatRp(total);
     });
 
-    // Pengumuman
+    // Ambil Pengumuman (Running Text)
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
-        if(d.length > 0) {
+        if(d && d.length > 0) {
             let txt = d.reverse().slice(0,3).map(x => x.judul).join(" • ");
-            document.getElementById("marqueeText").innerHTML = "📢 INFO: " + txt + " &nbsp;&nbsp;&nbsp;";
+            document.getElementById("marquee").innerHTML = "📢 INFO: " + txt + " &nbsp;&nbsp;&nbsp;";
         }
     });
 }
@@ -180,13 +161,13 @@ function updateChart(data) {
         if(!isNaN(t)) { msk[t.getMonth()] += Number(i.masuk||0); klr[t.getMonth()] += Number(i.keluar||0); }
     });
     if(chart) chart.destroy();
-    chart = new Chart(document.getElementById("myChart"), {
+    chart = new Chart(document.getElementById("kasChart"), {
         type: 'bar',
         data: {
             labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
             datasets: [
-                { label: 'Masuk', data: msk, backgroundColor: '#2f80ed' },
-                { label: 'Keluar', data: klr, backgroundColor: '#eb5757' }
+                { label: 'Masuk', data: msk, backgroundColor: '#3498db', borderRadius: 5 },
+                { label: 'Keluar', data: klr, backgroundColor: '#e74c3c', borderRadius: 5 }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false }
