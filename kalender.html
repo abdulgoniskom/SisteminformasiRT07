@@ -254,10 +254,15 @@
         const curMonth = date.getMonth() + 1;
         const curYear = date.getFullYear();
 
-        // Filter kegiatan bulan yang aktif dilihat
+        // LOGIKA FILTER BARU: Lebih teliti membaca format YYYY-MM-DD
         const filterBulan = eventsArray.filter(ev => {
-            const p = ev.tanggal.split('-');
-            return parseInt(p[0]) === curYear && parseInt(p[1]) === curMonth;
+            if (!ev.tanggal) return false;
+            const p = ev.tanggal.split('-'); // Memecah 2026-03-15 menjadi [2026, 03, 15]
+            
+            const tahunSheet = parseInt(p[0]);
+            const bulanSheet = parseInt(p[1]); // parseInt akan mengubah "03" menjadi 3
+            
+            return tahunSheet === curYear && bulanSheet === curMonth;
         });
 
         if (filterBulan.length > 0) {
@@ -282,10 +287,9 @@
                 listContainer.appendChild(div);
             });
         } else {
-            listContainer.innerHTML = "<p style='color: #999; font-size: 13px; text-align:center;'>Tidak ada kegiatan di bulan ini.</p>";
+            listContainer.innerHTML = `<p style='color: #999; font-size: 13px; text-align:center;'>Tidak ada kegiatan di bulan ${curMonth} tahun ${curYear}.</p>`;
         }
     }
-
     async function inputKegiatan() {
         const tgl = prompt("Tanggal (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
         if (!tgl) return;
