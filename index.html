@@ -6,15 +6,16 @@
     <title>Sistem Informasi RT 07</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
-        body { background:#f1f4f9; display:flex; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
+        body { background:#f1f4f9; display:flex; overflow-x: hidden; }
         
-        /* SIDEBAR DEFAULT */
+        /* SIDEBAR */
         .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; flex-shrink: 0; overflow-y: auto; z-index: 1000; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size: 18px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size: 14px; }
         .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
         
+        /* MAIN CONTENT AREA */
         .main { margin-left:220px; width:calc(100% - 220px); min-height: 100vh; display: flex; flex-direction: column; }
         
         /* HEADER */
@@ -25,7 +26,7 @@
         header h2 { font-size: 18px; color: #2c3e50; text-align: center; }
         .ketua-rt { font-size: 12px; font-weight: bold; color: #2f80ed; position: absolute; right: 30px; }
 
-        /* CONTAINER RUNNING TEXT */
+        /* RUNNING TEXT - PERBAIKAN AGAR TIDAK TERPOTONG */
         .running-text { 
             background: #f2994a; 
             color: white; 
@@ -35,12 +36,14 @@
             overflow: hidden;
             white-space: nowrap;
             width: 100%;
+            display: flex;
         }
 
         .marquee-container {
             display: inline-block;
+            white-space: nowrap;
             padding-left: 100%;
-            animation: jalan-terus 25s linear infinite;
+            animation: jalan-terus 30s linear infinite; /* Kecepatan lebih lambat agar enak dibaca */
         }
 
         @keyframes jalan-terus {
@@ -53,23 +56,36 @@
         }
         
         /* CONTAINER & CARDS */
-        .container { padding:20px; flex-grow: 1; }
+        .container { padding:20px; }
         .cards { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .card { flex:1; min-width:180px; padding:15px; border-radius:10px; color:white; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+        
+        .card { 
+            flex: 1; 
+            min-width: 180px; 
+            padding: 15px; 
+            border-radius: 10px; 
+            color: white; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
         .card:nth-child(1){background:#2f80ed;}
         .card:nth-child(2){background:#27ae60;}
         .card:nth-child(3){background:#eb5757;}
         .card:nth-child(4){background:#f2994a;}
+        
         .card h3 { font-size:12px; margin-bottom:5px; opacity: 0.9; }
         .card p { font-size:18px; font-weight:bold; }
         
+        /* GRAFIK & KALENDER */
         .chart-box { background:white; padding:15px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
         .mini-calendar { background:white; padding:15px; border-radius:10px; border: 1px solid #eee; margin-top:20px; }
         .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top: 10px;}
         .day { background:#f7f9fc; padding:5px; border-radius:3px; font-size:11px; text-align:center; }
         .today { background: #2f80ed; color: white; font-weight: bold; }
 
-        /* PERBAIKAN KHUSUS HAPE */
+        /* RESPONSIVE LAYOUT (HP) */
         @media (max-width: 768px) {
             .sidebar { width: 80px; }
             .sidebar h2 { font-size: 10px; padding: 10px 5px; }
@@ -82,9 +98,23 @@
             header h2 { font-size: 13px; margin-bottom: 5px; }
             .ketua-rt { position: static; font-size: 9px; }
             
-            .container { padding: 10px; }
-            .card { min-width: calc(50% - 5px); padding: 10px; }
             .running-text { font-size: 11px; }
+
+            .container { padding: 10px; }
+            .cards { gap: 10px; }
+            
+            /* KOTAK 2 KOLOM DI HP */
+            .card { 
+                flex: 0 0 calc(50% - 5px); 
+                min-width: calc(50% - 5px); 
+                aspect-ratio: 1 / 1; 
+                align-items: center;
+                text-align: center;
+            }
+            .card h3 { font-size: 10px; }
+            .card p { font-size: 13px; }
+
+            .chart-box h3 { font-size: 13px; }
         }
     </style>
 </head>
@@ -109,7 +139,7 @@
 
     <div class="running-text">
         <div class="marquee-container" id="marqueeKonten">
-            📢 Sedang memuat informasi terbaru...
+            📢 Memuat informasi terbaru...
         </div>
     </div> <div class="container">
         <div class="cards">
@@ -142,8 +172,8 @@
                 <div class="calendar-grid" id="miniCalendar"></div>
             </div>
         </div>
-    </div>
-</div> <script>
+    </div> </div> <script>
+// KONFIGURASI API
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
@@ -166,64 +196,4 @@ function loadKasRT() {
             let tgl = new Date(d.tanggal);
             if(tgl.getMonth() === sekarang.getMonth() && tgl.getFullYear() === sekarang.getFullYear()) keluarBulanIni += k;
         });
-        document.getElementById("totalKasRT").innerText = rupiah(totalMasuk - totalKeluar);
-        document.getElementById("pengeluaranBulan").innerText = rupiah(keluarBulanIni);
-        updateGrafik(data);
-    });
-}
-
-function loadKasAgustusan() {
-    fetch(API + "?sheet=Kas_Agustusan").then(res => res.json()).then(data => {
-        let total = 0;
-        data.forEach(d => total += (Number(d.masuk || 0) - Number(d.keluar || 0)));
-        document.getElementById("kasAgustusan").innerText = rupiah(total);
-    });
-}
-
-function updateGrafik(data) {
-    let bulanMasuk = Array(12).fill(0), bulanKeluar = Array(12).fill(0);
-    data.forEach(d => {
-        let tgl = new Date(d.tanggal);
-        if (!isNaN(tgl)) {
-            bulanMasuk[tgl.getMonth()] += Number(d.masuk || 0);
-            bulanKeluar[tgl.getMonth()] += Number(d.keluar || 0);
-        }
-    });
-    if(chart) chart.destroy();
-    chart = new Chart(document.getElementById("kasChart"), {
-        type: 'bar',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-            datasets: [
-                { label: 'Masuk', data: bulanMasuk, backgroundColor: '#2f80ed' },
-                { label: 'Keluar', data: bulanKeluar, backgroundColor: '#eb5757' }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-}
-
-function loadMiniCalendar() {
-    let now = new Date(), days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(), firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
-    let html = "";
-    for(let i=0; i<firstDay; i++) html += "<div></div>";
-    for(let d=1; d<=days; d++) {
-        let cls = (d === now.getDate()) ? "day today" : "day";
-        html += `<div class="${cls}">${d}</div>`;
-    }
-    document.getElementById("miniCalendar").innerHTML = html;
-}
-
-function loadRunningText() {
-    fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(res => res.json()).then(data => {
-        if (data && data.length > 0) {
-            let teks = data.reverse().slice(0, 3).map(d => d.judul).join(" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ");
-            document.getElementById("marqueeKonten").innerHTML = "📢 INFO TERBARU: " + teks + " &nbsp;&nbsp;&nbsp; ";
-        }
-    });
-}
-
-window.onload = () => { loadWargaCount(); loadKasRT(); loadKasAgustusan(); loadMiniCalendar(); loadRunningText(); };
-</script>
-</body>
-</html>
+        document.getElementById("totalKasRT").innerText =
