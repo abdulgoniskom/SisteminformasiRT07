@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengumuman RT 07 - RT 07 RW 09</title>
     <style>
-        /* CSS DASAR (Konsisten dengan Arsip & Kas) */
+        /* CSS DASAR KONSISTEN DENGAN ARSIP */
         * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
         body { background:#eef2f7; display:flex; overflow-x: hidden; }
 
@@ -14,24 +14,21 @@
             width:220px; background:#2c3e50; height:100vh; color:white; 
             position:fixed; transition: 0.3s; z-index: 1000; left: 0;
         }
-        .sidebar.closed { left: -220px; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:18px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
-        .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
-        .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
+        .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
         
         /* AREA UTAMA */
         .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
-        .main.expanded { margin-left: 0; }
 
         header { 
             background:#2f80ed; color:white; padding:15px; 
             display:flex; align-items: center; 
             position: sticky; top: 0; z-index: 900;
         }
-        .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; }
+        .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; display: none; }
 
-        /* KONTEN PENGUMUMAN */
+        /* KONTEN */
         .container { padding:20px; max-width:900px; margin:auto; }
         
         .card { 
@@ -42,10 +39,10 @@
         .card img { max-width:100%; border-radius:5px; margin-bottom:10px; display: block; }
         .card h3 { margin:0; font-size: 18px; color: #2c3e50; line-height: 1.5; }
         
-        /* TOMBOL-TOMBOL */
+        /* TOMBOL */
         .toolbar { text-align: right; margin-bottom: 15px; }
-        button { background:#2f80ed; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; font-weight: bold; }
-        button:hover { background:#1f6fd1; }
+        .btn-action { background:#2f80ed; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; font-weight: bold; }
+        .btn-logout { background: #e74c3c; }
         
         .btn-delete {
             background: #e74c3c; color: white; border: none; padding: 5px 10px; 
@@ -59,14 +56,13 @@
             border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1); 
             border: 1px solid #2f80ed;
         }
-        .formInput h3 { margin-bottom: 10px; color: #2f80ed; }
-        input { width:100%; padding:12px; margin:10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: #2f80ed; }
+        input { width:100%; padding:12px; margin:10px 0; border: 1px solid #ddd; border-radius: 5px; outline: none; }
 
         @media (max-width: 768px) {
             .sidebar { left: -220px; }
             .sidebar.open { left: 0; }
             .main { margin-left: 0; }
+            .menu-btn { display: block; }
         }
     </style>
 </head>
@@ -83,100 +79,168 @@
     <a href="struktur.html">Struktur</a>
 </div>
 
-<div class="main" id="mainContent">
+<div class="main">
     <header>
         <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-        <h2 style="font-size: 16px;">Pengumuman RT 07 RW 09 Bumi Indah City</h2>
+        <h2 style="font-size: 16px;">Pengumuman RT 07 RW 09</h2>
     </header>
 
     <div class="container">
         <div class="toolbar">
-            <button id="btnLogin" onclick="login()">Login Admin</button>
-            <button id="btnTambah" style="display:none;" onclick="toggleForm()">+ Tambah Pengumuman</button>
+            <button class="btn-action" id="authBtn" onclick="handleAuth()">Login Admin</button>
+            <button class="btn-action" id="btnTambah" style="display:none;" onclick="toggleForm()">+ Tambah Pengumuman</button>
         </div>
 
         <div class="formInput" id="formInput">
             <h3>Buat Pengumuman Baru</h3>
-            <p style="font-size: 12px; color: #666;">* Judul akan muncul otomatis di tulisan berjalan halaman depan.</p>
             <input type="text" id="judul" placeholder="Ketik isi pengumuman di sini...">
-            <input type="text" id="gambar" placeholder="Link Gambar/Banner (Boleh dikosongkan)">
-            <button id="btnSimpan" style="width: 100%;" onclick="simpan()">Simpan & Publikasikan</button>
+            <input type="text" id="gambar" placeholder="Link Gambar (Boleh Kosong)">
+            <button class="btn-action" style="width: 100%;" onclick="simpan()">Simpan & Publikasikan</button>
         </div>
 
         <div id="listPengumuman">
-            <p style="text-align: center;">Memuat data pengumuman...</p>
+            <p style="text-align: center; color: #7f8c8d;">Memuat data pengumuman...</p>
         </div>
     </div>
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbx4Qfqy_Mjc8FPxXj73OqNBU63kYgObQ8IBInhXlZ476J63YS7FTmCbqs2rZMsRWns/exec"; 
-    let isAdmin = false;
+    // --- GANTI URL INI DENGAN URL WEB APP BAPAK ---
+    const API = "https://script.google.com/macros/s/AKfycbxNy3SliVZfc69jt2Vxd8kKNcn95EOQBTB84mf8N1B1yzx5ebsm4jOTnJXzCKn8ZA/exec"; 
+    
+    // Cek status login dari session
+    let isAdmin = (sessionStorage.getItem('rt07_admin') === 'true');
 
-    // FUNGSI LOGIN (DIPINDAH KE SERVER/APPS SCRIPT)
-    async function login(){
-        let u = prompt("Username Admin:");
-        let p = prompt("Password Admin:");
-        if(!u || !p) return;
+    function toggleSidebar() {
+        document.getElementById("mySidebar").classList.toggle("open");
+    }
 
-        try {
-            const res = await fetch(API, {
-                method: "POST",
-                body: JSON.stringify({ action: "login", username: u, password: p })
-            });
-            const hasil = await res.json();
-            
-            if(hasil.status === "success") {
-                isAdmin = true;
-                document.getElementById("formInput").style.display = "block";
-                document.getElementById("btnTambah").style.display = "inline-block";
-                document.getElementById("btnLogin").style.display = "none";
-                loadData(); 
-                alert("Login Berhasil! Selamat bekerja, Pak.");
-            } else {
-                alert("Username atau Password salah!");
-            }
-        } catch(e) {
-            alert("Gagal terhubung ke server. Pastikan API URL benar.");
+    function toggleForm() {
+        const f = document.getElementById("formInput");
+        f.style.display = (f.style.display === "block") ? "none" : "block";
+    }
+
+    // Tampilan awal sesuai status login
+    if (isAdmin) {
+        document.getElementById("btnTambah").style.display = "inline-block";
+        const authBtn = document.getElementById("authBtn");
+        authBtn.innerText = "Logout Admin";
+        authBtn.classList.add("btn-logout");
+    }
+
+    // --- FUNGSI LOGIN (SERVER SIDE) ---
+    async function handleAuth() {
+        if (isAdmin) {
+            sessionStorage.removeItem('rt07_admin');
+            alert("Anda telah logout.");
+            location.reload();
+        } else {
+            let u = prompt("Username Admin:");
+            let p = prompt("Password Admin:");
+            if(!u || !p) return;
+
+            try {
+                const res = await fetch(API, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "login", username: u, password: p })
+                });
+                const hasil = await res.json();
+                if(hasil.status === "success") {
+                    sessionStorage.setItem('rt07_admin', 'true');
+                    alert("Login Berhasil!");
+                    location.reload();
+                } else {
+                    alert("Username atau Password salah!");
+                }
+            } catch(e) { alert("Gagal terhubung ke server."); }
         }
     }
 
-    // UPDATE FUNGSI SIMPAN (Menggunakan JSON agar seragam)
-    async function simpan(){
+    // --- AMBIL DATA PENGUMUMAN ---
+    async function loadData() {
+        const listDiv = document.getElementById("listPengumuman");
+        try {
+            const res = await fetch(API + "?sheet=Pengumuman");
+            const data = await res.json();
+            
+            if (!data || data.length === 0) {
+                listDiv.innerHTML = "<p style='text-align:center;'>Belum ada pengumuman.</p>";
+                return;
+            }
+
+            let html = "";
+            // Reverse agar yang terbaru di atas
+            data.reverse().forEach(item => {
+                html += `
+                <div class="card">
+                    ${isAdmin ? `<button class="btn-delete" onclick="hapus('${item.judul}')">Hapus</button>` : ''}
+                    ${item.gambar ? `<img src="${item.gambar}" onerror="this.style.display='none'">` : ''}
+                    <h3>${item.judul}</h3>
+                    <small style="color:#999; font-size:11px;">${item.tanggal || ''}</small>
+                </div>`;
+            });
+            listDiv.innerHTML = html;
+        } catch(e) { 
+            listDiv.innerHTML = "<p style='text-align:center;'>Gagal memuat data.</p>"; 
+        }
+    }
+
+    // --- SIMPAN PENGUMUMAN BARU ---
+    async function simpan() {
         let judul = document.getElementById("judul").value.trim();
         let gambar = document.getElementById("gambar").value.trim();
-        if(!judul){ alert("Isi pengumuman wajib diisi!"); return; }
+        if(!judul) return alert("Isi pengumuman wajib diisi!");
 
         const btn = document.getElementById("btnSimpan");
         btn.innerText = "Menyimpan...";
         btn.disabled = true;
 
-        const payload = {
-            action: "insert",
-            sheet: "Pengumuman",
-            judul: judul,
-            gambar: gambar
-        };
-
         try {
-            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            await fetch(API, { 
+                method: "POST", 
+                body: JSON.stringify({ 
+                    action: "insert", 
+                    sheet: "Pengumuman", 
+                    judul: judul, 
+                    gambar: gambar 
+                }) 
+            });
             alert("Pengumuman berhasil terbit!");
             location.reload();
-        } catch(e) {
-            alert("Gagal menyimpan.");
-            btn.disabled = false;
+        } catch(e) { 
+            // Kadang muncul CORS error tapi data sebenarnya masuk
+            alert("Data sedang diproses."); 
+            location.reload(); 
         }
     }
 
-    // UPDATE FUNGSI HAPUS
+    // --- HAPUS PENGUMUMAN ---
     async function hapus(judul) {
-        if(confirm("Hapus pengumuman ini?")) {
-            const payload = { action: "delete", sheet: "Pengumuman", judul: judul };
-            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
-            alert("Berhasil dihapus");
+        if(!confirm("Hapus pengumuman ini?")) return;
+        try {
+            await fetch(API, { 
+                method: "POST", 
+                body: JSON.stringify({ 
+                    action: "delete", 
+                    sheet: "Pengumuman", 
+                    judul: judul 
+                }) 
+            });
+            alert("Berhasil dihapus.");
             loadData();
-        }
+        } catch(e) { loadData(); }
     }
+
+    // Tutup sidebar otomatis di HP jika klik di luar
+    document.addEventListener('click', function(event) {
+        var sidebar = document.getElementById('mySidebar');
+        var btn = document.querySelector('.menu-btn');
+        if (window.innerWidth <= 768 && !sidebar.contains(event.target) && event.target !== btn) {
+            sidebar.classList.remove('open');
+        }
+    });
+
+    loadData();
 </script>
 </body>
 </html>
