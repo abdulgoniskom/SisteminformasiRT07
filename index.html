@@ -6,138 +6,113 @@
     <title>Sistem Informasi RT 07</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background:#f1f4f9; display:flex; overflow-x: hidden; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background:#f4f7fa; display:flex; color: #333; }
         
-        /* SIDEBAR */
-        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; flex-shrink: 0; overflow-y: auto; z-index: 1000; }
-        .sidebar h2 { text-align:center; padding:25px 20px; border-bottom:1px solid rgba(255,255,255,0.1); font-size: 18px; }
-        .sidebar a { display:block; color:rgba(255,255,255,0.8); padding:15px 25px; text-decoration:none; font-size: 14px; }
-        .sidebar a:hover, .sidebar a.active { background:#34495e; color: #1abc9c; border-left: 4px solid #1abc9c; }
+        /* SIDEBAR SIMPLE */
+        .sidebar { width:200px; background:#1a252f; height:100vh; color:white; position:fixed; z-index: 1000; }
+        .sidebar h2 { text-align:center; padding:20px; font-size: 16px; border-bottom: 1px solid #2c3e50; color: #1abc9c; }
+        .sidebar a { display:block; color:#bdc3c7; padding:12px 20px; text-decoration:none; font-size: 13px; transition: 0.2s; }
+        .sidebar a:hover, .sidebar a.active { background:#2c3e50; color: white; border-left: 3px solid #1abc9c; }
         
-        .main { margin-left:220px; width:calc(100% - 220px); min-height: 100vh; display: flex; flex-direction: column; }
+        .main { margin-left:200px; width:calc(100% - 200px); min-height: 100vh; display: flex; flex-direction: column; }
         
         /* HEADER */
-        header { 
-            background:white; padding:15px 30px; box-shadow:0 2px 10px rgba(0,0,0,0.05); 
-            display:flex; align-items: center; justify-content: center; position: relative; min-height: 70px;
-        }
-        header h2 { font-size: 16px; color: #2c3e50; text-align: center; font-weight: 700; }
-        .ketua-rt { font-size: 11px; font-weight: bold; color: #2f80ed; position: absolute; right: 30px; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
+        header { background:white; padding:15px 25px; display:flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; }
+        header h2 { font-size: 15px; font-weight: 600; }
+        .ketua-rt { font-size: 10px; font-weight: bold; color: #2f80ed; background: #eef5ff; padding: 4px 10px; border-radius: 4px; }
 
-        /* RUNNING TEXT - VERSI PASTI JALAN DI HP */
-        .running-text-wrapper { 
-            background: #f2994a; 
-            color: white; 
-            padding: 12px 0;
-            font-weight: 600; 
-            font-size: 13px; 
-            overflow: hidden;
-            width: 100%;
-            position: relative;
-            display: flex;
-        }
-
-        #marqueeKonten {
-            display: inline-block;
-            white-space: nowrap;
-            padding-left: 100%;
-            animation: jalan-terus 20s linear infinite;
-            -webkit-animation: jalan-terus 20s linear infinite; /* Support Safari HP */
-        }
-
-        @keyframes jalan-terus {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-
-        @-webkit-keyframes jalan-terus {
-            0% { -webkit-transform: translateX(0); }
-            100% { -webkit-transform: translateX(-100%); }
-        }
+        /* RUNNING TEXT */
+        .running-text-box { background: #f39c12; color: white; padding: 8px 0; font-size: 12px; overflow: hidden; }
+        #marquee { display: inline-block; white-space: nowrap; padding-left: 100%; animation: jln 20s linear infinite; }
+        @keyframes jln { from { transform: translateX(0); } to { transform: translateX(-100%); } }
         
-        /* CONTAINER & CARDS */
+        /* CARDS GRID - SIMPLE & COMPACT */
         .container { padding:20px; }
-        .cards { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-        
-        .card { 
-            flex: 1; 
-            min-width: 200px; 
-            padding: 20px; 
-            border-radius: 12px; 
-            color: white; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: 0.3s;
+        .cards-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            margin-bottom: 20px; 
         }
-        .card:nth-child(1){background: linear-gradient(135deg, #2f80ed, #56ccf2);}
-        .card:nth-child(2){background: linear-gradient(135deg, #27ae60, #2ecc71);}
-        .card:nth-child(3){background: linear-gradient(135deg, #eb5757, #f2994a);}
-        .card:nth-child(4){background: linear-gradient(135deg, #8e44ad, #9b59b6);}
         
-        .card h3 { font-size:11px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.9; }
-        .card p { font-size:18px; font-weight: 800; }
+        .card-mini { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border-left: 4px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .card-mini h3 { font-size: 10px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px; }
+        .card-mini p { font-size: 16px; font-weight: 700; color: #2c3e50; }
         
-        /* CHART BOX */
-        .chart-box { background:white; padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05); }
+        /* Warna Aksen per Kotak */
+        .blue { border-left-color: #2f80ed; }
+        .green { border-left-color: #27ae60; }
+        .red { border-left-color: #eb5757; }
+        .purple { border-left-color: #9b59b6; }
 
-        /* HP VIEW */
+        /* CHART BOX */
+        .box { background:white; padding:20px; border-radius:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .box h4 { font-size: 13px; margin-bottom: 15px; color: #7f8c8d; }
+
+        /* MOBILE VIEW */
         @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar h2 { display: none; }
-            .sidebar a { padding: 20px 0; text-align: center; font-size: 10px; }
-            .main { margin-left: 70px; width: calc(100% - 70px); }
-            header h2 { font-size: 13px; padding-right: 5px; }
-            .ketua-rt { position: static; margin-top: 5px; font-size: 9px; display: inline-block; }
-            .cards { gap: 10px; }
-            .card { 
-                flex: 0 0 calc(50% - 5px); 
-                min-width: calc(50% - 5px); 
-                aspect-ratio: 1/1;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                padding: 10px;
-            }
-            .card h3 { font-size: 9px; }
-            .card p { font-size: 13px; }
+            .sidebar { width: 60px; }
+            .sidebar h2, .sidebar a span { display: none; }
+            .main { margin-left: 60px; width: calc(100% - 60px); }
+            header h2 { font-size: 12px; }
+            .container { padding: 10px; }
+            
+            /* Kotak Kecil di HP */
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .card-mini { padding: 12px 10px; border-radius: 6px; aspect-ratio: 1.2 / 1; display: flex; flex-direction: column; justify-content: center; }
+            .card-mini p { font-size: 13px; }
         }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>RT 07 RW 09</h2>
-    <a href="index.html" class="active">Dashboard</a>
-    <a href="kas.html">Kas RT</a>
-    <a href="warga.html">Data Warga</a>
-    <a href="pengumuman.html">Pengumuman</a>
-    <a href="kalender.html">Kalender</a>
-    <a href="arsip.html">Arsip</a>
-    <a href="struktur.html">Struktur</a>
+    <h2>RT 07</h2>
+    <a href="#" class="active">🏠 <span>Dashboard</span></a>
+    <a href="#">💰 <span>Kas RT</span></a>
+    <a href="#">👥 <span>Warga</span></a>
+    <a href="#">📢 <span>Info</span></a>
 </div>
 
 <div class="main">
     <header>
-        <h2>Sistem Informasi RT 07 RW 09</h2>
-        <div class="ketua-rt">Bpk. Muhammad Zainudin</div>
+        <h2>Dashboard RT 07</h2>
+        <div class="ketua-rt">Zainudin</div>
     </header>
 
-    <div class="running-text-wrapper">
-        <div id="marqueeKonten">📢 Menghubungkan ke database...</div>
+    <div class="running-text-box">
+        <div id="marquee">📢 Memuat pengumuman terbaru RT 07 RW 09...</div>
     </div>
 
     <div class="container">
-        <div class="cards">
-            <div class="card"><h3>Total Kas RT</h3><p id="totalKasRT">Rp 0</p></div>
-            <div class="card"><h3>Kas Agustusan</h3><p id="kasAgustusan">Rp 0</p></div>
-            <div class="card"><h3>Pengeluaran</h3><p id="pengeluaranBulan">Rp 0</p></div>
-            <div class="card"><h3>Total Warga</h3><p id="jumlahWargaDisplay">...</p></div>
+        <div class="cards-grid">
+            <div class="card-mini blue">
+                <h3>Kas RT</h3>
+                <p id="totalKasRT">Rp 0</p>
+            </div>
+            <div class="card-mini green">
+                <h3>Agustusan</h3>
+                <p id="kasAgustusan">Rp 0</p>
+            </div>
+            <div class="card-mini red">
+                <h3>Keluar</h3>
+                <p id="pengeluaranBulan">Rp 0</p>
+            </div>
+            <div class="card-mini purple">
+                <h3>Warga</h3>
+                <p id="jumlahWargaDisplay">0</p>
+            </div>
         </div>
 
-        <div class="chart-box">
-            <h3 style="font-size: 14px; margin-bottom: 15px;">Grafik Kas</h3>
+        <div class="box">
+            <h4>Statistik Bulanan</h4>
             <div style="height: 250px;"><canvas id="kasChart"></canvas></div>
         </div>
     </div>
@@ -149,63 +124,64 @@ const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
 
 let chart;
-function rupiah(a) { return "Rp " + Number(a).toLocaleString("id-ID"); }
+const rupiah = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
-async function loadData() {
-    try {
-        // Load Warga
-        const resWarga = await fetch(API_WARGA + "?sheet=Data_Warga");
-        const dataWarga = await resWarga.json();
-        document.getElementById("jumlahWargaDisplay").innerText = dataWarga.length + " Orang";
+function loadDashboard() {
+    // 1. Ambil Data Warga
+    fetch(API_WARGA + "?sheet=Data_Warga").then(r => r.json()).then(d => {
+        document.getElementById("jumlahWargaDisplay").innerText = (d.length || 0) + " Orang";
+    });
 
-        // Load Kas RT
-        const resKas = await fetch(API + "?sheet=Kas_RT");
-        const dataKas = await resKas.json();
-        let m = 0, k = 0, kb = 0, s = new Date();
-        dataKas.forEach(x => {
-            let masuk = Number(x.masuk || 0), keluar = Number(x.keluar || 0);
-            m += masuk; k += keluar;
-            let t = new Date(x.tanggal);
-            if(t.getMonth() === s.getMonth() && t.getFullYear() === s.getFullYear()) kb += keluar;
+    // 2. Ambil Data Kas
+    fetch(API + "?sheet=Kas_RT").then(r => r.json()).then(d => {
+        let masuk = 0, keluar = 0, blnIni = 0, skr = new Date();
+        d.forEach(i => {
+            let m = Number(i.masuk||0), k = Number(i.keluar||0);
+            masuk += m; keluar += k;
+            let t = new Date(i.tanggal);
+            if(t.getMonth() === skr.getMonth() && t.getFullYear() === skr.getFullYear()) blnIni += k;
         });
-        document.getElementById("totalKasRT").innerText = rupiah(m - k);
-        document.getElementById("pengeluaranBulan").innerText = rupiah(kb);
-        updateChart(dataKas);
+        document.getElementById("totalKasRT").innerText = rupiah(masuk - keluar);
+        document.getElementById("pengeluaranBulan").innerText = rupiah(blnIni);
+        updateChart(d);
+    });
 
-        // Load Agustusan
-        const resAgus = await fetch(API + "?sheet=Kas_Agustusan");
-        const dataAgus = await resAgus.json();
-        let tagus = 0; dataAgus.forEach(x => tagus += (Number(x.masuk || 0) - Number(x.keluar || 0)));
-        document.getElementById("kasAgustusan").innerText = rupiah(tagus);
+    // 3. Ambil Agustusan
+    fetch(API + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
+        let t = 0; d.forEach(i => t += (Number(i.masuk||0) - Number(i.keluar||0)));
+        document.getElementById("kasAgustusan").innerText = rupiah(t);
+    });
 
-        // Load Pengumuman
-        const resAnnounce = await fetch(API_PENGUMUMAN + "?sheet=Pengumuman");
-        const dataAnnounce = await resAnnounce.json();
-        if (dataAnnounce && dataAnnounce.length > 0) {
-            let teks = dataAnnounce.reverse().slice(0, 3).map(x => x.judul).join(" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ");
-            document.getElementById("marqueeKonten").innerHTML = "📢 INFO: " + teks + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    // 4. Pengumuman
+    fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
+        if(d.length > 0) {
+            let txt = d.reverse().slice(0,3).map(x => x.judul).join(" • ");
+            document.getElementById("marquee").innerHTML = "📢 " + txt + " &nbsp;&nbsp;&nbsp;";
         }
-    } catch (e) { console.error("Gagal load data", e); }
+    });
 }
 
 function updateChart(data) {
-    let bm = Array(12).fill(0), bk = Array(12).fill(0);
-    data.forEach(x => {
-        let t = new Date(x.tanggal);
-        if(!isNaN(t)) { bm[t.getMonth()] += Number(x.masuk || 0); bk[t.getMonth()] += Number(x.keluar || 0); }
+    let msk = Array(12).fill(0), klr = Array(12).fill(0);
+    data.forEach(i => {
+        let t = new Date(i.tanggal);
+        if(!isNaN(t)) { msk[t.getMonth()] += Number(i.masuk||0); klr[t.getMonth()] += Number(i.keluar||0); }
     });
     if(chart) chart.destroy();
     chart = new Chart(document.getElementById("kasChart"), {
         type: 'bar',
         data: {
             labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-            datasets: [{label:'Masuk',data:bm,backgroundColor:'#2f80ed'},{label:'Keluar',data:bk,backgroundColor:'#eb5757'}]
+            datasets: [
+                { label: 'Masuk', data: msk, backgroundColor: '#2f80ed' },
+                { label: 'Keluar', data: klr, backgroundColor: '#eb5757' }
+            ]
         },
         options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
-window.onload = loadData;
+window.onload = loadDashboard;
 </script>
 </body>
 </html>
