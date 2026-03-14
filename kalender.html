@@ -128,14 +128,13 @@
 </div>
 
 <script>
-    // URL Web App dari Script Kalender Bapak
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxXYWj4rTNO5_UR944bwuH13BH1R8y_Ik-yrX_whcNvFQr443Ky5x5hemn0wEFU9Cs/exec'; 
+    // PASTIKAN INI URL BARU HASIL DEPLOY ULANG (NEW DEPLOYMENT)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxv3kWHNZ8JEPAHb7oA_y9-VgSml8JNk7izb3a3nloZ_Se9nWnstIJbi6rnsmpccyw/exec'; 
     
     let date = new Date();
     let eventsArray = []; 
     let isAdmin = (localStorage.getItem('rt07_admin_kalender') === 'true');
 
-    // Cek Status Admin saat Load
     if (isAdmin) {
         document.getElementById('adminPanel').style.display = 'block';
         const authBtn = document.getElementById('authBtn');
@@ -165,50 +164,41 @@
             if (!user) return;
             let pass = prompt("Password Admin:");
             if (!pass) return;
-            
             try {
-                // Sesuai dengan doGet Bapak: ?action=login&username=...
                 const response = await fetch(`${scriptURL}?action=login&username=${user}&password=${pass}`);
                 const res = await response.json();
                 if (res.result === "success") {
                     localStorage.setItem('rt07_admin_kalender', 'true');
-                    alert("Login Berhasil!");
                     location.reload();
-                } else {
-                    alert("Username atau Password Salah!");
-                }
+                } else { alert("Kredensial Salah!"); }
             } catch (e) {
-                // Fallback jika ada kendala koneksi/CORS
                 if (user === "KetuaRT" && pass === "Bumiindah07") {
                     localStorage.setItem('rt07_admin_kalender', 'true');
                     location.reload();
-                } else {
-                    alert("Gagal terhubung ke server.");
                 }
             }
         }
     }
 
     async function fetchEvents() {
-    try {
-        const response = await fetch(scriptURL);
-        const data = await response.json();
-        
-        // CEK DI CONSOLE (F12): Pastikan data muncul di sini
-        console.log("Data dari Sheets:", data);
-        
-        eventsArray = Array.isArray(data) ? data : [];
-        
-        if (eventsArray.length === 0) {
-            document.getElementById("list-detail").innerHTML = "<p style='text-align:center;'>Sheets kosong atau Tab salah.</p>";
+        try {
+            const response = await fetch(scriptURL);
+            const data = await response.json();
+            
+            // Kita paksa bersihkan format tanggal yang masuk
+            eventsArray = Array.isArray(data) ? data.map(ev => {
+                let cleanTgl = String(ev.tanggal).split('T')[0].split(' ')[0];
+                return { ...ev, tanggal: cleanTgl };
+            }) : [];
+            
+            console.log("Data Berhasil Dimuat:", eventsArray);
+            renderCalendar();
+        } catch (e) { 
+            console.error("Gagal ambil data:", e);
+            document.getElementById("list-detail").innerHTML = "Gagal menyambung ke server.";
         }
-        
-        renderCalendar();
-    } catch (e) { 
-        console.error("Gagal ambil data:", e);
-        document.getElementById("list-detail").innerHTML = "<p style='text-align:center; color:red;'>Gagal menyambung ke Script.</p>";
     }
-}
+
     function renderCalendar() {
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -230,6 +220,7 @@
             }
             
             let cell = document.createElement("td");
+            // Format pencocokan YYYY-MM-DD
             let tglKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             
             const skrg = new Date();
@@ -239,7 +230,7 @@
 
             let html = `<span class="date-num">${d}</span>`;
             
-            // Filter kegiatan di kotak kalender
+            // Cari kegiatan yang cocok dengan tanggal sel ini
             const kegiatanHariIni = eventsArray.filter(ev => ev.tanggal === tglKey);
             kegiatanHariIni.forEach(ev => {
                 html += `<div class="event-item" title="${ev.kegiatan}"><b>${ev.kegiatan}</b></div>`;
@@ -257,32 +248,38 @@
     function updateDetailList() {
         const listContainer = document.getElementById("list-detail");
         listContainer.innerHTML = "";
+        
         const curMonth = date.getMonth() + 1;
         const curYear = date.getFullYear();
 
-        // Ambil kegiatan hanya untuk bulan yang sedang tampil
+        // FILTER: Kita cocokkan Tahun dan Bulan saja
         const filterBulan = eventsArray.filter(ev => {
-            let parts = ev.tanggal.split('T')[0].split('-');
-            return parseInt(parts[1]) === curMonth && parseInt(parts[0]) === curYear;
+            if (!ev.tanggal) return false;
+            const bagian = ev.tanggal.split('-'); // [2026, 03, 25]
+            return parseInt(bagian[0]) === curYear && parseInt(bagian[1]) === curMonth;
         });
 
         if (filterBulan.length > 0) {
+            filterBulan.sort((a, b) => a.tanggal.localeCompare(b.tanggal));
             filterBulan.forEach(item => {
                 const div = document.createElement("div");
                 div.className = "detail-item";
+                
+                const p = item.tanggal.split('-');
+                const tglIndo = `${p[2]}/${p[1]}/${p[0]}`;
+
+                let btnHapus = isAdmin ? `<button onclick="hapusKegiatan('${item.tanggal}', '${item.kegiatan}')" style="position:absolute; right:15px; top:15px; background:none; border:none; color:#eb5757; cursor:pointer; font-size:18px;">🗑️</button>` : "";
+
                 div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between;">
-                        <strong>${item.kegiatan}</strong>
-                        <span style="font-size: 11px; color: #2f80ed;">📅 ${item.tanggal.split('T')[0]}</span>
-                    </div>
-                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                        📍 ${item.lokasi || 'Lokasi tidak diatur'} | 🏷️ ${item.kategori || 'Umum'}
-                    </div>
+                    ${btnHapus}
+                    <div style="font-weight:bold; color:#2c3e50; padding-right:30px;">${item.kegiatan}</div>
+                    <div style="font-size:13px; color:#7f8c8d; margin:5px 0;">📍 ${item.lokasi || '-'} | 🏷️ ${item.kategori || 'Umum'}</div>
+                    <div style="font-size:11px; color:#2f80ed; font-weight:bold;">📅 ${tglIndo}</div>
                 `;
                 listContainer.appendChild(div);
             });
         } else {
-            listContainer.innerHTML = "<p style='color: #999; font-size: 13px;'>Tidak ada kegiatan di bulan ini.</p>";
+            listContainer.innerHTML = `<p style="color: #999; font-size: 13px; text-align:center; padding:20px;">Tidak ada kegiatan di bulan ${curMonth} - ${curYear}.</p>`;
         }
     }
 
@@ -295,40 +292,28 @@
         const kat = prompt("Kategori:", "Umum");
 
         try {
+            // Kita pakai POST dengan mode no-cors untuk bypass Google Security
             await fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors', // Menghindari masalah CORS saat post
-                body: JSON.stringify({ 
-                    tanggal: tgl, 
-                    kegiatan: keg, 
-                    lokasi: lok, 
-                    kategori: kat 
-                })
+                mode: 'no-cors',
+                body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
             });
-            alert("Berhasil disimpan! Halaman akan dimuat ulang.");
-            location.reload();
-        } catch (e) { 
-            alert("Gagal mengirim data."); 
-        }
+            alert("Berhasil! Data sedang diproses. Silakan tunggu 2 detik lalu refresh.");
+            setTimeout(() => location.reload(), 2000);
+        } catch (e) { alert("Gagal mengirim data."); }
     }
 
     async function hapusKegiatan(tgl, keg) {
-        if (!confirm(`Hapus kegiatan "${keg}" pada tanggal ${tgl}?`)) return;
+        if (!confirm(`Hapus kegiatan "${keg}"?`)) return;
         try {
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({ 
-                    action: "delete", 
-                    tanggal: tgl, 
-                    kegiatan: keg 
-                })
+                body: JSON.stringify({ action: "delete", tanggal: tgl, kegiatan: keg })
             });
-            alert("Permintaan hapus sedang diproses...");
-            setTimeout(() => location.reload(), 1500);
-        } catch (e) { 
-            alert("Gagal menghapus."); 
-        }
+            alert("Sedang menghapus...");
+            setTimeout(() => location.reload(), 2000);
+        } catch (e) { alert("Gagal menghapus."); }
     }
 
     function moveMonth(v) {
@@ -336,8 +321,6 @@
         renderCalendar();
     }
 
-    // Jalankan pertama kali
     fetchEvents();
-</script>
-</body>
+</script></body>
 </html>
