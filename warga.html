@@ -296,43 +296,56 @@ async function hapusWarga(row_id){
 }
 
 function cetakPDF(){
+    // Cek apakah data ada
+    if (dataWarga.length === 0) {
+        alert("Tidak ada data untuk dicetak!");
+        return;
+    }
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const tgl = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
     const pageWidth = doc.internal.pageSize.getWidth();
 
+    // Judul PDF
     doc.setFontSize(16);
     doc.text("DATA WARGA RT 07 RW 09", 105, 15, { align: "center" });
     doc.setFontSize(11);
     doc.text("Perumahan Bumi Indah City - Tangerang", 105, 22, { align: "center" });
     doc.line(20, 25, 190, 25);
 
-    const rows = dataWarga.map((w,i)=>[
-        i+1, 
-        w.nama_lengkap || w.nama, 
-        w.alamat_/_blok || w.alamat, 
-        w.status_warga || w.status
+    // Bagian Map Data (Penyebab Error Sebelumnya)
+    const rows = dataWarga.map((w, i) => [
+        i + 1, 
+        w.nama || "-",    // Pakai w.nama saja sesuai header Sheet
+        w.alamat || "-",  // Pakai w.alamat saja sesuai header Sheet
+        w.status || "-"   // Pakai w.status saja sesuai header Sheet
     ]);
 
+    // Membuat Tabel di PDF
     doc.autoTable({ 
-        head:[["No","Nama Lengkap","Alamat / Blok","Status Warga"]], 
-        body:rows, 
+        head: [["No", "Nama Lengkap", "Alamat / Blok", "Status Warga"]], 
+        body: rows, 
         startY: 30,
-        headStyles: { fillColor: [47, 128, 237], halign: 'center' }
+        headStyles: { fillColor: [47, 128, 237], halign: 'center' },
+        styles: { fontSize: 10 }
     });
 
+    // Tanda Tangan
     let ttdY = doc.lastAutoTable.finalY + 20;
     if (ttdY > 250) { doc.addPage(); ttdY = 20; }
+    
     doc.text(`Tangerang, ${tgl}`, pageWidth - 20, ttdY, { align: "right" });
     doc.text("Mengetahui,", 20, ttdY + 10);
     doc.text("Ketua RT 07", 20, ttdY + 18);
     doc.text("( Muhammad Zainudin )", 20, ttdY + 40);
+    
     doc.text("Sekretaris RT 07", pageWidth - 20, ttdY + 18, { align: "right" });
     doc.text("( Aris Munandar )", pageWidth - 20, ttdY + 40, { align: "right" });
 
-    doc.save(`Data_Warga_RT07.pdf`);
+    // Simpan File
+    doc.save(`Data_Warga_RT07_${tgl}.pdf`);
 }
-
 window.onclick = e => { if(e.target.classList.contains("modal")) e.target.style.display="none"; }
 ambilData();
 </script>
