@@ -15,70 +15,16 @@
         .sidebar-menu a { display: block; color: #ffffff; padding: 12px 20px; text-decoration: none; font-size: 14px; transition: 0.3s; border-left: 4px solid transparent; cursor: pointer; }
         .sidebar-menu a:hover, .sidebar-menu a.active { background: #34495e; border-left: 4px solid #3498db; }
 
-       /* --- FIX TAMPILAN HP TOTAL --- */
-@media (max-width: 768px) {
-    /* Sidebar tetap ramping */
-    .sidebar { 
-        width: 65px !important; 
-    } 
-
-    /* Paksa konten utama bergeser agar tidak tertutup sidebar */
-    .main { 
-        margin-left: 65px !important; 
-        width: calc(100% - 65px) !important; 
-    }
-
-    /* Header dibuat susun atas-bawah agar tidak tabrakan */
-    header { 
-        padding: 10px !important; 
-        flex-direction: column !important; 
-        height: auto !important;
-        text-align: center;
-    }
-
-    header h2 {
-        font-size: 12px !important;
-        margin-bottom: 5px;
-    }
-
-    /* Beri jarak agar Running Text tidak menabrak Header */
-    .running-box {
-        margin-top: 0px;
-        height: 35px !important; /* Kunci tinggi box agar stabil */
-        line-height: 15px;
-    }
-
-    /* Kotak Kas dibuat 2 kolom kecil */
-    .cards-grid { 
-        grid-template-columns: 1fr 1fr !important; 
-        gap: 8px !important; 
-        padding: 10px !important;
-    }
-
-    .card {
-        padding: 10px !important;
-    }
-
-    .card h3 { font-size: 8px !important; }
-    .card p { font-size: 11px !important; }
-
-    /* Pastikan Grafik tidak meluap keluar */
-    canvas {
-        max-width: 100% !important;
-        height: 200px !important; /* Kecilkan sedikit tingginya di HP */
-    }
-}
-        
         /* --- MAIN AREA --- */
         .main { margin-left:200px; width:calc(100% - 200px); display: flex; flex-direction: column; min-height: 100vh; transition: 0.3s; }
         
         /* --- HEADER --- */
-        header { background:white; padding:15px 25px; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        header { background:white; padding:15px 25px; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; z-index: 10; }
         header h2 { font-size: 14px; color: #333; font-weight: 700; }
         .ketua { font-size: 10px; color: #2f80ed; font-weight: bold; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
 
         /* --- RUNNING TEXT --- */
-        .running-box { background: #f2994a; color: white; padding: 10px 0; font-size: 12px; font-weight: 600; overflow: hidden; display: flex; }
+        .running-box { background: #f2994a; color: white; padding: 10px 0; font-size: 12px; font-weight: 600; overflow: hidden; display: flex; align-items: center; }
         #marquee { display: inline-block; white-space: nowrap; padding-left: 100%; animation: jln linear infinite; }
         @keyframes jln { from { transform: translateX(0); } to { transform: translateX(-100%); } }
         
@@ -96,7 +42,7 @@
         .white-box { background:white; padding:20px; border-radius:12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .white-box h4 { margin-bottom: 15px; font-size: 13px; color: #7f8c8d; text-transform: uppercase; }
 
-        /* Gaya List Agenda */
+        /* Agenda Item Style */
         .agenda-item { padding: 10px; background: #f9f9f9; border-left: 4px solid #2f80ed; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .agenda-info b { font-size: 13px; display: block; color: #333; }
         .agenda-info span { font-size: 11px; color: #666; }
@@ -104,9 +50,35 @@
         .agenda-date .day { font-size: 14px; font-weight: 800; color: #2c3e50; display: block; }
         .agenda-date .month { font-size: 9px; color: #eb5757; text-transform: uppercase; font-weight: bold; }
 
+        /* ======================================================
+           SATU-SATUNYA MEDIA QUERY UNTUK HP (MAX-WIDTH: 768px)
+           ====================================================== */
         @media (max-width: 768px) {
-            header { padding: 10px 15px; flex-direction: column; gap: 8px; }
-            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .sidebar { width: 65px !important; } 
+            .sidebar h2 { display: none; }
+            .sidebar-menu a { padding: 15px 5px; text-align: center; font-size: 9px; border-left: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+            .main { margin-left: 65px !important; width: calc(100% - 65px) !important; }
+
+            header { 
+                padding: 10px !important; 
+                flex-direction: column !important; 
+                height: auto !important;
+                text-align: center;
+                gap: 5px;
+            }
+            header h2 { font-size: 11px !important; }
+            .ketua { font-size: 8px !important; padding: 3px 10px !important; }
+
+            .running-box { height: 30px !important; font-size: 10px !important; }
+
+            .cards-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; padding: 10px 0 !important; }
+            .card { padding: 12px 10px !important; }
+            .card h3 { font-size: 8px !important; }
+            .card p { font-size: 11px !important; }
+
+            .white-box { padding: 15px !important; }
+            canvas { height: 180px !important; }
         }
     </style>
 </head>
@@ -151,7 +123,7 @@
         <div class="white-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h4 style="margin:0;">📅 Agenda Kegiatan Terdekat</h4>
-                <a href="kalender.html" style="font-size: 11px; color: #2f80ed; text-decoration: none; font-weight: bold;">Semua Jadwal →</a>
+                <a href="kalender.html" style="font-size: 11px; color: #2f80ed; text-decoration: none; font-weight: bold;">Semua →</a>
             </div>
             <div id="list-agenda-index">
                 <p style="color: #999; font-size: 12px;">Memuat agenda...</p>
@@ -171,19 +143,16 @@ function showSection(id) {
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
-// URL API Kalender (Sesuai dengan kalender.html)
 const API_KALENDER = "https://script.google.com/macros/s/AKfycbwMlHDBnOmjWDAekrlRsPBKwSlLtbeCUQ2gdZJfPrpp0QmVeBII1d7boc2Xh724PO4/exec";
 
 let chart;
 const formatRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
 async function fetchData() {
-    // Data Warga
     fetch(API_WARGA + "?sheet=Data_Warga").then(r => r.json()).then(d => {
         document.getElementById("jumlahWargaDisplay").innerText = (d.length || 0) + " Orang";
     });
 
-    // Data Kas
     fetch(API + "?sheet=Kas_RT").then(r => r.json()).then(d => {
         let masuk = 0, keluar = 0, blnIni = 0, skr = new Date();
         d.forEach(i => {
@@ -197,13 +166,11 @@ async function fetchData() {
         updateChart(d);
     });
 
-    // Kas Agustusan
     fetch(API + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
         let total = 0; d.forEach(i => total += (Number(i.masuk||0) - Number(i.keluar||0)));
         document.getElementById("kasAgustusan").innerText = formatRp(total);
     });
 
-    // Running Text Pengumuman
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
         if(d && d.length > 0) {
             let txt = d.reverse().map(x => x.judul).join(" • ");
@@ -215,14 +182,12 @@ async function fetchData() {
         }
     });
 
-    // AMBIL DATA KALENDER (Fitur Baru)
     fetch(API_KALENDER).then(r => r.json()).then(d => {
         const container = document.getElementById("list-agenda-index");
         if(d && d.length > 0) {
-            // Urutkan berdasarkan tanggal terdekat
             const sorted = d.sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
             let html = "";
-            sorted.slice(0, 3).forEach(item => { // Ambil 3 teratas
+            sorted.slice(0, 3).forEach(item => {
                 const dt = new Date(item.tanggal);
                 const bulan = ["JAN","FEB","MAR","APR","MEI","JUN","JUL","AGU","SEP","OKT","NOV","DES"];
                 html += `
