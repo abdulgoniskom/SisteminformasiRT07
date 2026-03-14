@@ -285,8 +285,8 @@
         if (!tgl) return;
         const keg = prompt("Nama Kegiatan:");
         if (!keg) return;
-        const lok = prompt("Lokasi:", "Musholla At-Taqwa");
-        const kat = prompt("Kategori:", "Umum");
+        const lok = prompt("Lokasi:", "");
+        const kat = prompt("Kategori:", "");
 
         try {
             await fetch(scriptURL, {
