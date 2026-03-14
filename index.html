@@ -10,12 +10,12 @@
         body { background:#f1f4f9; display:flex; }
         
         /* SIDEBAR DEFAULT */
-        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; flex-shrink: 0; overflow-y: auto; }
+        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; flex-shrink: 0; overflow-y: auto; z-index: 1000; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.2); font-size: 18px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size: 14px; }
         .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
         
-        .main { margin-left:220px; width:100%; min-width: 0; }
+        .main { margin-left:220px; width:calc(100% - 220px); min-height: 100vh; display: flex; flex-direction: column; }
         
         /* HEADER */
         header { 
@@ -26,40 +26,34 @@
         .ketua-rt { font-size: 12px; font-weight: bold; color: #2f80ed; position: absolute; right: 30px; }
 
         /* CONTAINER RUNNING TEXT */
-.running-text { 
-    background: #f2994a; 
-    color: white; 
-    padding: 8px 0; /* Padding atas bawah saja */
-    font-weight: bold; 
-    font-size: 13px; 
-    overflow: hidden; /* Sembunyikan teks yang keluar jalur */
-    white-space: nowrap; /* Paksa teks jadi satu baris */
-    display: flex;
-    align-items: center;
-}
+        .running-text { 
+            background: #f2994a; 
+            color: white; 
+            padding: 10px 0;
+            font-weight: bold; 
+            font-size: 13px; 
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+        }
 
-/* ANIMASI HALUS */
-.marquee-container {
-    display: inline-block;
-    padding-left: 100%; /* Mulai dari luar layar kanan */
-    animation: jalan-terus 20s linear infinite; /* 20 detik, makin besar makin lambat/nyaman */
-}
+        .marquee-container {
+            display: inline-block;
+            padding-left: 100%;
+            animation: jalan-terus 25s linear infinite;
+        }
 
-@keyframes jalan-terus {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-}
+        @keyframes jalan-terus {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
 
-/* Pause saat disentuh (HP) atau di-hover (Laptop) agar mudah dibaca */
-.running-text:hover .marquee-container {
-    animation-play-state: paused;
-}
-
-@media (max-width: 768px) {
-    .running-text { font-size: 11px; padding: 6px 0; }
-}
+        .running-text:hover .marquee-container {
+            animation-play-state: paused;
+        }
+        
         /* CONTAINER & CARDS */
-        .container { padding:20px; }
+        .container { padding:20px; flex-grow: 1; }
         .cards { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .card { flex:1; min-width:180px; padding:15px; border-radius:10px; color:white; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
         .card:nth-child(1){background:#2f80ed;}
@@ -82,19 +76,15 @@
             .sidebar a { padding: 12px 2px; font-size: 9px; text-align: center; border-left: none; }
             .sidebar a:hover, .sidebar a.active { border-left: none; background:#34495e; color: #1abc9c; }
             
-            .main { margin-left: 80px; }
+            .main { margin-left: 80px; width: calc(100% - 80px); }
             
             header { flex-direction: column; padding: 10px; min-height: auto; }
             header h2 { font-size: 13px; margin-bottom: 5px; }
             .ketua-rt { position: static; font-size: 9px; }
             
             .container { padding: 10px; }
-            .cards { gap: 10px; }
-            .card { min-width: calc(50% - 5px); padding: 10px; } /* Kartu jadi 2 kolom di HP */
-            .card h3 { font-size: 10px; }
-            .card p { font-size: 14px; }
-            
-            .chart-box h3 { font-size: 13px; }
+            .card { min-width: calc(50% - 5px); padding: 10px; }
+            .running-text { font-size: 11px; }
         }
     </style>
 </head>
@@ -118,11 +108,10 @@
     </header>
 
     <div class="running-text">
-    <div class="marquee-container" id="marqueeKonten">
-        📢 Sedang memuat informasi terbaru...
-    </div>
-
-    <div class="container">
+        <div class="marquee-container" id="marqueeKonten">
+            📢 Sedang memuat informasi terbaru...
+        </div>
+    </div> <div class="container">
         <div class="cards">
             <div class="card">
                 <h3>Total Kas RT</h3>
@@ -144,7 +133,9 @@
 
         <div class="chart-box">
             <h3 style="font-size: 14px; margin-bottom: 10px;">Grafik Kas RT</h3>
-            <canvas id="kasChart" style="max-height: 250px;"></canvas>
+            <div style="height: 250px;">
+                <canvas id="kasChart"></canvas>
+            </div>
             
             <div class="mini-calendar">
                 <h3 style="font-size: 12px;">Kalender</h3>
@@ -152,10 +143,7 @@
             </div>
         </div>
     </div>
-</div>
-
-<script>
-// PERINTAH API TETAP SAMA (TIDAK ADA YANG DIUBAH)
+</div> <script>
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
@@ -229,13 +217,12 @@ function loadMiniCalendar() {
 function loadRunningText() {
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(res => res.json()).then(data => {
         if (data && data.length > 0) {
-            // Ambil 3 pengumuman terbaru, gabungkan dengan separator yang jelas
             let teks = data.reverse().slice(0, 3).map(d => d.judul).join(" &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ");
             document.getElementById("marqueeKonten").innerHTML = "📢 INFO TERBARU: " + teks + " &nbsp;&nbsp;&nbsp; ";
         }
     });
 }
-    
+
 window.onload = () => { loadWargaCount(); loadKasRT(); loadKasAgustusan(); loadMiniCalendar(); loadRunningText(); };
 </script>
 </body>
