@@ -129,7 +129,7 @@
 
 <script>
     // URL Web App dari Script Kalender Bapak
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbywpmzbkZKRDguVtlRf9J5kM0qV6Cl19j4XOwKInE1oBLyNV7SB8KSWCkebGaeG5uc/exec'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxXYWj4rTNO5_UR944bwuH13BH1R8y_Ik-yrX_whcNvFQr443Ky5x5hemn0wEFU9Cs/exec'; 
     
     let date = new Date();
     let eventsArray = []; 
@@ -190,18 +190,25 @@
     }
 
     async function fetchEvents() {
-        try {
-            const response = await fetch(scriptURL);
-            const data = await response.json();
-            // Simpan data sebagai array
-            eventsArray = Array.isArray(data) ? data : [];
-            renderCalendar();
-        } catch (e) { 
-            console.error("Fetch Error:", e);
-            document.getElementById("list-detail").innerHTML = "<p style='text-align:center; color:red;'>Gagal memuat data dari Google Sheets.</p>";
+    try {
+        const response = await fetch(scriptURL);
+        const data = await response.json();
+        
+        // CEK DI CONSOLE (F12): Pastikan data muncul di sini
+        console.log("Data dari Sheets:", data);
+        
+        eventsArray = Array.isArray(data) ? data : [];
+        
+        if (eventsArray.length === 0) {
+            document.getElementById("list-detail").innerHTML = "<p style='text-align:center;'>Sheets kosong atau Tab salah.</p>";
         }
+        
+        renderCalendar();
+    } catch (e) { 
+        console.error("Gagal ambil data:", e);
+        document.getElementById("list-detail").innerHTML = "<p style='text-align:center; color:red;'>Gagal menyambung ke Script.</p>";
     }
-
+}
     function renderCalendar() {
         const year = date.getFullYear();
         const month = date.getMonth();
