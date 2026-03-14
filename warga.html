@@ -56,7 +56,8 @@
         .btn-edit { background:#3498db; }
         .btn-delete { background:#e74c3c; }
         .btn-pdf { background:#e67e22; }
-        .btn-login { background: rgba(255,255,255,0.2); border: 1px solid white; width: 80%; margin: 20px auto; display: block; }
+        /* Style Tombol Login yang dipindah */
+        .btn-login-pos { background: #2c3e50; border: 1px solid #34495e; }
 
         /* MODAL */
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; }
@@ -69,6 +70,9 @@
             .sidebar.open { left: 0; }
             .main { margin-left: 0; }
             .search-box { width: 100%; }
+            /* Memastikan tombol tidak bertumpuk di HP */
+            .toolbar-btns { width: 100%; display: flex; gap: 5px; justify-content: space-between; }
+            .toolbar-btns .btn { flex: 1; padding: 10px 5px; font-size: 11px; }
         }
     </style>
 </head>
@@ -83,8 +87,7 @@
     <a href="kalender.html">Kalender</a>
     <a href="arsip.html">Arsip</a>
     <a href="struktur.html">Struktur</a>
-    <button class="btn btn-login" id="adminToggle" onclick="tampilkanLogin()">Login Admin</button>
-</div>
+    </div>
 
 <div class="main" id="mainContent">
     <header>
@@ -100,7 +103,8 @@
             <div class="toolbar">
                 <input type="text" id="cariNama" class="search-box" placeholder="Cari Nama Warga..." onkeyup="filterWarga()">
                 
-                <div style="display: flex; gap: 10px;">
+                <div class="toolbar-btns" style="display: flex; gap: 10px;">
+                    <button class="btn btn-login-pos" id="adminToggle" onclick="tampilkanLogin()">Login Admin</button>
                     <button id="btnTambah" class="btn btn-add" style="display:none;" onclick="tambahWarga()">+ Tambah Warga</button>
                     <button class="btn btn-pdf" onclick="cetakPDF()">🧾 Cetak PDF</button>
                 </div>
@@ -180,6 +184,7 @@ function loginAdmin(){
         document.getElementById("thAksi").style.display = "table-cell";
         document.getElementById("statusAdmin").style.display = "block";
         document.getElementById("adminToggle").innerText = "Logout Admin";
+        document.getElementById("adminToggle").classList.add("btn-delete"); // Beri warna merah saat logout
         document.getElementById("adminToggle").onclick = () => location.reload();
         tampilkanData();
     } else { alert("Username atau password salah!"); }
@@ -195,7 +200,6 @@ async function ambilData(){
     }
 }
 
-// FITUR PENCARIAN (Penting!)
 function filterWarga() {
     const keyword = document.getElementById("cariNama").value.toLowerCase();
     const filteredData = dataWarga.filter(warga => 
@@ -301,7 +305,7 @@ function cetakPDF(){
     doc.text("Mengetahui,", 20, ttdY + 10);
     doc.text("Ketua RT 07", 20, ttdY + 18);
     doc.text("( Muhammad Zainudin )", 20, ttdY + 40);
-    doc.text("Sekretariat RT 07", pageWidth - 20, ttdY + 18, { align: "right" });
+    doc.text("Sekretaris RT 07", pageWidth - 20, ttdY + 18, { align: "right" });
     doc.text("( Aris Munandar )", pageWidth - 20, ttdY + 40, { align: "right" });
 
     doc.save(`Data_Warga_RT07.pdf`);
