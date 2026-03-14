@@ -15,14 +15,74 @@
         .sidebar-menu a { display: block; color: #ffffff; padding: 12px 20px; text-decoration: none; font-size: 14px; transition: 0.3s; border-left: 4px solid transparent; cursor: pointer; }
         .sidebar-menu a:hover, .sidebar-menu a.active { background: #34495e; border-left: 4px solid #3498db; }
 
-        /* --- OPTIMASI KHUSUS TAMPILAN HP --- */
-        @media (max-width: 768px) {
-            .sidebar { width: 65px; } 
-            .sidebar h2 { display: none; }
-            .sidebar-menu a { padding: 15px 5px; text-align: center; font-size: 9px; border-left: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
-            .sidebar-menu a.active { background: #3498db; color: white; }
-            .main { margin-left: 65px; width: calc(100% - 65px); }
-        }
+        /* --- PERBAIKAN TAMPILAN MOBILE --- */
+@media (max-width: 768px) {
+    .sidebar { 
+        width: 65px; 
+    } 
+
+    .sidebar h2 { 
+        display: none; 
+    }
+
+    .sidebar-menu a { 
+        padding: 15px 5px; 
+        text-align: center; 
+        font-size: 9px; 
+        border-left: none;
+    }
+
+    /* Penyesuaian Main Area agar tidak tertutup sidebar */
+    .main { 
+        margin-left: 65px; 
+        width: calc(100% - 65px); 
+    }
+
+    /* Header dibuat susun ke bawah agar tidak tabrakan */
+    header { 
+        padding: 15px; 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 10px;
+        height: auto;
+    }
+
+    header h2 {
+        font-size: 13px;
+    }
+
+    /* Running Box dibuat lebih fleksibel */
+    .running-box {
+        font-size: 11px;
+        padding: 8px 0;
+        height: auto;
+    }
+
+    /* Kotak Kas dibuat 2 kolom agar tidak terlalu panjang ke bawah */
+    .cards-grid { 
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px; 
+        padding: 0 5px;
+    }
+
+    .card {
+        padding: 12px 10px;
+    }
+
+    .card h3 {
+        font-size: 8px;
+    }
+
+    .card p {
+        font-size: 12px;
+    }
+
+    /* Grafik diperkecil sedikit agar pas di layar */
+    .white-box {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+}
         
         /* --- MAIN AREA --- */
         .main { margin-left:200px; width:calc(100% - 200px); display: flex; flex-direction: column; min-height: 100vh; transition: 0.3s; }
