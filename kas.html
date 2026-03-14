@@ -180,7 +180,93 @@
     }
 
     // --- LOGIKA PROGRAM KAS RT ---
-    const API="https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
+    const API="// =============================================
+// SISTEM INFORMASI RT 07 - GABUNGAN (WARGA & KAS)
+// =============================================
+
+function doGet(e) {
+  const sheetName = e.parameter.sheet || "Data_Warga"; 
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+  
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify({error: "Sheet tidak ditemukan"})).setMimeType(ContentService.MimeType.JSON);
+  
+  const data = sheet.getDataRange().getValues();
+  const header = data[0];
+  const rows = data.slice(1);
+  
+  // Format data menjadi JSON agar mudah dibaca di HTML
+  const result = rows.map((row, index) => {
+    let obj = { row_id: index + 2 }; 
+    header.forEach((key, i) => {
+      let cleanKey = key.toString().toLowerCase().replace(/\s+/g, '_');
+      obj[cleanKey] = row[i];
+    });
+    return obj;
+  });
+  
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  let params;
+  
+  // Cek apakah data dikirim via FormData atau JSON
+  if (e.postData) {
+    params = JSON.parse(e.postData.contents);
+  } else {
+    params = e.parameter;
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(params.sheet);
+  const action = params.action;
+
+  // --- 1. FITUR LOGIN AMAN (Berlaku untuk Warga & Kas) ---
+  if (action === "login") {
+    const adminUser = "Bendahara"; 
+    const adminPass = "Bumiindah07"; // GANTI PASSWORD DI SINI
+    
+    if (params.username === adminUser && params.password === adminPass) {
+      return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+        .setMimeType(ContentService.MimeType.JSON);
+    } else {
+      return ContentService.createTextOutput(JSON.stringify({status: "error"}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  // --- 2. LOGIKA DATA WARGA ---
+  if (params.sheet === "Data_Warga") {
+    if (action === "insert") {
+      sheet.appendRow([sheet.getLastRow(), params.nama, params.alamat, params.status]);
+    } 
+    else if (action === "update") {
+      const row = parseInt(params.row_id);
+      sheet.getRange(row, 2).setValue(params.nama); 
+      sheet.getRange(row, 3).setValue(params.alamat); 
+      sheet.getRange(row, 4).setValue(params.status); 
+    }
+    else if (action === "delete") {
+      sheet.deleteRow(parseInt(params.row_id));
+    }
+  }
+
+  // --- 3. LOGIKA KAS RT / KAS AGUSTUSAN ---
+  if (params.sheet === "Kas_RT" || params.sheet === "Kas_Agustusan") {
+    if (action === "insert_kas") {
+      sheet.appendRow([
+        params.tanggal, 
+        params.keterangan, 
+        Number(params.masuk) || 0, 
+        Number(params.keluar) || 0, 
+        params.bukti
+      ]);
+    }
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({result:"success"})).setMimeType(ContentService.MimeType.JSON);
+}";
     let chart;
 
     function rupiah(angka){
