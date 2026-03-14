@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalender Kegiatan RT 07 - RT 07 RW 09</title>
     <style>
-        /* CSS SINKRON DENGAN ARSIP & WARGA */
+        /* CSS RESET & BASE */
         * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
         body { background:#eef2f7; display:flex; overflow-x: hidden; }
 
+        /* SIDEBAR */
         .sidebar { 
             width:220px; background:#2c3e50; height:100vh; color:white; 
             position:fixed; transition: 0.3s; z-index: 1000; left: 0;
@@ -19,6 +20,7 @@
         .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
         .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
         
+        /* MAIN CONTENT */
         .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
         .main.expanded { margin-left: 0; }
 
@@ -32,7 +34,7 @@
         .container { padding:20px; max-width:1100px; margin:auto; }
         .card { background:white; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
         
-        /* CALENDAR TABLE */
+        /* CALENDAR */
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         #month-year { font-weight: bold; font-size: 20px; color: #2c3e50; }
         
@@ -48,13 +50,14 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         
-        /* LIST DETAIL BAWAH */
+        /* LIST DETAIL Bawah */
         .detail-box { margin-top: 30px; border-top: 2px solid #ddd; padding-top: 20px; }
         .detail-item { 
             padding: 12px; background: #f9f9f9; border-left: 5px solid #2f80ed; 
             margin-bottom: 10px; border-radius: 5px;
         }
 
+        /* BUTTONS */
         .btn { padding:8px 15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; }
         .btn-nav { background:#2f80ed; color:white; }
         .btn-login { background: rgba(255,255,255,0.2); border: 1px solid white; color:white; font-size: 12px; }
@@ -124,12 +127,20 @@
 </div>
 
 <script>
-    // URL SCRIPT BAPAK
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzQkEf8MLhO5Q0_S370X4RSkxcW95MT0-dCRCNdPpuU3p5-xGVjuoOwU4kqccrLroc/exec'; 
+    // GANTI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxHtCUVESO0VMfcmgztaZLdOU_OmIz2SNmLF1oG33hJOEPH8wh2Je37GTN3G1JqPLs/exec'; 
     
     let date = new Date();
     let eventsArray = []; 
     let isAdmin = (localStorage.getItem('rt07_admin_kalender') === 'true');
+
+    // Cek Status Admin Saat Halaman Dimuat
+    if (isAdmin) {
+        document.getElementById('adminPanel').style.display = 'block';
+        const authBtn = document.getElementById('authBtn');
+        authBtn.innerText = "Logout Admin";
+        authBtn.style.background = "#eb5757";
+    }
 
     function toggleSidebar() {
         const sidebar = document.getElementById("mySidebar");
@@ -142,52 +153,48 @@
         }
     }
 
+    // --- FITUR LOGIN/LOGOUT (Username & Password) ---
     async function handleAuth() {
-    if (isAdmin) {
-        if (confirm("Apakah Anda yakin ingin Logout?")) {
-            localStorage.removeItem('rt07_admin_kalender');
-            location.reload();
-        }
-    } else {
-        let user = prompt("Masukkan Username Admin:");
-        if (!user) return;
-        let pass = prompt("Masukkan Password Admin:");
-        if (!pass) return;
-
-        alert("Sedang memverifikasi...");
-        try {
-            const response = await fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ 
-                    action: "login", 
-                    username: user, 
-                    password: pass 
-                })
-            });
-            const res = await response.json();
-
-            if (res.result === "success") {
-                localStorage.setItem('rt07_admin_kalender', 'true');
-                alert("Login Berhasil! Selamat Datang Admin.");
+        if (isAdmin) {
+            if (confirm("Apakah Anda yakin ingin Logout?")) {
+                localStorage.removeItem('rt07_admin_kalender');
                 location.reload();
-            } else {
-                alert("Username atau Password Salah!");
             }
-        } catch (e) {
-            alert("Gagal koneksi ke server.");
+        } else {
+            let user = prompt("Username Admin:");
+            if (!user) return;
+            let pass = prompt("Password Admin:");
+            if (!pass) return;
+
+            alert("Memverifikasi...");
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "login", username: user, password: pass })
+                });
+                const res = await response.json();
+
+                if (res.result === "success") {
+                    localStorage.setItem('rt07_admin_kalender', 'true');
+                    alert("Login Berhasil!");
+                    location.reload();
+                } else {
+                    alert("Username atau Password Salah!");
+                }
+            } catch (e) {
+                alert("Gagal koneksi ke server.");
+            }
         }
     }
-}
-    // Fungsi pembantu untuk memformat tanggal ISO/String GSheet ke YYYY-MM-DD lokal
+
+    // --- LOGIKA PENANGGALAN (Agar Tidak Selisih Sehari) ---
     function formatToLocalISO(dateInput) {
         let d = new Date(dateInput);
         let month = '' + (d.getMonth() + 1);
         let day = '' + d.getDate();
         let year = d.getFullYear();
-
         if (month.length < 2) month = '0' + month;
         if (day.length < 2) day = '0' + day;
-
         return [year, month, day].join('-');
     }
 
@@ -232,7 +239,6 @@
 
             let html = `<span class="date-num">${d}</span>`;
             
-            // LOGIKA FILTER DIPERBAIKI: Menggunakan format lokal agar tidak selisih hari
             const kegiatanHariIni = eventsArray.filter(ev => {
                 let tglEvent = formatToLocalISO(ev.tanggal);
                 return tglEvent === tglKey;
@@ -251,13 +257,13 @@
         updateDetailList();
     }
 
+    // --- TAMPILAN DETAIL KEGIATAN & FITUR HAPUS ---
     function updateDetailList() {
         const listContainer = document.getElementById("list-detail");
         listContainer.innerHTML = "";
         const curMonth = date.getMonth() + 1;
         const curYear = date.getFullYear();
 
-        // Ambil kegiatan hanya untuk bulan yang sedang tampil
         const filterBulan = eventsArray.filter(ev => {
             let localDate = formatToLocalISO(ev.tanggal);
             let parts = localDate.split('-');
@@ -265,25 +271,27 @@
         });
 
         if (filterBulan.length > 0) {
-            // Urutkan berdasarkan tanggal terkecil
             filterBulan.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-
             filterBulan.forEach(item => {
                 const div = document.createElement("div");
                 div.className = "detail-item";
                 
-                // Format tanggal untuk tampilan user (misal: 12 Maret 2026)
                 let displayDate = new Date(item.tanggal).toLocaleDateString('id-ID', {
                     day: 'numeric', month: 'long', year: 'numeric'
                 });
 
+                let btnHapus = isAdmin ? `<button onclick="hapusKegiatan('${item.tanggal}', '${item.kegiatan}')" style="background:none; border:none; color:#eb5757; cursor:pointer; font-size:12px; font-weight:bold;">🗑️ Hapus</button>` : "";
+
                 div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
                         <strong>${item.kegiatan}</strong>
-                        <span style="font-size: 11px; color: #2f80ed;">📅 ${displayDate}</span>
+                        ${btnHapus}
                     </div>
-                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                        📍 ${item.lokasi || 'Lokasi tidak diatur'} | 🏷️ ${item.kategori || 'Umum'}
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <div style="font-size: 12px; color: #666;">
+                            📍 ${item.lokasi || '-'} | 🏷️ ${item.kategori || '-'}
+                        </div>
+                        <span style="font-size: 11px; color: #2f80ed; font-weight:bold;">📅 ${displayDate}</span>
                     </div>
                 `;
                 listContainer.appendChild(div);
@@ -293,34 +301,6 @@
         }
     }
 
-    function moveMonth(v) {
-        date.setMonth(date.getMonth() + v);
-        renderCalendar();
-    }
-
+    // --- FITUR TAMBAH KEGIATAN ---
     async function inputKegiatan() {
-        const tgl = prompt("Tanggal (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-        const keg = prompt("Nama Kegiatan:");
-        const lok = prompt("Lokasi:");
-        const kat = prompt("Kategori:");
-
-        if (tgl && keg) {
-            alert("Sedang menyimpan ke Google Sheets...");
-            try {
-                // Menggunakan fetch dengan mode no-cors jika perlu, 
-                // tapi biasanya POST JSON ke Apps Script butuh konfigurasi doGet/doPost yang benar
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
-                });
-                alert("Data berhasil masuk GSheet!");
-                location.reload();
-            } catch (e) { alert("Gagal koneksi ke server."); }
-        }
-    }
-
-    // JALANKAN AMBIL DATA
-    fetchEvents();
-</script>
-</body>
-</html>
+        const tgl = prompt("Tanggal (YYYY-MM-DD):", new Date().toISOString().split('T')
