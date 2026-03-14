@@ -211,22 +211,27 @@ async function ambilData(){
 function filterWarga() {
     const keyword = document.getElementById("cariNama").value.toLowerCase();
     const filteredData = dataWarga.filter(warga => 
-        (warga.nama_lengkap || warga.nama || "").toLowerCase().includes(keyword) || 
-        (warga.alamat_/_blok || warga.alamat || "").toLowerCase().includes(keyword)
+        (warga.nama || "").toLowerCase().includes(keyword) || 
+        (warga.alamat || "").toLowerCase().includes(keyword)
     );
     tampilkanData(filteredData);
 }
-
+    
 function tampilkanData(dataManual = null){
     const list = dataManual || dataWarga;
     const tbody = document.getElementById("isiTabel");
     tbody.innerHTML = "";
     
+    if (list.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Tidak ada data warga.</td></tr>";
+        return;
+    }
+    
     list.forEach((warga, index) => {
-        // PERBAIKAN: Menyesuaikan nama kolom dari Google Sheet
-        const nama = warga.nama_lengkap || warga.nama || "";
-        const alamat = warga.alamat_/_blok || warga.alamat || "";
-        const status = warga.status_warga || warga.status || "";
+        // DISESUAIKAN DENGAN HEADER: No, Nama, Alamat, Status
+        const nama = warga.nama || "-";
+        const alamat = warga.alamat || "-";
+        const status = warga.status || "-";
 
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -244,7 +249,6 @@ function tampilkanData(dataManual = null){
         tbody.appendChild(row);
     });
 }
-
 function tambahWarga(){
     document.getElementById("formTitle").innerText = "Tambah Warga Baru";
     document.getElementById("rowId").value = "";
@@ -257,12 +261,14 @@ function prepareEdit(index){
     const item = dataWarga[index];
     document.getElementById("formTitle").innerText = "Edit Data Warga";
     document.getElementById("rowId").value = item.row_id;
-    document.getElementById("namaWarga").value = item.nama_lengkap || item.nama;
-    document.getElementById("alamatWarga").value = item.alamat_/_blok || item.alamat;
-    document.getElementById("statusWarga").value = item.status_warga || item.status;
+    
+    // DISESUAIKAN DENGAN HEADER: nama, alamat, status
+    document.getElementById("namaWarga").value = item.nama || "";
+    document.getElementById("alamatWarga").value = item.alamat || "";
+    document.getElementById("statusWarga").value = item.status || "Warga Tetap";
+    
     document.getElementById("formModal").style.display = "flex";
 }
-
 async function submitForm(){
     const rowId = document.getElementById("rowId").value;
     const btn = document.getElementById("btnSimpan");
