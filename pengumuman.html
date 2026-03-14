@@ -110,126 +110,73 @@
 </div>
 
 <script>
-    // URL API TETAP SAMA
-    const API = "https://script.google.com/macros/s/AKfycbwztCRZt1BwQ_JmQKTxNBBlhYYcSmCTatjAXbqjR5WpSp8Yh5vsvLIp8TFRYJfoWY4/exec"; 
-
+    const API = "https://script.google.com/macros/s/AKfycbx4Qfqy_Mjc8FPxXj73OqNBU63kYgObQ8IBInhXlZ476J63YS7FTmCbqs2rZMsRWns/exec"; 
     let isAdmin = false;
 
-    // FUNGSI SIDEBAR
-    function toggleSidebar() {
-        const sidebar = document.getElementById("mySidebar");
-        const main = document.getElementById("mainContent");
-        if (window.innerWidth > 768) {
-            sidebar.classList.toggle("closed");
-            main.classList.toggle("expanded");
-        } else {
-            sidebar.classList.toggle("open");
-        }
-    }
+    // FUNGSI LOGIN (DIPINDAH KE SERVER/APPS SCRIPT)
+    async function login(){
+        let u = prompt("Username Admin:");
+        let p = prompt("Password Admin:");
+        if(!u || !p) return;
 
-    // FUNGSI LOGIN
-    function login(){
-        let u = prompt("Username");
-        let p = prompt("Password");
-        if(u == "admin" && p == "12345"){
-            isAdmin = true;
-            document.getElementById("formInput").style.display = "block";
-            document.getElementById("btnTambah").style.display = "inline-block";
-            document.getElementById("btnLogin").style.display = "none";
-            loadData(); 
-            alert("Login Berhasil!");
-        } else {
-            alert("Login gagal! Periksa kembali username dan password.");
-        }
-    }
-
-    function toggleForm() {
-        const f = document.getElementById("formInput");
-        f.style.display = f.style.display === "none" ? "block" : "none";
-    }
-
-    function loadData(){
-        fetch(API + "?sheet=Pengumuman")
-        .then(res => res.json())
-        .then(data => {
-            let reversedData = [...data].reverse(); 
-            let html = "";
-            if(reversedData.length === 0) {
-                html = "<p style='text-align:center;'>Tidak ada pengumuman saat ini.</p>";
-            }
-            reversedData.forEach((d) => {
-                html += `
-                    <div class="card">
-                        ${isAdmin ? `<button class="btn-delete" onclick="hapus('${d.judul}')">Hapus</button>` : ""}
-                        ${d.gambar ? `<img src="${d.gambar}" alt="banner">` : ""}
-                        <h3>${d.judul}</h3>
-                    </div>`;
+        try {
+            const res = await fetch(API, {
+                method: "POST",
+                body: JSON.stringify({ action: "login", username: u, password: p })
             });
-            document.getElementById("listPengumuman").innerHTML = html;
-        })
-        .catch(err => {
-            console.error(err);
-            document.getElementById("listPengumuman").innerHTML = "Gagal memuat pengumuman.";
-        });
+            const hasil = await res.json();
+            
+            if(hasil.status === "success") {
+                isAdmin = true;
+                document.getElementById("formInput").style.display = "block";
+                document.getElementById("btnTambah").style.display = "inline-block";
+                document.getElementById("btnLogin").style.display = "none";
+                loadData(); 
+                alert("Login Berhasil! Selamat bekerja, Pak.");
+            } else {
+                alert("Username atau Password salah!");
+            }
+        } catch(e) {
+            alert("Gagal terhubung ke server. Pastikan API URL benar.");
+        }
     }
 
-    function simpan(){
+    // UPDATE FUNGSI SIMPAN (Menggunakan JSON agar seragam)
+    async function simpan(){
         let judul = document.getElementById("judul").value.trim();
         let gambar = document.getElementById("gambar").value.trim();
-        
         if(!judul){ alert("Isi pengumuman wajib diisi!"); return; }
 
-        document.getElementById("btnSimpan").innerText = "Menyimpan...";
-        document.getElementById("btnSimpan").disabled = true;
+        const btn = document.getElementById("btnSimpan");
+        btn.innerText = "Menyimpan...";
+        btn.disabled = true;
 
-        let params = new URLSearchParams();
-        params.append("sheet", "Pengumuman");
-        params.append("action", "insert");
-        params.append("judul", judul);
-        params.append("gambar", gambar);
+        const payload = {
+            action: "insert",
+            sheet: "Pengumuman",
+            judul: judul,
+            gambar: gambar
+        };
 
-        fetch(API, {
-            method: "POST",
-            body: params.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        })
-        .then(res => res.text())
-        .then(res => {
-            alert("Pengumuman berhasil disimpan!");
-            document.getElementById("judul").value = "";
-            document.getElementById("gambar").value = "";
-            document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
-            document.getElementById("btnSimpan").disabled = false;
-            toggleForm();
-            loadData();
-        })
-        .catch(err => {
-            alert("Gagal menyimpan");
-            document.getElementById("btnSimpan").innerText = "Simpan & Publikasikan";
-            document.getElementById("btnSimpan").disabled = false;
-        });
-    }
-
-    function hapus(judul) {
-        if(confirm("Hapus pengumuman: " + judul + "?")) {
-            let params = new URLSearchParams();
-            params.append("sheet", "Pengumuman");
-            params.append("action", "delete");
-            params.append("judul", judul);
-
-            fetch(API, {
-                method: "POST",
-                body: params.toString(),
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            })
-            .then(() => {
-                alert("Berhasil dihapus");
-                loadData();
-            });
+        try {
+            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            alert("Pengumuman berhasil terbit!");
+            location.reload();
+        } catch(e) {
+            alert("Gagal menyimpan.");
+            btn.disabled = false;
         }
     }
 
-    loadData();
+    // UPDATE FUNGSI HAPUS
+    async function hapus(judul) {
+        if(confirm("Hapus pengumuman ini?")) {
+            const payload = { action: "delete", sheet: "Pengumuman", judul: judul };
+            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            alert("Berhasil dihapus");
+            loadData();
+        }
+    }
 </script>
 </body>
 </html>
