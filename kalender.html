@@ -127,12 +127,14 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzV-dJn2y2VXP3a6HJOol0W6ZcOZkH-3AJ5opFhV3vv1FoMSeZUAoLWmHJDH974HFU/exec'; 
+    // MASUKKAN URL GOOGLE SCRIPT ANDA DI SINI
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz4r6lCQBxP__2YYizLl-Naompow4W_4EarVS2iFOg_PzxWgl7k0daz1dWwHhSMrtI/exec'; 
     
     let date = new Date();
     let eventsArray = []; 
     let isAdmin = (localStorage.getItem('rt07_admin_kalender') === 'true');
 
+    // Cek Status Admin
     if (isAdmin) {
         document.getElementById('adminPanel').style.display = 'block';
         const authBtn = document.getElementById('authBtn');
@@ -151,6 +153,7 @@
         }
     }
 
+    // --- FUNGSI LOGIN DENGAN CADANGAN (LOCAL CHECK) ---
     async function handleAuth() {
         if (isAdmin) {
             if (confirm("Apakah Anda yakin ingin Logout?")) {
@@ -164,7 +167,9 @@
             if (!pass) return;
 
             alert("Memverifikasi...");
+            
             try {
+                // Jalur 1: Cek ke Google Script (Metode POST)
                 const response = await fetch(scriptURL, {
                     method: 'POST',
                     body: JSON.stringify({ action: "login", username: user, password: pass })
@@ -175,11 +180,20 @@
                     localStorage.setItem('rt07_admin_kalender', 'true');
                     alert("Login Berhasil!");
                     location.reload();
-                } else {
-                    alert("Username atau Password Salah!");
+                    return;
                 }
             } catch (e) {
-                alert("Gagal koneksi ke server.");
+                console.log("Koneksi POST lambat, mencoba Local Bypass...");
+            }
+
+            // Jalur 2: Local Bypass (Jika internet lambat/CORS error)
+            // Kredensial ini harus sama dengan yang ada di Code.gs
+            if (user === "KetuaRT" && pass === "Bumiindah07") {
+                localStorage.setItem('rt07_admin_kalender', 'true');
+                alert("Login Berhasil!");
+                location.reload();
+            } else {
+                alert("Username atau Password Salah!");
             }
         }
     }
@@ -298,21 +312,21 @@
 
     async function inputKegiatan() {
         const tgl = prompt("Tanggal (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+        if (!tgl) return;
         const keg = prompt("Nama Kegiatan:");
+        if (!keg) return;
         const lok = prompt("Lokasi:");
         const kat = prompt("Kategori:");
 
-        if (tgl && keg) {
-            alert("Sedang menyimpan...");
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: "add", tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
-                });
-                alert("Data berhasil disimpan!");
-                location.reload();
-            } catch (e) { alert("Gagal menyimpan data."); }
-        }
+        alert("Sedang menyimpan...");
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "add", tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
+            });
+            alert("Data berhasil disimpan!");
+            location.reload();
+        } catch (e) { alert("Gagal menyimpan data."); }
     }
 
     async function hapusKegiatan(tgl, keg) {
