@@ -13,7 +13,6 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
         body { background:#eef2f7; display:flex; overflow-x: hidden; }
 
-        /* SIDEBAR STYLE (Sama dengan arsip.html) */
         .sidebar { 
             width:220px; background:#2c3e50; height:100vh; color:white; 
             position:fixed; transition: 0.3s; z-index: 1000; left: 0;
@@ -24,7 +23,6 @@
         .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
         .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
         
-        /* AREA UTAMA */
         .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
         .main.expanded { margin-left: 0; }
 
@@ -33,11 +31,9 @@
             display:flex; justify-content:space-between; align-items: center; 
             position: sticky; top: 0; z-index: 900;
         }
-
         .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; }
         .header-left { display: flex; align-items: center; }
 
-        /* KONTEN KAS */
         .container { padding:20px; max-width:1000px; margin:auto; }
         .card { 
             background:white; padding:15px; border-radius:10px; 
@@ -45,7 +41,7 @@
         }
 
         button { background:#2f80ed; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight: bold; }
-        .logout { background:red; }
+        .logout { background:#e74c3c; }
 
         table { width:100%; border-collapse:collapse; min-width:600px; }
         th,td { border-bottom:1px solid #ddd; padding:10px; text-align:center; font-size:13px; }
@@ -55,7 +51,8 @@
         .masuk { color:#2f80ed; font-weight:bold; }
         .keluar { color:#eb5757; font-weight:bold; }
 
-        input, select { padding:8px; margin:5px; border: 1px solid #ddd; border-radius: 4px; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        input, select { padding:8px; border: 1px solid #ddd; border-radius: 4px; }
         .formInput { display:none; margin-top: 20px; border-top: 2px dashed #2f80ed; padding-top: 15px; }
 
         @media (max-width: 768px) {
@@ -102,14 +99,6 @@
                     <option value="">Semua Tahun</option>
                 </select>
 
-                <select id="filterTriwulan" onchange="loadData()">
-                    <option value="">Semua Triwulan</option>
-                    <option value="1">Triwulan 1 (Jan–Mar)</option>
-                    <option value="2">Triwulan 2 (Apr–Jun)</option>
-                    <option value="3">Triwulan 3 (Jul–Sep)</option>
-                    <option value="4">Triwulan 4 (Okt–Des)</option>
-                </select>
-
                 <select id="filterBulan" onchange="loadData()">
                     <option value="">Semua Bulan</option>
                     <option value="1">Januari</option>
@@ -126,19 +115,21 @@
                     <option value="12">Desember</option>
                 </select>
 
-                <button onclick="cetakPDF()">🧾 Cetak Laporan Kas</button>
+                <button onclick="cetakPDF()">🧾 Cetak Laporan</button>
             </div>
 
             <h3 id="saldo" style="margin-top:15px; color:#2c3e50;">Saldo : Rp 0</h3>
 
             <div class="formInput" id="formInput">
-                <h3>Input Transaksi</h3>
-                <input type="date" id="tanggal">
-                <input type="text" id="ket" placeholder="Keterangan">
-                <input type="number" id="masuk" placeholder="Kas Masuk">
-                <input type="number" id="keluar" placeholder="Kas Keluar">
-                <input type="text" id="bukti" placeholder="Link Bukti">
-                <button onclick="simpan()">Simpan Data</button>
+                <h3>Input Transaksi Baru</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <input type="date" id="tanggal">
+                    <input type="text" id="ket" placeholder="Keterangan Transaksi">
+                    <input type="number" id="masuk" placeholder="Kas Masuk (Rp)">
+                    <input type="number" id="keluar" placeholder="Kas Keluar (Rp)">
+                    <input type="text" id="bukti" placeholder="Link Bukti (Drive/Imgur)" style="grid-column: span 2;">
+                </div>
+                <button onclick="simpan()" style="width: 100%; margin-top: 10px; background: #1abc9c;">Simpan Data Ke Spreadsheet</button>
             </div>
         </div>
 
@@ -155,7 +146,9 @@
                             <th>Saldo</th>
                         </tr>
                     </thead>
-                    <tbody id="tabel"></tbody>
+                    <tbody id="tabel">
+                        <tr><td colspan="6">Memuat data kas...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -167,7 +160,10 @@
 </div>
 
 <script>
-    // --- FUNGSI SIDEBAR ---
+    // --- KONFIGURASI ---
+    const API_URL = "GANTI_DENGAN_URL_WEB_APP_ANDA"; // Masukkan URL Google Apps Script Anda di sini
+    let chart;
+
     function toggleSidebar() {
         const sidebar = document.getElementById("mySidebar");
         const main = document.getElementById("mainContent");
@@ -179,276 +175,205 @@
         }
     }
 
-    // --- LOGIKA PROGRAM KAS RT ---
-    const API="// =============================================
-// SISTEM INFORMASI RT 07 - GABUNGAN (WARGA & KAS)
-// =============================================
-
-function doGet(e) {
-  const sheetName = e.parameter.sheet || "Data_Warga"; 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(sheetName);
-  
-  if (!sheet) return ContentService.createTextOutput(JSON.stringify({error: "Sheet tidak ditemukan"})).setMimeType(ContentService.MimeType.JSON);
-  
-  const data = sheet.getDataRange().getValues();
-  const header = data[0];
-  const rows = data.slice(1);
-  
-  // Format data menjadi JSON agar mudah dibaca di HTML
-  const result = rows.map((row, index) => {
-    let obj = { row_id: index + 2 }; 
-    header.forEach((key, i) => {
-      let cleanKey = key.toString().toLowerCase().replace(/\s+/g, '_');
-      obj[cleanKey] = row[i];
-    });
-    return obj;
-  });
-  
-  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  let params;
-  
-  // Cek apakah data dikirim via FormData atau JSON
-  if (e.postData) {
-    params = JSON.parse(e.postData.contents);
-  } else {
-    params = e.parameter;
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(params.sheet);
-  const action = params.action;
-
-  // --- 1. FITUR LOGIN AMAN (Berlaku untuk Warga & Kas) ---
-  if (action === "login") {
-    const adminUser = "Bendahara"; 
-    const adminPass = "Bumiindah07"; // GANTI PASSWORD DI SINI
-    
-    if (params.username === adminUser && params.password === adminPass) {
-      return ContentService.createTextOutput(JSON.stringify({status: "success"}))
-        .setMimeType(ContentService.MimeType.JSON);
-    } else {
-      return ContentService.createTextOutput(JSON.stringify({status: "error"}))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-  }
-
-  // --- 2. LOGIKA DATA WARGA ---
-  if (params.sheet === "Data_Warga") {
-    if (action === "insert") {
-      sheet.appendRow([sheet.getLastRow(), params.nama, params.alamat, params.status]);
-    } 
-    else if (action === "update") {
-      const row = parseInt(params.row_id);
-      sheet.getRange(row, 2).setValue(params.nama); 
-      sheet.getRange(row, 3).setValue(params.alamat); 
-      sheet.getRange(row, 4).setValue(params.status); 
-    }
-    else if (action === "delete") {
-      sheet.deleteRow(parseInt(params.row_id));
-    }
-  }
-
-  // --- 3. LOGIKA KAS RT / KAS AGUSTUSAN ---
-  if (params.sheet === "Kas_RT" || params.sheet === "Kas_Agustusan") {
-    if (action === "insert_kas") {
-      sheet.appendRow([
-        params.tanggal, 
-        params.keterangan, 
-        Number(params.masuk) || 0, 
-        Number(params.keluar) || 0, 
-        params.bukti
-      ]);
-    }
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({result:"success"})).setMimeType(ContentService.MimeType.JSON);
-}";
-    let chart;
-
     function rupiah(angka){
-        if(!angka || angka==0) return "-";
-        return "Rp "+Number(angka).toLocaleString("id-ID");
+        if(!angka || angka == 0) return "-";
+        return "Rp " + Number(angka).toLocaleString("id-ID");
     }
 
-    // Login & Logout
-    document.getElementById("loginBtn").onclick=function(){
-        let u=prompt("Username");
-        let p=prompt("Password");
-        if(u=="admin" && p=="12345"){
-            document.getElementById("formInput").style.display="block";
-            document.getElementById("loginBtn").style.display="none";
-            document.getElementById("logoutBtn").style.display="inline";
-        } else { alert("Login gagal"); }
+    // --- LOGIN SISTEM ---
+    document.getElementById("loginBtn").onclick = async function(){
+        let u = prompt("Username Pengurus:");
+        let p = prompt("Password:");
+        if(!u || !p) return;
+
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "login", username: u, password: p })
+            });
+            const hasil = await res.json();
+            if(hasil.status === "success") {
+                document.getElementById("formInput").style.display = "block";
+                document.getElementById("loginBtn").style.display = "none";
+                document.getElementById("logoutBtn").style.display = "inline";
+                alert("Login Berhasil!");
+            } else { alert("Akses Ditolak!"); }
+        } catch(e) { alert("Error koneksi API"); }
     }
 
-    document.getElementById("logoutBtn").onclick=function(){
-        document.getElementById("formInput").style.display="none";
-        document.getElementById("loginBtn").style.display="inline";
-        document.getElementById("logoutBtn").style.display="none";
-    }
+    document.getElementById("logoutBtn").onclick = () => location.reload();
 
-    function isiTahun(data){
-        let tahunSet=new Set();
-        data.forEach(d=>{
-            let t=new Date(d.tanggal).getFullYear();
-            tahunSet.add(t);
-        });
-        let select=document.getElementById("filterTahun");
-        let valLama = select.value;
-        select.innerHTML='<option value="">Semua Tahun</option>';
-        [...tahunSet].sort().forEach(t=>{
-            select.innerHTML+=`<option value="${t}">${t}</option>`;
-        });
-        select.value = valLama;
-    }
-
+    // --- DATA HANDLING ---
     function loadData(){
-        let sheet=document.getElementById("sheet").value;
-        let bulanFilter=document.getElementById("filterBulan").value;
-        let tahunFilter=document.getElementById("filterTahun").value;
-        let triwulanFilter=document.getElementById("filterTriwulan").value;
+        const sheet = document.getElementById("sheet").value;
+        const bulanFilter = document.getElementById("filterBulan").value;
+        const tahunFilter = document.getElementById("filterTahun").value;
 
-        fetch(API+"?sheet="+sheet)
-        .then(r=>r.json())
-        .then(data=>{
-            isiTahun(data);
-            let html="";
-            let saldo=0;
-            let masukTotal=0;
-            let keluarTotal=0;
+        fetch(`${API_URL}?sheet=${sheet}`)
+        .then(r => r.json())
+        .then(data => {
+            if(data.error) throw new Error();
+            
+            // Isi pilihan tahun secara otomatis
+            let tahunSet = new Set();
+            data.forEach(d => { if(d.tanggal) tahunSet.add(new Date(d.tanggal).getFullYear()); });
+            let tSelect = document.getElementById("filterTahun");
+            let currentVal = tSelect.value;
+            tSelect.innerHTML = '<option value="">Semua Tahun</option>';
+            [...tahunSet].sort().forEach(t => tSelect.innerHTML += `<option value="${t}">${t}</option>`);
+            tSelect.value = currentVal;
 
-            data.forEach(d=>{
-                let tgl=new Date(d.tanggal);
-                let bulan=tgl.getMonth()+1;
-                let tahun=tgl.getFullYear();
-                let triwulan=Math.ceil(bulan/3);
+            let html = "";
+            let runningSaldo = 0;
+            let totalM = 0, totalK = 0;
 
-                if(bulanFilter && bulan!=bulanFilter) return;
-                if(tahunFilter && tahun!=tahunFilter) return;
-                if(triwulanFilter && triwulan!=triwulanFilter) return;
+            data.forEach(d => {
+                let tgl = new Date(d.tanggal);
+                if(bulanFilter && (tgl.getMonth()+1) != bulanFilter) return;
+                if(tahunFilter && tgl.getFullYear() != tahunFilter) return;
 
-                saldo+=Number(d.masuk)-Number(d.keluar);
-                masukTotal+=Number(d.masuk);
-                keluarTotal+=Number(d.keluar);
+                runningSaldo += (Number(d.masuk) || 0) - (Number(d.keluar) || 0);
+                totalM += (Number(d.masuk) || 0);
+                totalK += (Number(d.keluar) || 0);
 
-                html+=`<tr>
+                html += `<tr>
                     <td>${tgl.toLocaleDateString("id-ID")}</td>
-                    <td>${d.keterangan}</td>
+                    <td style="text-align:left;">${d.keterangan || "-"}</td>
                     <td class="masuk">${rupiah(d.masuk)}</td>
                     <td class="keluar">${rupiah(d.keluar)}</td>
-                    <td>${d.bukti?`<a href="${d.bukti}" target="_blank">Lihat</a>`:"-"}</td>
-                    <td>${rupiah(saldo)}</td>
+                    <td>${d.bukti ? `<a href="${d.bukti}" target="_blank">Lihat</a>` : "-"}</td>
+                    <td style="font-weight:bold;">${rupiah(runningSaldo)}</td>
                 </tr>`;
             });
 
-            document.getElementById("tabel").innerHTML=html;
-            document.getElementById("saldo").innerHTML="Saldo : "+rupiah(masukTotal-keluarTotal);
-
-            if(chart) chart.destroy();
-            chart = new Chart(document.getElementById("chart"), {
-                type: "doughnut",
-                data: {
-                    labels: ["Masuk","Keluar"],
-                    datasets: [{
-                        data: [masukTotal, keluarTotal],
-                        backgroundColor:["#2f80ed","#eb5757"]
-                    }]
-                },
-                options: {
-                    plugins: { title: { display: true, text: "Grafik Pemasukan vs Pengeluaran" }, legend: { position: "bottom" } }
-                }
-            });
+            document.getElementById("tabel").innerHTML = html || '<tr><td colspan="6">Data tidak ditemukan</td></tr>';
+            document.getElementById("saldo").innerText = "Saldo Akhir : " + rupiah(totalM - totalK);
+            updateChart(totalM, totalK);
+        })
+        .catch(() => {
+            document.getElementById("tabel").innerHTML = '<tr><td colspan="6" style="color:red">Gagal memuat data dari Spreadsheet.</td></tr>';
         });
     }
 
-    function simpan(){
-        let sheet=document.getElementById("sheet").value;
-        let form=new FormData();
-        form.append("sheet",sheet);
-        form.append("tanggal",document.getElementById("tanggal").value);
-        form.append("keterangan",document.getElementById("ket").value);
-        form.append("masuk",document.getElementById("masuk").value);
-        form.append("keluar",document.getElementById("keluar").value);
-        form.append("bukti",document.getElementById("bukti").value);
-
-        fetch(API,{method:"POST",body:form})
-        .then(r=>r.text())
-        .then(res=>{ alert("Data tersimpan"); loadData(); });
+    function updateChart(m, k) {
+        if(chart) chart.destroy();
+        chart = new Chart(document.getElementById("chart"), {
+            type: "doughnut",
+            data: {
+                labels: ["Pemasukan", "Pengeluaran"],
+                datasets: [{ data: [m, k], backgroundColor: ["#2f80ed", "#eb5757"] }]
+            },
+            options: { plugins: { legend: { position: "bottom" } } }
+        });
     }
 
-    // --- FUNGSI CETAK PDF (VERSI PALING LENGKAP) ---
+    async function simpan(){
+        const payload = {
+            action: "insert_kas",
+            sheet: document.getElementById("sheet").value,
+            tanggal: document.getElementById("tanggal").value,
+            keterangan: document.getElementById("ket").value,
+            masuk: document.getElementById("masuk").value,
+            keluar: document.getElementById("keluar").value,
+            bukti: document.getElementById("bukti").value
+        };
+
+        if(!payload.tanggal || !payload.keterangan) return alert("Mohon lengkapi data!");
+
+        try {
+            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            alert("Data tersimpan!");
+            location.reload();
+        } catch(e) { alert("Gagal menyimpan data!"); }
+    }
+
+    // --- FUNGSI CETAK PDF LENGKAP DENGAN TANDA TANGAN ---
     function cetakPDF(){
         const { jsPDF } = window.jspdf;
-        let doc=new jsPDF();
+        const doc = new jsPDF();
         
-        let kas=document.getElementById("sheet").selectedOptions[0].text;
-        
-        // Logika Periode
-        let bulanTxt = document.getElementById("filterBulan").selectedOptions[0].text;
-        let tahunTxt = document.getElementById("filterTahun").selectedOptions[0].text;
-        let triwulanTxt = document.getElementById("filterTriwulan").selectedOptions[0].text;
-        
-        let periode = "Semua Data";
-        if(bulanTxt !== "Semua Bulan") {
-            periode = bulanTxt + " " + tahunTxt;
-        } else if(triwulanTxt !== "Semua Triwulan") {
-            periode = triwulanTxt + " " + tahunTxt;
-        } else if(tahunTxt !== "Semua Tahun" && tahunTxt !== "Tahun") {
-            periode = "Tahun " + tahunTxt;
-        }
+        const namaSheet = document.getElementById("sheet").selectedOptions[0].text;
+        const bulanTxt = document.getElementById("filterBulan").selectedOptions[0].text;
+        const tahunTxt = document.getElementById("filterTahun").selectedOptions[0].text;
+        const periode = (bulanTxt !== "Semua Bulan") ? `${bulanTxt} ${tahunTxt}` : `Tahun ${tahunTxt}`;
 
-        doc.setFontSize(18);
-        doc.text("LAPORAN KAS RT 07",105,20,{align:"center"});
+        // Header Laporan
+        doc.setFontSize(16);
+        doc.text("LAPORAN KAS RT 07 RW 09", 105, 15, { align: "center" });
         doc.setFontSize(11);
-        doc.text("Perumahan Bumi Indah City",105,27,{align:"center"});
-        
-        doc.text("Jenis Kas : "+kas,14,40);
-        doc.text("Periode : "+periode,14,46);
-        doc.text("Tanggal Cetak : "+new Date().toLocaleDateString("id-ID"),14,52);
+        doc.text("Perumahan Bumi Indah City", 105, 22, { align: "center" });
+        doc.text(`Jenis Kas: ${namaSheet} | Periode: ${periode}`, 105, 28, { align: "center" });
+        doc.line(14, 32, 196, 32); // Garis pemisah
 
-        let rows=[]; let totalMasuk=0; let totalKeluar=0;
-        document.querySelectorAll("#tabel tr").forEach(tr=>{
-            let td=tr.querySelectorAll("td"); if(td.length<6) return;
-            totalMasuk+=Number(td[2].innerText.replace(/[^0-9]/g,""));
-            totalKeluar+=Number(td[3].innerText.replace(/[^0-9]/g,""));
-            rows.push([td[0].innerText, td[1].innerText, td[2].innerText, td[3].innerText, td[5].innerText]);
+        let rows = [];
+        let totalMasuk = 0;
+        let totalKeluar = 0;
+
+        document.querySelectorAll("#tabel tr").forEach(tr => {
+            let td = tr.querySelectorAll("td");
+            if(td.length >= 6) {
+                // Ambil angka saja untuk kalkulasi total di bawah
+                totalMasuk += Number(td[2].innerText.replace(/[^0-9]/g,"")) || 0;
+                totalKeluar += Number(td[3].innerText.replace(/[^0-9]/g,"")) || 0;
+                
+                rows.push([
+                    td[0].innerText, 
+                    td[1].innerText, 
+                    td[2].innerText, 
+                    td[3].innerText, 
+                    td[5].innerText
+                ]);
+            }
         });
 
+        // Tabel Data
         doc.autoTable({
-            startY:60,
-            head:[["Tanggal","Keterangan","Masuk","Keluar","Saldo"]],
-            body:rows,
-            headStyles:{fillColor:[47,128,237]},
-            columnStyles:{2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}}
+            head: [["Tanggal", "Keterangan", "Masuk", "Keluar", "Saldo"]],
+            body: rows,
+            startY: 38,
+            headStyles: { fillColor: [47, 128, 237] },
+            columnStyles: {
+                2: { halign: 'right' },
+                3: { halign: 'right' },
+                4: { halign: 'right' }
+            }
         });
 
-        let y = doc.lastAutoTable.finalY + 10;
-        doc.text("Total Pemasukan : Rp "+totalMasuk.toLocaleString("id-ID"), 14, y);
-        doc.text("Total Pengeluaran : Rp "+totalKeluar.toLocaleString("id-ID"), 14, y+6);
-        doc.text("Saldo Akhir : Rp "+(totalMasuk-totalKeluar).toLocaleString("id-ID"), 14, y+12);
+        // Ringkasan Total
+        let finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Total Pemasukan : Rp ${totalMasuk.toLocaleString("id-ID")}`, 14, finalY);
+        doc.text(`Total Pengeluaran : Rp ${totalKeluar.toLocaleString("id-ID")}`, 14, finalY + 6);
+        doc.text(`Saldo Akhir : Rp ${(totalMasuk - totalKeluar).toLocaleString("id-ID")}`, 14, finalY + 12);
 
-        // TANDA TANGAN (TANGERANG & PENGURUS)
-        let ttdY = y + 30;
+        // Bagian Tanda Tangan
+        let ttdY = finalY + 30;
         let pageWidth = doc.internal.pageSize.getWidth();
-        doc.text("Tangerang, "+new Date().toLocaleDateString("id-ID"), pageWidth-14, ttdY, {align:"right"});
+        doc.setFont(undefined, 'normal');
         
-        doc.text("Mengetahui,", 14, ttdY+10);
-        doc.text("Ketua RT 07", 14, ttdY+20);
-        doc.text("(Muhammad Zainudin)", 14, ttdY+40);
-        
-        doc.text("Bendahara RT 07", pageWidth-14, ttdY+20, {align:"right"});
-        doc.text("(Abdul Goni)", pageWidth-14, ttdY+40, {align:"right"});
+        // Titimangsa (Tempat & Tanggal)
+        doc.text(`Tangerang, ${new Date().toLocaleDateString("id-ID")}`, pageWidth - 14, ttdY, { align: "right" });
 
-        doc.save("Laporan_Kas_RT07.pdf");
+        // Ketua RT (Kiri)
+        doc.text("Mengetahui,", 25, ttdY + 10);
+        doc.text("Ketua RT 07", 25, ttdY + 16);
+        doc.text("_______________________", 25, ttdY + 35);
+        doc.setFont(undefined, 'bold');
+        doc.text("( Muhammad Zainudin )", 25, ttdY + 41);
+
+        // Bendahara (Kanan)
+        doc.setFont(undefined, 'normal');
+        doc.text("Dibuat oleh,", pageWidth - 25, ttdY + 10, { align: "right" });
+        doc.text("Bendahara RT 07", pageWidth - 25, ttdY + 16, { align: "right" });
+        doc.text("_______________________", pageWidth - 25, ttdY + 35, { align: "right" });
+        doc.setFont(undefined, 'bold');
+        doc.text("( Abdul Goni )", pageWidth - 25, ttdY + 41, { align: "right" });
+
+        // Simpan File
+        doc.save(`Laporan_Kas_RT07_${periode.replace(/\s+/g, '_')}.pdf`);
     }
-
     loadData();
-    setInterval(loadData,5000);
 </script>
-
 </body>
 </html>
