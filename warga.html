@@ -157,7 +157,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbyzLAUN6Bwl_vzgrcMgkIrP6ukHLyu2VBTWHxZcUvwpt37gGRTzMQcsMBdeV2jomxGs/exec"; 
 let dataWarga = [];
 let isAdmin = false;
 
@@ -174,20 +174,59 @@ function toggleSidebar() {
 
 function tampilkanLogin(){ document.getElementById("loginModal").style.display="flex"; }
 
-function loginAdmin(){
+async function loginAdmin() {
     const user = document.getElementById("username").value;
     const pass = document.getElementById("password").value;
-    if(user === "admin" && pass === "admin123"){
-        isAdmin = true;
-        document.getElementById("loginModal").style.display = "none";
-        document.getElementById("btnTambah").style.display = "inline-block";
-        document.getElementById("thAksi").style.display = "table-cell";
-        document.getElementById("statusAdmin").style.display = "block";
-        document.getElementById("adminToggle").innerText = "Logout Admin";
-        document.getElementById("adminToggle").classList.add("btn-delete"); // Beri warna merah saat logout
-        document.getElementById("adminToggle").onclick = () => location.reload();
-        tampilkanData();
-    } else { alert("Username atau password salah!"); }
+    const btnLogin = document.querySelector("#loginModal button");
+
+    if (!user || !pass) {
+        alert("Harap isi username dan password!");
+        return;
+    }
+
+    btnLogin.innerText = "Memverifikasi...";
+    btnLogin.disabled = true;
+
+    try {
+        const payload = {
+            action: "login",
+            sheet: "Data_Warga",
+            username: user,
+            password: pass
+        };
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+
+        const hasil = await response.json();
+
+        if (hasil.status === "success") {
+            isAdmin = true;
+            document.getElementById("loginModal").style.display = "none";
+            document.getElementById("btnTambah").style.display = "inline-block";
+            document.getElementById("thAksi").style.display = "table-cell";
+            document.getElementById("statusAdmin").style.display = "block";
+            
+            // Ubah tombol Login menjadi Logout
+            const btnToggle = document.getElementById("adminToggle");
+            btnToggle.innerText = "Logout Admin";
+            btnToggle.classList.add("btn-delete"); 
+            btnToggle.onclick = () => location.reload();
+            
+            tampilkanData();
+            alert("Login Berhasil!");
+        } else {
+            alert("Username atau Password Salah!");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Gagal terhubung ke server.");
+    } finally {
+        btnLogin.innerText = "Masuk";
+        btnLogin.disabled = false;
+    }
 }
 
 async function ambilData(){
