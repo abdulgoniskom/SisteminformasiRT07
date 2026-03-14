@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Utama - RT 07 RW 09</title>
+    <title>Dashboard Kas RT - RT 07 RW 09</title>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
     <style>
-        /* CSS DISAMAKAN DENGAN KAS.HTML ANDA */
         * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
         body { background:#eef2f7; display:flex; overflow-x: hidden; }
 
@@ -20,7 +23,7 @@
         .sidebar a:hover { background:#34495e; border-left: 4px solid #1abc9c; }
         .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; font-weight: bold; }
         
-        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; display: flex; flex-direction: column; }
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
         .main.expanded { margin-left: 0; }
 
         header { 
@@ -31,33 +34,31 @@
         .menu-btn { font-size: 24px; cursor: pointer; color: white; margin-right: 15px; }
         .header-left { display: flex; align-items: center; }
 
-        /* RUNNING TEXT */
-        .running-box { background: #f2994a; color: white; padding: 10px 0; font-size: 12px; font-weight: 600; overflow: hidden; display: flex; }
-        #marquee { display: inline-block; white-space: nowrap; padding-left: 100%; animation: jln linear infinite; }
-        @keyframes jln { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        .container { padding:20px; max-width:1000px; margin:auto; }
+        .card { 
+            background:white; padding:15px; border-radius:10px; 
+            margin-bottom:20px; box-shadow:0 4px 8px rgba(0,0,0,0.1); 
+        }
 
-        /* CARDS */
-        .container { padding:20px; max-width:1100px; margin:0 auto; width: 100%; }
-        .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .card-box { padding: 20px; border-radius: 10px; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .card-box h3 { font-size: 11px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.9; }
-        .card-box p { font-size: 18px; font-weight: bold; }
-        
-        .bg-blue { background: #2f80ed; }
-        .bg-green { background: #27ae60; }
-        .bg-red { background: #eb5757; }
-        .bg-purple { background: #8e44ad; }
+        button { background:#2f80ed; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight: bold; }
+        .logout { background:#e74c3c; }
 
-        .white-box { background:white; padding:20px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
-        .white-box h4 { margin-bottom: 15px; color: #7f8c8d; font-size: 14px; }
+        table { width:100%; border-collapse:collapse; min-width:600px; }
+        th,td { border-bottom:1px solid #ddd; padding:10px; text-align:center; font-size:13px; }
+        th { background:#2f80ed; color:white; }
+        tr:hover { background:#f5f9ff; }
+
+        .masuk { color:#2f80ed; font-weight:bold; }
+        .keluar { color:#eb5757; font-weight:bold; }
+
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        input, select { padding:8px; border: 1px solid #ddd; border-radius: 4px; }
+        .formInput { display:none; margin-top: 20px; border-top: 2px dashed #2f80ed; padding-top: 15px; }
 
         @media (max-width: 768px) {
             .sidebar { left: -220px; }
             .sidebar.open { left: 0; }
             .main { margin-left: 0; }
-            /* Header di HP jadi Center */
-            header { flex-direction: column; text-align: center; gap: 8px; }
-            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
         }
     </style>
 </head>
@@ -65,8 +66,8 @@
 
 <div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
-    <a href="index.html" class="active">Dashboard</a>
-    <a href="kas.html">Kas RT</a>
+    <a href="index.html">Dashboard</a>
+    <a href="kas.html" class="active">Kas RT</a>
     <a href="warga.html">Data Warga</a>
     <a href="pengumuman.html">Pengumuman</a>
     <a href="kalender.html">Kalender</a>
@@ -78,49 +79,90 @@
     <header>
         <div class="header-left">
             <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-            <h2 style="font-size: 16px;">Sistem Informasi RT 07 RW 09</h2>
+            <h2 style="font-size: 16px;">Laporan Kas RT 07 RW 09 Bumi Indah City</h2>
         </div>
-        <div style="font-size: 10px; font-weight: bold; background: #eef5ff; color:#2f80ed; padding: 5px 12px; border-radius: 20px;">
-            Ketua: Bpk. Muhammad Zainudin
+        <div class="header-right">
+            <button id="loginBtn">Login Admin</button>
+            <button id="logoutBtn" class="logout" style="display:none">Logout</button>
         </div>
     </header>
 
-    <div class="running-box">
-        <div id="marquee">📢 INFO: Memuat data terbaru...</div>
-    </div>
-
     <div class="container">
-        <div class="cards-grid">
-            <div class="card-box bg-blue">
-                <h3>Total Kas RT</h3>
-                <p id="totalKasRT">Rp 0</p>
+        <div class="card">
+            <div class="toolbar">
+                <select id="sheet" onchange="loadData()">
+                    <option value="Kas_RT">Kas RT</option>
+                    <option value="Kas_Agustusan">Kas Agustusan</option>
+                </select>
+
+                <select id="filterTahun" onchange="loadData()">
+                    <option value="">Semua Tahun</option>
+                </select>
+
+                <select id="filterBulan" onchange="loadData()">
+                    <option value="">Semua Bulan</option>
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+
+                <button onclick="cetakPDF()">🧾 Cetak Laporan</button>
             </div>
-            <div class="card-box bg-green">
-                <h3>Kas Agustusan</h3>
-                <p id="kasAgustusan">Rp 0</p>
-            </div>
-            <div class="card-box bg-red">
-                <h3>Pengeluaran Bulan Ini</h3>
-                <p id="pengeluaranBulan">Rp 0</p>
-            </div>
-            <div class="card-box bg-purple">
-                <h3>Total Warga</h3>
-                <p id="jumlahWargaDisplay">0 Orang</p>
+
+            <h3 id="saldo" style="margin-top:15px; color:#2c3e50;">Saldo : Rp 0</h3>
+
+            <div class="formInput" id="formInput">
+                <h3>Input Transaksi Baru</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <input type="date" id="tanggal">
+                    <input type="text" id="ket" placeholder="Keterangan Transaksi">
+                    <input type="number" id="masuk" placeholder="Kas Masuk (Rp)">
+                    <input type="number" id="keluar" placeholder="Kas Keluar (Rp)">
+                    <input type="text" id="bukti" placeholder="Link Bukti (Drive/Imgur)" style="grid-column: span 2;">
+                </div>
+                <button onclick="simpan()" style="width: 100%; margin-top: 10px; background: #1abc9c;">Simpan Data Ke Spreadsheet</button>
             </div>
         </div>
 
-        <div class="white-box">
-            <h4>Grafik Arus Kas (Pemasukan vs Pengeluaran)</h4>
-            <div style="height: 300px;"><canvas id="mainChart"></canvas></div>
+        <div class="card">
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Keterangan</th>
+                            <th>Masuk</th>
+                            <th>Keluar</th>
+                            <th>Bukti</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel">
+                        <tr><td colspan="6">Memuat data kas...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <canvas id="chart"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-    // URL API SAMA DENGAN KAS.HTML ANDA
-    const API_KAS = "https://script.google.com/macros/s/AKfycbwVy1gR1QVulkvqBxsbAC2tKFfOynyjlph23PoyuyroaquVpPbPGv_TcniTWOGCKPk/exec";
-    const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
-    const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
+    // --- KONFIGURASI ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbw3onRvmdlqfNpNQiH5b284d7L97FCU1OFe8SkSY6dcumi1mBVXyicWHPPNmqUGig/exec"; // Masukkan URL Google Apps Script Anda di sini
+    let chart;
 
     function toggleSidebar() {
         const sidebar = document.getElementById("mySidebar");
@@ -133,65 +175,224 @@
         }
     }
 
-    const rupiah = (n) => "Rp " + Number(n).toLocaleString("id-ID");
+    function rupiah(angka){
+        if(!angka || angka == 0) return "-";
+        return "Rp " + Number(angka).toLocaleString("id-ID");
+    }
 
-    async function loadDashboard() {
-        // Ambil Data Warga
-        fetch(API_WARGA + "?sheet=Data_Warga").then(r => r.json()).then(d => {
-            document.getElementById("jumlahWargaDisplay").innerText = (d.length || 0) + " Orang";
-        });
+    // --- LOGIN SISTEM ---
+    document.getElementById("loginBtn").onclick = async function(){
+        let u = prompt("Username Pengurus:");
+        let p = prompt("Password:");
+        if(!u || !p) return;
 
-        // Ambil Data Kas RT & Grafik
-        fetch(API_KAS + "?sheet=Kas_RT").then(r => r.json()).then(d => {
-            let masuk = 0, keluar = 0, blnIni = 0, skr = new Date();
-            d.forEach(i => {
-                let m = Number(i.masuk||0), k = Number(i.keluar||0);
-                masuk += m; keluar += k;
-                let t = new Date(i.tanggal);
-                if(t.getMonth() === skr.getMonth() && t.getFullYear() === skr.getFullYear()) blnIni += k;
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "login", username: u, password: p })
             });
-            document.getElementById("totalKasRT").innerText = rupiah(masuk - keluar);
-            document.getElementById("pengeluaranBulan").innerText = rupiah(blnIni);
-            updateChart(d);
-        });
+            const hasil = await res.json();
+            if(hasil.status === "success") {
+                document.getElementById("formInput").style.display = "block";
+                document.getElementById("loginBtn").style.display = "none";
+                document.getElementById("logoutBtn").style.display = "inline";
+                alert("Login Berhasil!");
+            } else { alert("Akses Ditolak!"); }
+        } catch(e) { alert("Error koneksi API"); }
+    }
 
-        // Ambil Data Agustusan
-        fetch(API_KAS + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
-            let total = 0; d.forEach(i => total += (Number(i.masuk||0) - Number(i.keluar||0)));
-            document.getElementById("kasAgustusan").innerText = rupiah(total);
-        });
+    document.getElementById("logoutBtn").onclick = () => location.reload();
 
-        // Ambil Pengumuman (Running Text)
-        fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
-            if(d && d.length > 0) {
-                let txt = d.reverse().map(x => x.judul).join(" • ");
-                const marqueeEl = document.getElementById("marquee");
-                marqueeEl.innerHTML = "📢 INFO: " + txt + " &nbsp;&nbsp;&nbsp;";
-                marqueeEl.style.animationDuration = (txt.length / 12 > 15 ? txt.length / 12 : 15) + "s";
-            }
+    // --- DATA HANDLING ---
+    function loadData(){
+        const sheet = document.getElementById("sheet").value;
+        const bulanFilter = document.getElementById("filterBulan").value;
+        const tahunFilter = document.getElementById("filterTahun").value;
+
+        fetch(`${API_URL}?sheet=${sheet}`)
+        .then(r => r.json())
+        .then(data => {
+            if(data.error) throw new Error();
+            
+            // Isi pilihan tahun secara otomatis
+            let tahunSet = new Set();
+            data.forEach(d => { if(d.tanggal) tahunSet.add(new Date(d.tanggal).getFullYear()); });
+            let tSelect = document.getElementById("filterTahun");
+            let currentVal = tSelect.value;
+            tSelect.innerHTML = '<option value="">Semua Tahun</option>';
+            [...tahunSet].sort().forEach(t => tSelect.innerHTML += `<option value="${t}">${t}</option>`);
+            tSelect.value = currentVal;
+
+            let html = "";
+            let runningSaldo = 0;
+            let totalM = 0, totalK = 0;
+
+            data.forEach(d => {
+                let tgl = new Date(d.tanggal);
+                if(bulanFilter && (tgl.getMonth()+1) != bulanFilter) return;
+                if(tahunFilter && tgl.getFullYear() != tahunFilter) return;
+
+                runningSaldo += (Number(d.masuk) || 0) - (Number(d.keluar) || 0);
+                totalM += (Number(d.masuk) || 0);
+                totalK += (Number(d.keluar) || 0);
+
+                html += `<tr>
+                    <td>${tgl.toLocaleDateString("id-ID")}</td>
+                    <td style="text-align:left;">${d.keterangan || "-"}</td>
+                    <td class="masuk">${rupiah(d.masuk)}</td>
+                    <td class="keluar">${rupiah(d.keluar)}</td>
+                    <td>${d.bukti ? `<a href="${d.bukti}" target="_blank">Lihat</a>` : "-"}</td>
+                    <td style="font-weight:bold;">${rupiah(runningSaldo)}</td>
+                </tr>`;
+            });
+
+            document.getElementById("tabel").innerHTML = html || '<tr><td colspan="6">Data tidak ditemukan</td></tr>';
+            document.getElementById("saldo").innerText = "Saldo Akhir : " + rupiah(totalM - totalK);
+            updateChart(totalM, totalK);
+        })
+        .catch(() => {
+            document.getElementById("tabel").innerHTML = '<tr><td colspan="6" style="color:red">Gagal memuat data dari Spreadsheet.</td></tr>';
         });
     }
 
-    function updateChart(data) {
-        let msk = Array(12).fill(0), klr = Array(12).fill(0);
-        data.forEach(i => {
-            let t = new Date(i.tanggal);
-            if(!isNaN(t)) { msk[t.getMonth()] += Number(i.masuk||0); klr[t.getMonth()] += Number(i.keluar||0); }
-        });
-        new Chart(document.getElementById("mainChart"), {
-            type: 'bar',
+    function updateChart(m, k) {
+        if(chart) chart.destroy();
+        chart = new Chart(document.getElementById("chart"), {
+            type: "doughnut",
             data: {
-                labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-                datasets: [
-                    { label: 'Masuk', data: msk, backgroundColor: '#2f80ed', borderRadius: 5 },
-                    { label: 'Keluar', data: klr, backgroundColor: '#eb5757', borderRadius: 5 }
-                ]
+                labels: ["Pemasukan", "Pengeluaran"],
+                datasets: [{ data: [m, k], backgroundColor: ["#2f80ed", "#eb5757"] }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { plugins: { legend: { position: "bottom" } } }
         });
     }
 
-    window.onload = loadDashboard;
+    async function simpan(){
+        const payload = {
+            action: "insert_kas",
+            sheet: document.getElementById("sheet").value,
+            tanggal: document.getElementById("tanggal").value,
+            keterangan: document.getElementById("ket").value,
+            masuk: document.getElementById("masuk").value,
+            keluar: document.getElementById("keluar").value,
+            bukti: document.getElementById("bukti").value
+        };
+
+        if(!payload.tanggal || !payload.keterangan) return alert("Mohon lengkapi data!");
+
+        try {
+            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            alert("Data tersimpan!");
+            location.reload();
+        } catch(e) { alert("Gagal menyimpan data!"); }
+    }
+
+    function cetakPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // --- 1. SETTING HEADER ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("LAPORAN KAS RT 07 RW 09", 105, 15, { align: "center" });
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text("Perumahan Bumi Indah City", 105, 21, { align: "center" });
+
+    // Informasi Jenis Kas & Periode
+    const namaSheet = document.getElementById("sheet").selectedOptions[0].text;
+    const bulanTxt = document.getElementById("filterBulan").selectedOptions[0].text;
+    const tahunTxt = document.getElementById("filterTahun").selectedOptions[0].text || new Date().getFullYear();
+    const tglCetak = new Date().toLocaleDateString("id-ID");
+
+    doc.setFontSize(10);
+    doc.text(`Jenis Kas : ${namaSheet}`, 14, 35);
+    doc.text(`Periode : ${bulanTxt} ${tahunTxt}`, 14, 41);
+    doc.text(`Tanggal Cetak : ${tglCetak}`, 14, 47);
+
+    // --- 2. PREPARASI DATA TABEL ---
+    let rows = [];
+    let totalMasuk = 0;
+    let totalKeluar = 0;
+
+    // Mengambil data dari tabel di layar
+    document.querySelectorAll("#tabel tr").forEach(tr => {
+        let td = tr.querySelectorAll("td");
+        if (td.length >= 6 && td[0].innerText !== "Data tidak ditemukan") {
+            let m = Number(td[2].innerText.replace(/[^0-9]/g, "")) || 0;
+            let k = Number(td[3].innerText.replace(/[^0-9]/g, "")) || 0;
+            totalMasuk += m;
+            totalKeluar += k;
+
+            rows.push([
+                td[0].innerText, // Tanggal
+                td[1].innerText, // Keterangan
+                m > 0 ? "Rp " + m.toLocaleString("id-ID") : "-", // Masuk
+                k > 0 ? "Rp " + k.toLocaleString("id-ID") : "-", // Keluar
+                td[5].innerText  // Saldo
+            ]);
+        }
+    });
+
+   // --- 3. MEMBUAT TABEL (AutoTable) ---
+    doc.autoTable({
+        head: [["Tanggal", "Keterangan", "Masuk", "Keluar", "Saldo"]],
+        body: rows,
+        startY: 55,
+        theme: 'grid',
+        headStyles: { 
+            fillColor: [47, 128, 237], 
+            textColor: [255, 255, 255], // Pastikan tulisan judul SEMUA PUTIH
+            halign: 'center',
+            fontStyle: 'bold' 
+        },
+        columnStyles: {
+            0: { cellWidth: 25, halign: 'center' },
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 30, halign: 'right' },
+            3: { cellWidth: 30, halign: 'right' },
+            4: { cellWidth: 35, halign: 'right' }
+        },
+        styles: { fontSize: 9, cellPadding: 3 },
+        didParseCell: function (data) {
+            // Logika: JIKA ini baris BODY (bukan header) DAN kolom KELUAR (indeks 3)
+            if (data.section === 'body' && data.column.index === 3) {
+                if (data.cell.text[0] !== "-") { // Jika ada nominalnya (bukan strip)
+                    data.cell.styles.textColor = [231, 76, 60]; // Ubah isi datanya jadi MERAH
+                }
+            }
+        }
+    });
+        
+    // --- 4. RINGKASAN TOTAL ---
+    let finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total Pemasukan : Rp ${totalMasuk.toLocaleString("id-ID")}`, 14, finalY);
+    doc.text(`Total Pengeluaran : Rp ${totalKeluar.toLocaleString("id-ID")}`, 14, finalY + 7);
+    doc.text(`Saldo Akhir : Rp ${(totalMasuk - totalKeluar).toLocaleString("id-ID")}`, 14, finalY + 14);
+
+    // --- 5. AREA TANDA TANGAN ---
+    let ttdY = finalY + 35;
+    let pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFont("helvetica", "normal");
+    doc.text(`Tangerang, ${tglCetak}`, pageWidth - 15, ttdY - 10, { align: "right" });
+
+    // Kolom Kiri (Ketua RT)
+    doc.text("Mengetahui,", 35, ttdY, { align: "center" });
+    doc.text("Ketua RT 07", 35, ttdY + 6, { align: "center" });
+    doc.text("( Muhammad Zainudin )", 35, ttdY + 35, { align: "center" });
+
+    // Kolom Kanan (Bendahara)
+    doc.text("Bendahara RT 07", pageWidth - 35, ttdY + 6, { align: "center" });
+    doc.text("( Abdul Goni )", pageWidth - 35, ttdY + 35, { align: "center" });
+
+    // --- 6. SIMPAN PDF ---
+    doc.save(`Laporan_Kas_RT07_${namaSheet}.pdf`);
+}
+
+    loadData();
 </script>
 </body>
 </html>
