@@ -9,78 +9,26 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background:#f4f7f6; display:flex; min-height: 100vh; overflow-x: hidden; }
         
-       /* --- SIDEBAR DESKTOP --- */
-.sidebar { 
-    width: 200px; 
-    background: #2c3e50; 
-    color: white; 
-    position: fixed; 
-    height: 100vh; 
-    z-index: 1000; 
-}
+        /* --- SIDEBAR DESKTOP --- */
+        .sidebar { width: 200px; background: #2c3e50; color: white; position: fixed; height: 100vh; z-index: 1000; }
+        .sidebar h2 { text-align: center; padding: 20px 10px; font-size: 16px; background: #1a252f; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-menu a { display: block; color: #ffffff; padding: 12px 20px; text-decoration: none; font-size: 14px; transition: 0.3s; border-left: 4px solid transparent; cursor: pointer; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: #34495e; border-left: 4px solid #3498db; }
 
-.sidebar h2 { 
-    text-align: center; 
-    padding: 20px 10px; 
-    font-size: 16px; 
-    background: #1a252f; 
-    border-bottom: 1px solid rgba(255,255,255,0.1); 
-}
-
-.sidebar-menu a { 
-    display: block; 
-    color: #ffffff; 
-    padding: 12px 20px; /* Ukuran kotak diperkecil agar tidak terlalu besar */
-    text-decoration: none; 
-    font-size: 14px; 
-    transition: 0.3s; 
-    border-left: 4px solid transparent;
-    cursor: pointer;
-}
-
-.sidebar-menu a:hover, .sidebar-menu a.active { 
-    background: #34495e; 
-    border-left: 4px solid #3498db; 
-}
-
-/* --- OPTIMASI KHUSUS TAMPILAN HP --- */
-@media (max-width: 768px) {
-    .sidebar { 
-        width: 65px; /* Sidebar jadi lebih ramping di HP */
-    } 
-
-    .sidebar h2 { 
-        display: none; /* Sembunyikan judul RT di HP agar hemat ruang */
-    }
-
-    .sidebar-menu a { 
-        padding: 15px 5px; /* Kotak menu lebih ringkas */
-        text-align: center; 
-        font-size: 9px; /* Tulisan kecil tapi tetap rapi */
-        border-left: none;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .sidebar-menu a.active {
-        background: #3498db; /* Warna blok penuh untuk menu aktif di HP */
-        color: white;
-    }
-
-    .main { 
-        margin-left: 65px; 
-        width: calc(100% - 65px); 
-    }
-}
+        /* --- OPTIMASI KHUSUS TAMPILAN HP --- */
+        @media (max-width: 768px) {
+            .sidebar { width: 65px; } 
+            .sidebar h2 { display: none; }
+            .sidebar-menu a { padding: 15px 5px; text-align: center; font-size: 9px; border-left: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+            .sidebar-menu a.active { background: #3498db; color: white; }
+            .main { margin-left: 65px; width: calc(100% - 65px); }
+        }
         
         /* --- MAIN AREA --- */
-        .main { margin-left:200px; width:calc(100% - 200px); display: flex; flex-direction: column; min-height: 100vh; }
+        .main { margin-left:200px; width:calc(100% - 200px); display: flex; flex-direction: column; min-height: 100vh; transition: 0.3s; }
         
         /* --- HEADER --- */
-        header { 
-            background:white; padding:15px 25px; display:flex; 
-            justify-content: space-between; align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-        }
+        header { background:white; padding:15px 25px; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         header h2 { font-size: 14px; color: #333; font-weight: 700; }
         .ketua { font-size: 10px; color: #2f80ed; font-weight: bold; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
 
@@ -103,29 +51,31 @@
         .white-box { background:white; padding:20px; border-radius:12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .white-box h4 { margin-bottom: 15px; font-size: 13px; color: #7f8c8d; text-transform: uppercase; }
 
-        /* --- MOBILE --- */
+        /* Gaya List Agenda */
+        .agenda-item { padding: 10px; background: #f9f9f9; border-left: 4px solid #2f80ed; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .agenda-info b { font-size: 13px; display: block; color: #333; }
+        .agenda-info span { font-size: 11px; color: #666; }
+        .agenda-date { text-align: center; min-width: 50px; background: #fff; padding: 5px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .agenda-date .day { font-size: 14px; font-weight: 800; color: #2c3e50; display: block; }
+        .agenda-date .month { font-size: 9px; color: #eb5757; text-transform: uppercase; font-weight: bold; }
+
         @media (max-width: 768px) {
-            .sidebar { width: 70px; } 
-            .sidebar h2 { display: none; }
-            .sidebar-menu a { padding: 20px 0; text-align: center; font-size: 9px; border-left: none; }
-            .main { margin-left: 70px; width: calc(100% - 70px); }
-            header { padding: 10px 15px; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 8px; }
+            header { padding: 10px 15px; flex-direction: column; gap: 8px; }
             .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
         }
     </style>
 </head>
 <body>
     
-<!-- SIDEBAR -->
 <div class="sidebar" id="mySidebar">
     <h2>RT 07 RW 09</h2>
     <div class="sidebar-menu">
-        <a onclick="showSection('dashboard')" id="nav-dashboard">Dashboard</a>
+        <a onclick="showSection('dashboard')" class="active">Dashboard</a>
         <a href="kas.html">Kas RT</a>
         <a href="warga.html">Data Warga</a>
         <a href="pengumuman.html">Pengumuman</a>
         <a href="kalender.html">Kalender</a>
-        <a href="arsip.html" class="active">Arsip</a>
+        <a href="arsip.html">Arsip</a>
         <a href="struktur.html">Struktur</a>
     </div>
 </div>
@@ -147,50 +97,48 @@
             <div class="card bg-red"><h3>Pengeluaran</h3><p id="pengeluaranBulan">Rp 0</p></div>
             <div class="card bg-purple"><h3>Total Warga</h3><p id="jumlahWargaDisplay">0 Orang</p></div>
         </div>
+        
         <div class="white-box">
             <h4>Grafik Keuangan</h4>
             <div style="height: 250px;"><canvas id="kasChart"></canvas></div>
         </div>
-    </div>
 
-    <div id="kas" class="content-section">
-        <div class="white-box"><h4>Detail Kas RT</h4><p>Halaman rincian kas sedang dikembangkan...</p></div>
-    </div>
-    <div id="warga" class="content-section">
-        <div class="white-box"><h4>Data Warga</h4><p>Daftar warga akan muncul di sini.</p></div>
-    </div>
-    <div id="pengumuman" class="content-section">
-        <div class="white-box"><h4>Arsip Pengumuman</h4><p>Semua info penting RT ada di sini.</p></div>
+        <div class="white-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 style="margin:0;">📅 Agenda Kegiatan Terdekat</h4>
+                <a href="kalender.html" style="font-size: 11px; color: #2f80ed; text-decoration: none; font-weight: bold;">Semua Jadwal →</a>
+            </div>
+            <div id="list-agenda-index">
+                <p style="color: #999; font-size: 12px;">Memuat agenda...</p>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-// FUNGSI PINDAH MENU
 function showSection(id) {
-    // Sembunyikan semua section
     document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
-    // Hilangkan status active di semua menu sidebar
     document.querySelectorAll('.sidebar-menu a').forEach(link => link.classList.remove('active'));
-    
-    // Tampilkan section yang dipilih
     document.getElementById(id).classList.add('active');
-    // Beri tanda active pada menu yang diklik
     event.currentTarget.classList.add('active');
 }
 
-// LOGIKA DATA API (SAMA SEPERTI SEBELUMNYA)
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
+// URL API Kalender (Sesuai dengan kalender.html)
+const API_KALENDER = "https://script.google.com/macros/s/AKfycbwMlHDBnOmjWDAekrlRsPBKwSlLtbeCUQ2gdZJfPrpp0QmVeBII1d7boc2Xh724PO4/exec";
 
 let chart;
 const formatRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
 async function fetchData() {
+    // Data Warga
     fetch(API_WARGA + "?sheet=Data_Warga").then(r => r.json()).then(d => {
         document.getElementById("jumlahWargaDisplay").innerText = (d.length || 0) + " Orang";
     });
 
+    // Data Kas
     fetch(API + "?sheet=Kas_RT").then(r => r.json()).then(d => {
         let masuk = 0, keluar = 0, blnIni = 0, skr = new Date();
         d.forEach(i => {
@@ -204,11 +152,13 @@ async function fetchData() {
         updateChart(d);
     });
 
+    // Kas Agustusan
     fetch(API + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
         let total = 0; d.forEach(i => total += (Number(i.masuk||0) - Number(i.keluar||0)));
         document.getElementById("kasAgustusan").innerText = formatRp(total);
     });
 
+    // Running Text Pengumuman
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
         if(d && d.length > 0) {
             let txt = d.reverse().map(x => x.judul).join(" • ");
@@ -218,6 +168,37 @@ async function fetchData() {
             if (durasi < 15) durasi = 15;
             marqueeEl.style.animationDuration = durasi + "s";
         }
+    });
+
+    // AMBIL DATA KALENDER (Fitur Baru)
+    fetch(API_KALENDER).then(r => r.json()).then(d => {
+        const container = document.getElementById("list-agenda-index");
+        if(d && d.length > 0) {
+            // Urutkan berdasarkan tanggal terdekat
+            const sorted = d.sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+            let html = "";
+            sorted.slice(0, 3).forEach(item => { // Ambil 3 teratas
+                const dt = new Date(item.tanggal);
+                const bulan = ["JAN","FEB","MAR","APR","MEI","JUN","JUL","AGU","SEP","OKT","NOV","DES"];
+                html += `
+                    <div class="agenda-item">
+                        <div class="agenda-info">
+                            <b>${item.kegiatan}</b>
+                            <span>📍 ${item.lokasi || 'Lokasi Tertera'}</span>
+                        </div>
+                        <div class="agenda-date">
+                            <span class="day">${dt.getDate()}</span>
+                            <span class="month">${bulan[dt.getMonth()]}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = "<p style='color:#999; font-size:12px;'>Tidak ada agenda terdekat.</p>";
+        }
+    }).catch(e => {
+        document.getElementById("list-agenda-index").innerHTML = "<p style='color:red; font-size:11px;'>Gagal memuat kalender.</p>";
     });
 }
 
