@@ -125,7 +125,7 @@
 
 <script>
     // URL SCRIPT BAPAK
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwMlHDBnOmjWDAekrlRsPBKwSlLtbeCUQ2gdZJfPrpp0QmVeBII1d7boc2Xh724PO4/exec'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyyjWtJLNxfFmFIyaP1dLkloL_4UwjgybKynqn4DYqDU4P1ciNcoIjSkM_M5pODS7s/exec'; 
     
     let date = new Date();
     let eventsArray = []; 
@@ -161,11 +161,23 @@
         document.getElementById('authBtn').style.background = "#eb5757";
     }
 
+    // Fungsi pembantu untuk memformat tanggal ISO/String GSheet ke YYYY-MM-DD lokal
+    function formatToLocalISO(dateInput) {
+        let d = new Date(dateInput);
+        let month = '' + (d.getMonth() + 1);
+        let day = '' + d.getDate();
+        let year = d.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [year, month, day].join('-');
+    }
+
     async function fetchEvents() {
         try {
             const response = await fetch(scriptURL);
             const data = await response.json();
-            // Pastikan data yang diambil disimpan ke eventsArray
             eventsArray = Array.isArray(data) ? data : [];
             renderCalendar();
         } catch (e) { 
@@ -203,9 +215,9 @@
 
             let html = `<span class="date-num">${d}</span>`;
             
-            // LOGIKA FILTER: Mencari kegiatan yang tanggalnya sama dengan kotak kalender
+            // LOGIKA FILTER DIPERBAIKI: Menggunakan format lokal agar tidak selisih hari
             const kegiatanHariIni = eventsArray.filter(ev => {
-                let tglEvent = ev.tanggal.split('T')[0]; // Menangani format 2026-03-13T...
+                let tglEvent = formatToLocalISO(ev.tanggal);
                 return tglEvent === tglKey;
             });
 
@@ -230,18 +242,28 @@
 
         // Ambil kegiatan hanya untuk bulan yang sedang tampil
         const filterBulan = eventsArray.filter(ev => {
-            let parts = ev.tanggal.split('T')[0].split('-');
+            let localDate = formatToLocalISO(ev.tanggal);
+            let parts = localDate.split('-');
             return parseInt(parts[1]) === curMonth && parseInt(parts[0]) === curYear;
         });
 
         if (filterBulan.length > 0) {
+            // Urutkan berdasarkan tanggal terkecil
+            filterBulan.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
             filterBulan.forEach(item => {
                 const div = document.createElement("div");
                 div.className = "detail-item";
+                
+                // Format tanggal untuk tampilan user (misal: 12 Maret 2026)
+                let displayDate = new Date(item.tanggal).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                });
+
                 div.innerHTML = `
                     <div style="display: flex; justify-content: space-between;">
                         <strong>${item.kegiatan}</strong>
-                        <span style="font-size: 11px; color: #2f80ed;">📅 ${item.tanggal.split('T')[0]}</span>
+                        <span style="font-size: 11px; color: #2f80ed;">📅 ${displayDate}</span>
                     </div>
                     <div style="font-size: 12px; color: #666; margin-top: 5px;">
                         📍 ${item.lokasi || 'Lokasi tidak diatur'} | 🏷️ ${item.kategori || 'Umum'}
@@ -268,6 +290,8 @@
         if (tgl && keg) {
             alert("Sedang menyimpan ke Google Sheets...");
             try {
+                // Menggunakan fetch dengan mode no-cors jika perlu, 
+                // tapi biasanya POST JSON ke Apps Script butuh konfigurasi doGet/doPost yang benar
                 await fetch(scriptURL, {
                     method: 'POST',
                     body: JSON.stringify({ tanggal: tgl, kegiatan: keg, lokasi: lok, kategori: kat })
