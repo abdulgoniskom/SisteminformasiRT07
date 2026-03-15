@@ -64,6 +64,11 @@
             .main { margin-left: 0; }
             .menu-btn { display: block; }
         }
+        .btn-edit {
+    background: #f1c40f; color: #2c3e50; border: none; padding: 5px 10px; 
+    border-radius: 4px; cursor: pointer; position: absolute; top: 15px; right: 65px;
+    font-size: 11px; font-weight: bold;
+}
     </style>
 </head>
 <body>
@@ -165,14 +170,17 @@
 
             let html = "";
             data.reverse().forEach(item => {
-                html += `
-                <div class="card">
-                    ${isAdmin ? `<button class="btn-delete" onclick="hapus('${item.judul}')">Hapus</button>` : ''}
-                    ${item.gambar ? `<img src="${item.gambar}" onerror="this.style.display='none'">` : ''}
-                    <h3>${item.judul}</h3>
-                    <p style="font-size:14px; color:#555; margin-top:5px;">${item.konten || ''}</p>
-                </div>`;
-            });
+    html += `
+    <div class="card">
+        ${isAdmin ? `
+            <button class="btn-edit" onclick="isiFormEdit('${item.judul}', '${item.konten}', '${item.gambar}')">Edit</button>
+            <button class="btn-delete" onclick="hapus('${item.judul}')">Hapus</button>
+        ` : ''}
+        ${item.gambar ? `<img src="${item.gambar}" onerror="this.style.display='none'">` : ''}
+        <h3>${item.judul}</h3>
+        <p style="font-size:14px; color:#555; margin-top:5px;">${item.konten || ''}</p>
+    </div>`;
+});
             listDiv.innerHTML = html;
         } catch(e) { 
             listDiv.innerHTML = "<p style='text-align:center;'>Gagal memuat data.</p>"; 
@@ -239,6 +247,66 @@
     });
 
     loadData();
+    // Fungsi untuk memindahkan data ke kotak input
+function isiFormEdit(judul, konten, gambar) {
+    document.getElementById("formInput").style.display = "block";
+    document.getElementById("inputPengumuman").value = konten;
+    document.getElementById("gambar").value = (gambar !== 'undefined') ? gambar : "";
+    
+    // Scroll otomatis ke atas agar Bapak langsung lihat formnya
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    
+    // Ubah tulisan tombol simpan agar Bapak tahu ini sedang mode edit
+    document.getElementById("btnSimpan").innerText = "Simpan Perubahan (Edit)";
+    
+    // Simpan judul lama sebagai referensi untuk dihapus/diganti di database
+    sessionStorage.setItem('judul_lama_edit', judul);
+}
+
+// Update fungsi simpan Bapak agar mendukung Edit
+async function simpan() {
+    let teksLengkap = document.getElementById("inputPengumuman").value.trim();
+    let linkGambar = document.getElementById("gambar").value.trim();
+    let judulLama = sessionStorage.getItem('judul_lama_edit');
+    
+    if(!teksLengkap) return alert("Isi pengumuman wajib diisi!");
+
+    const btn = document.getElementById("btnSimpan");
+    btn.innerText = "Sedang Memproses...";
+    btn.disabled = true;
+
+    let judulSingkat = teksLengkap.length > 40 ? teksLengkap.substring(0, 40) + "..." : teksLengkap;
+
+    try {
+        // Jika sedang mode edit, kita kirim perintah untuk hapus yang lama dulu
+        if (judulLama) {
+            await fetch(API, { 
+                method: "POST", mode: "no-cors",
+                body: JSON.stringify({ action: "delete", sheet: "Pengumuman", judul: judulLama }) 
+            });
+            sessionStorage.removeItem('judul_lama_edit');
+        }
+
+        // Simpan data baru (atau data hasil edit)
+        await fetch(API, { 
+            method: "POST", 
+            mode: "no-cors",
+            body: JSON.stringify({ 
+                action: "insert", 
+                sheet: "Pengumuman", 
+                judul: judulSingkat,
+                gambar: linkGambar,
+                konten: teksLengkap
+            }) 
+        });
+        
+        alert("Berhasil diperbarui!");
+        location.reload();
+    } catch(e) { 
+        alert("Permintaan sedang diproses."); 
+        location.reload(); 
+    }
+}
 </script>
 </body>
 </html>
