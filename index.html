@@ -24,9 +24,29 @@
         .ketua { font-size: 10px; color: #2f80ed; font-weight: bold; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
 
         /* --- RUNNING TEXT --- */
-        .running-box { background: #f2994a; color: white; padding: 10px 0; font-size: 12px; font-weight: 600; overflow: hidden; display: flex; align-items: center; }
-        #marquee { display: inline-block; white-space: nowrap; padding-left: 100%; animation: jln linear infinite; }
-        @keyframes jln { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+.running-box { 
+    background: #f2994a; 
+    color: white; 
+    height: 40px; /* Beri tinggi tetap agar stabil */
+    overflow: hidden; 
+    display: flex; 
+    align-items: center; 
+    position: relative;
+}
+
+#marquee { 
+    display: inline-block; 
+    white-space: nowrap; /* KUNCI UTAMA: Agar teks tidak turun ke bawah */
+    padding-left: 100%; 
+    animation: jln linear infinite; 
+    font-size: 13px; /* Sedikit diperbesar agar jelas di HP */
+}
+
+/* Perbaikan Keyframes agar tidak memotong teks di tengah jalan */
+@keyframes jln { 
+    0% { transform: translateX(0); } 
+    100% { transform: translateX(-100%); } 
+}
         
         /* --- SECTION CONTROL --- */
         .content-section { display: none; padding: 20px; flex-grow: 1; }
@@ -172,16 +192,21 @@ async function fetchData() {
     });
 
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
-        if(d && d.length > 0) {
-            let txt = d.reverse().map(x => x.judul).join(" • ");
-            const marqueeEl = document.getElementById("marquee");
-            marqueeEl.innerHTML = "📢 INFO: " + txt + " &nbsp;&nbsp;&nbsp;";
-            let durasi = txt.length / 15;
-            if (durasi < 15) durasi = 15;
-            marqueeEl.style.animationDuration = durasi + "s";
-        }
-    });
-
+    if(d && d.length > 0) {
+        // Ambil data konten/judul dan balik urutannya (terbaru di depan)
+        // Gunakan .join dengan banyak spasi agar antar pengumuman ada jarak lebar
+        let txt = d.reverse().map(x => x.judul).join(" &nbsp;&nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;&nbsp; ");
+        
+        const marqueeEl = document.getElementById("marquee");
+        // Tambahkan banyak spasi di akhir agar loop animasi halus
+        marqueeEl.innerHTML = "📢 INFO TERBARU: " + txt + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        
+        // Atur kecepatan berdasarkan panjang teks (makin panjang makin lambat biar terbaca)
+        let durasi = txt.length / 10; 
+        if (durasi < 15) durasi = 15; // Minimal 15 detik
+        marqueeEl.style.animationDuration = durasi + "s";
+    }
+});
     fetch(API_KALENDER).then(r => r.json()).then(d => {
         const container = document.getElementById("list-agenda-index");
         if(d && d.length > 0) {
