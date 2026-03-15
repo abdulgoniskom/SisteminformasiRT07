@@ -36,14 +36,11 @@
 
 #marquee { 
     display: inline-block; 
-    white-space: nowrap; /* Mencegah teks turun ke bawah (penyebab terpotong) */
+    white-space: nowrap; /* PENTING: Mencegah teks baris baru di layar kecil */
     padding-left: 100%; 
     animation: jln linear infinite; 
-    font-size: 12px;
-    font-weight: 600;
 }
 
-/* Animasi agar teks muncul dari kanan layar sampai habis ke kiri */
 @keyframes jln { 
     0% { transform: translateX(0); } 
     100% { transform: translateX(-100%); } 
@@ -194,18 +191,15 @@ async function fetchData() {
 
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
     if(d && d.length > 0) {
-        // Balik urutan agar yang terbaru muncul duluan
-        // Gunakan pemisah bintang dan spasi yang banyak agar antar teks tidak mepet
-        let txt = d.reverse().map(x => x.judul).join(" &nbsp;&nbsp;&nbsp; ★ &nbsp;&nbsp;&nbsp; ");
+        // GANTI x.judul MENJADI x.konten SUPAYA TEKS LENGKAP MUNCUL
+        let txt = d.reverse().map(x => x.konten || x.judul).join(" &nbsp;&nbsp;&nbsp; ★ &nbsp;&nbsp;&nbsp; ");
         
         const marqueeEl = document.getElementById("marquee");
-        // Tambahkan spasi tambahan di akhir kalimat
-        marqueeEl.innerHTML = "📢 INFO TERBARU: " + txt + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        marqueeEl.innerHTML = "📢 INFO: " + txt + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         
-        // Atur kecepatan: semakin panjang teks, durasi animasi otomatis bertambah (biar tidak terlalu cepat)
-        let durasi = (txt.length / 12) + 10; 
-        if (durasi < 15) durasi = 15; 
-        marqueeEl.style.animationDuration = durasi + "s";
+        // Sesuaikan kecepatan biar enak dibaca
+        let durasi = (txt.length / 10) + 5; 
+        marqueeEl.style.animationDuration = (durasi < 15 ? 15 : durasi) + "s";
     }
 });
     fetch(API_KALENDER).then(r => r.json()).then(d => {
