@@ -23,11 +23,11 @@
         header h2 { font-size: 14px; color: #333; font-weight: 700; }
         .ketua { font-size: 10px; color: #2f80ed; font-weight: bold; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
 
-        /* --- RUNNING TEXT --- */
+        /* --- RUNNING TEXT FIXED --- */
 .running-box { 
     background: #f2994a; 
     color: white; 
-    height: 40px; /* Beri tinggi tetap agar stabil */
+    height: 35px; 
     overflow: hidden; 
     display: flex; 
     align-items: center; 
@@ -36,13 +36,14 @@
 
 #marquee { 
     display: inline-block; 
-    white-space: nowrap; /* KUNCI UTAMA: Agar teks tidak turun ke bawah */
+    white-space: nowrap; /* Mencegah teks turun ke bawah (penyebab terpotong) */
     padding-left: 100%; 
     animation: jln linear infinite; 
-    font-size: 13px; /* Sedikit diperbesar agar jelas di HP */
+    font-size: 12px;
+    font-weight: 600;
 }
 
-/* Perbaikan Keyframes agar tidak memotong teks di tengah jalan */
+/* Animasi agar teks muncul dari kanan layar sampai habis ke kiri */
 @keyframes jln { 
     0% { transform: translateX(0); } 
     100% { transform: translateX(-100%); } 
@@ -193,17 +194,17 @@ async function fetchData() {
 
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
     if(d && d.length > 0) {
-        // Ambil data konten/judul dan balik urutannya (terbaru di depan)
-        // Gunakan .join dengan banyak spasi agar antar pengumuman ada jarak lebar
-        let txt = d.reverse().map(x => x.judul).join(" &nbsp;&nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;&nbsp; ");
+        // Balik urutan agar yang terbaru muncul duluan
+        // Gunakan pemisah bintang dan spasi yang banyak agar antar teks tidak mepet
+        let txt = d.reverse().map(x => x.judul).join(" &nbsp;&nbsp;&nbsp; ★ &nbsp;&nbsp;&nbsp; ");
         
         const marqueeEl = document.getElementById("marquee");
-        // Tambahkan banyak spasi di akhir agar loop animasi halus
+        // Tambahkan spasi tambahan di akhir kalimat
         marqueeEl.innerHTML = "📢 INFO TERBARU: " + txt + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         
-        // Atur kecepatan berdasarkan panjang teks (makin panjang makin lambat biar terbaca)
-        let durasi = txt.length / 10; 
-        if (durasi < 15) durasi = 15; // Minimal 15 detik
+        // Atur kecepatan: semakin panjang teks, durasi animasi otomatis bertambah (biar tidak terlalu cepat)
+        let durasi = (txt.length / 12) + 10; 
+        if (durasi < 15) durasi = 15; 
         marqueeEl.style.animationDuration = durasi + "s";
     }
 });
