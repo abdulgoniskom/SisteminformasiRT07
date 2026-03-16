@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,27 +7,24 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
         body { background:#eef2f7; padding: 15px; }
-        
-        .container { max-width: 600px; margin: auto; }
+        .container { max-width: 650px; margin: auto; }
         .header { text-align: center; margin-bottom: 20px; }
         .header h2 { color: #f2994a; }
-        
         .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th { background: #f2994a; color: white; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
-        
         .status-ada { color: #27ae60; font-weight: bold; }
         .status-kosong { color: #eb5757; font-weight: bold; }
-
-        .btn-wa { 
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; padding: 12px; background: #25d366; color: white; 
-            text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px;
-        }
+        .btn-wa { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; background: #25d366; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px; }
         
-        .btn-back { display: block; text-align: center; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 13px; }
+        /* Panel Admin */
+        #panelAdmin { display: none; background: #fff3e0; border: 2px solid #f2994a; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .btn-aksi { padding: 5px 8px; border: none; border-radius: 4px; cursor: pointer; color: white; margin-right: 3px; font-size: 11px; }
+        .btn-edit { background: #2f80ed; }
+        .btn-hapus { background: #eb5757; }
+        .btn-login-admin { background: #9b59b6; color: white; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(155,89,182,0.3); }
     </style>
 </head>
 <body>
@@ -35,38 +32,56 @@
 <div class="container">
     <div class="header">
         <h2>📦 Inventaris RT 07</h2>
-        <p style="font-size: 12px; color: #7f8c8d;">Daftar aset milik warga RT 07 RW 09</p>
+        <p style="font-size: 12px; color: #7f8c8d;">Aset Milik Warga Bumi Indah City</p>
+    </div>
+
+    <div id="panelAdmin">
+        <h4 style="margin-bottom:10px;">⚙️ Kelola Barang</h4>
+        <input type="hidden" id="oldNama">
+        <input type="text" id="namaBarang" placeholder="Nama Barang">
+        <input type="number" id="jumlah" placeholder="Jumlah">
+        <input type="text" id="satuan" placeholder="Satuan (Pcs/Unit/Set)">
+        <select id="status">
+            <option value="Tersedia">Tersedia</option>
+            <option value="Dipinjam">Dipinjam</option>
+        </select>
+        <button onclick="simpanBarang()" id="btnSimpan" style="width:100%; background:#27ae60; color:white; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">💾 Simpan ke Database</button>
+        <button onclick="resetForm()" style="width:100%; background:#95a5a6; color:white; padding:8px; border:none; border-radius:6px; margin-top:5px; cursor:pointer;">Batal</button>
     </div>
 
     <div class="card">
-        <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px;">Daftar Barang:</p>
         <div style="overflow-x: auto;">
             <table>
                 <thead>
                     <tr>
-                        <th>Nama Barang</th>
+                        <th>Barang</th>
                         <th>Jumlah</th>
                         <th>Status</th>
+                        <th id="thAksi" style="display:none;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tabelInventaris">
-                    <tr><td colspan="3" style="text-align:center;">Memuat data barang...</td></tr>
+                    <tr><td colspan="4" style="text-align:center;">Memuat data barang...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="card" style="border-left: 5px solid #f2994a;">
-        <p style="font-size: 13px;"><b>Ingin Meminjam?</b><br>Silakan hubungi seksi perlengkapan untuk cek ketersediaan tanggal pinjam.</p>
-        <a href="https://wa.me/628123456789" class="btn-wa"> 💬 Hubungi via WhatsApp
-        </a>
+    <div class="card" style="border-left: 5px solid #25d366;">
+        <p style="font-size: 13px;"><b>Butuh Pinjaman?</b><br>Klik tombol di bawah untuk hubungi Seksi Perlengkapan.</p>
+        <a href="https://wa.me/628123456789" class="btn-wa">💬 Chat WhatsApp</a>
     </div>
-    
-    <a href="fitur.html" class="btn-back">← Kembali ke Fitur Warga</a>
+
+    <center>
+        <button class="btn-login-admin" id="btnLogin" onclick="loginAdmin()">⚙️ LOGIN PENGURUS</button>
+        <br><br>
+        <a href="fitur.html" style="text-decoration:none; color:#7f8c8d; font-size:13px;">← Kembali ke Fitur</a>
+    </center>
 </div>
 
 <script>
-    const SCRIPT_URL = "URL_APP_SCRIPT_BAPAK"; // Pakai API URL yang sama
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ9cm5qdv7zyi9FK1MiVHzIqFSJ1byZ5t83QatTcIeYO67QLVsncKUFYktjgR-r0M/exec"; 
+    let PASS_SAYA = "";
 
     function loadInventaris() {
         fetch(SCRIPT_URL + "?sheet=Inventaris")
@@ -74,22 +89,91 @@
         .then(data => {
             let html = "";
             data.forEach(item => {
-                let statusClass = item.status === "Tersedia" ? "status-ada" : "status-kosong";
+                let sClass = item.status === "Tersedia" ? "status-ada" : "status-kosong";
+                let btnAksi = PASS_SAYA ? `<td><button class="btn-aksi btn-edit" onclick='isiForm(${JSON.stringify(item)})'>Edit</button><button class="btn-aksi btn-hapus" onclick="hapusBarang('${item.nama_barang}')">X</button></td>` : "";
+                
                 html += `<tr>
                     <td>${item.nama_barang}</td>
                     <td>${item.jumlah} ${item.satuan}</td>
-                    <td class="${statusClass}">${item.status}</td>
+                    <td class="${sClass}">${item.status}</td>
+                    ${btnAksi}
                 </tr>`;
             });
-            document.getElementById("tabelInventaris").innerHTML = html || '<tr><td colspan="3">Data kosong</td></tr>';
-        })
-        .catch(() => {
-            document.getElementById("tabelInventaris").innerHTML = '<tr><td colspan="3">Gagal memuat data</td></tr>';
+            document.getElementById("tabelInventaris").innerHTML = html || '<tr><td colspan="4">Data Kosong</td></tr>';
+            if(PASS_SAYA) document.getElementById("thAksi").style.display = "table-cell";
         });
+    }
+
+    function loginAdmin() {
+        let p = prompt("Masukkan Password Pengurus:");
+        if(!p) return;
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "cekLoginAdmin", password: p })
+        })
+        .then(r => r.text())
+        .then(res => {
+            if(res === "AUTH_OK") {
+                PASS_SAYA = p;
+                document.getElementById("panelAdmin").style.display = "block";
+                document.getElementById("btnLogin").style.display = "none";
+                loadInventaris();
+            } else {
+                alert("Password Salah, Pak!");
+            }
+        });
+    }
+
+    function isiForm(item) {
+        document.getElementById("oldNama").value = item.nama_barang;
+        document.getElementById("namaBarang").value = item.nama_barang;
+        document.getElementById("jumlah").value = item.jumlah;
+        document.getElementById("satuan").value = item.satuan;
+        document.getElementById("status").value = item.status;
+        document.getElementById("btnSimpan").innerText = "Update Data Barang";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function simpanBarang() {
+        let old = document.getElementById("oldNama").value;
+        let data = {
+            action: old ? "updateInventaris" : "tambahInventaris",
+            password: PASS_SAYA,
+            oldNama: old,
+            nama: document.getElementById("namaBarang").value,
+            jumlah: document.getElementById("jumlah").value,
+            satuan: document.getElementById("satuan").value,
+            status: document.getElementById("status").value
+        };
+
+        if(!data.nama) return alert("Nama barang jangan kosong!");
+
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) })
+        .then(() => {
+            alert("Berhasil!");
+            resetForm();
+            loadInventaris();
+        });
+    }
+
+    function hapusBarang(nama) {
+        if(!confirm("Hapus " + nama + "?")) return;
+        fetch(SCRIPT_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "hapusInventaris", password: PASS_SAYA, nama: nama }) 
+        }).then(() => { alert("Terhapus!"); loadInventaris(); });
+    }
+
+    function resetForm() {
+        document.getElementById("oldNama").value = "";
+        document.getElementById("namaBarang").value = "";
+        document.getElementById("jumlah").value = "";
+        document.getElementById("satuan").value = "";
+        document.getElementById("btnSimpan").innerText = "💾 Simpan ke Database";
     }
 
     window.onload = loadInventaris;
 </script>
-
 </body>
 </html>
