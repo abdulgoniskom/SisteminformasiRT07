@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permohonan Surat - RT 07</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background:#eef2f7; padding: 15px; }
+        
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { font-size: 18px; color: #2c3e50; margin-bottom: 5px; text-align: center; }
+        p { font-size: 12px; color: #7f8c8d; text-align: center; margin-bottom: 20px; }
+
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; 
+            border-radius: 8px; font-size: 14px; background: #f9f9f9;
+        }
+
+        button { 
+            width: 100%; padding: 15px; background: #2f80ed; color: white; 
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px;
+        }
+        button:active { background: #1e5bb8; }
+        
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📄 Permohonan Surat</h2>
+    <p>Isi data dengan benar untuk mempercepat proses pengantar RT</p>
+
+    <form id="formSurat">
+        <label>Nama Lengkap</label>
+        <input type="text" id="nama" placeholder="Sesuai KTP" required>
+
+        <label>NIK (Nomor Induk Kependudukan)</label>
+        <input type="number" id="nik" placeholder="16 digit angka" required>
+
+        <label>Jenis Surat</label>
+        <select id="jenisSurat" required>
+            <option value="">-- Pilih Jenis Surat --</option>
+            <option value="Surat Pengantar KTP">Surat Pengantar KTP</option>
+            <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
+            <option value="Surat Pengantar Menikah">Surat Pengantar Menikah</option>
+            <option value="Surat Keterangan Tidak Mampu">Surat Keterangan Tidak Mampu (SKTM)</option>
+            <option value="Lainnya">Lainnya (Tulis di Keperluan)</option>
+        </select>
+
+        <label>Keperluan</label>
+        <textarea id="keperluan" rows="3" placeholder="Contoh: Untuk syarat melamar pekerjaan" required></textarea>
+
+        <label>Nomor WhatsApp</label>
+        <input type="number" id="wa" placeholder="0812xxxx" required>
+
+        <button type="submit" id="btnKirim">Kirim Permohonan</button>
+    </form>
+    
+    <a href="fitur.html" class="btn-back">← Kembali ke Fitur Warga</a>
+</div>
+
+<script>
+    // MASUKKAN URL APP SCRIPT BAPAK DI SINI
+    const SCRIPT_URL = "URL_APP_SCRIPT_BAPAK"; 
+
+    document.getElementById('formSurat').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btnKirim');
+        btn.innerHTML = "Mengirim...";
+        btn.disabled = true;
+
+        const data = {
+            action: "insert_surat", // Perintah untuk App Script
+            nama: document.getElementById('nama').value,
+            nik: document.getElementById('nik').value,
+            jenis: document.getElementById('jenisSurat').value,
+            keperluan: document.getElementById('keperluan').value,
+            wa: document.getElementById('wa').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        .then(res => {
+            alert("Permohonan Berhasil Dikirim! Mohon tunggu konfirmasi dari Pak RT lewat WhatsApp.");
+            location.reload();
+        })
+        .catch(err => {
+            alert("Ada kendala teknis. Coba hubungi Pak RT langsung.");
+            console.error(err);
+        })
+        .finally(() => {
+            btn.innerHTML = "Kirim Permohonan";
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
