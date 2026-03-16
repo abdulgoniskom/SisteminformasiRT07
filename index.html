@@ -24,27 +24,27 @@
         .ketua { font-size: 10px; color: #2f80ed; font-weight: bold; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
 
         /* --- RUNNING TEXT FIXED --- */
-.running-box { 
-    background: #f2994a; 
-    color: white; 
-    height: 35px; 
-    overflow: hidden; 
-    display: flex; 
-    align-items: center; 
-    position: relative;
-}
+        .running-box { 
+            background: #f2994a; 
+            color: white; 
+            height: 35px; 
+            overflow: hidden; 
+            display: flex; 
+            align-items: center; 
+            position: relative;
+        }
 
-#marquee { 
-    display: inline-block; 
-    white-space: nowrap; /* PENTING: Mencegah teks baris baru di layar kecil */
-    padding-left: 100%; 
-    animation: jln linear infinite; 
-}
+        #marquee { 
+            display: inline-block; 
+            white-space: nowrap; 
+            padding-left: 100%; 
+            animation: jln linear infinite; 
+        }
 
-@keyframes jln { 
-    0% { transform: translateX(0); } 
-    100% { transform: translateX(-100%); } 
-}
+        @keyframes jln { 
+            0% { transform: translateX(0); } 
+            100% { transform: translateX(-100%); } 
+        }
         
         /* --- SECTION CONTROL --- */
         .content-section { display: none; padding: 20px; flex-grow: 1; }
@@ -60,7 +60,6 @@
         .white-box { background:white; padding:20px; border-radius:12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .white-box h4 { margin-bottom: 15px; font-size: 13px; color: #7f8c8d; text-transform: uppercase; }
 
-        /* Agenda Item Style */
         .agenda-item { padding: 10px; background: #f9f9f9; border-left: 4px solid #2f80ed; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .agenda-info b { font-size: 13px; display: block; color: #333; }
         .agenda-info span { font-size: 11px; color: #666; }
@@ -68,28 +67,27 @@
         .agenda-date .day { font-size: 14px; font-weight: 800; color: #2c3e50; display: block; }
         .agenda-date .month { font-size: 9px; color: #eb5757; text-transform: uppercase; font-weight: bold; }
 
-        /* ======================================================
-           SATU-SATUNYA MEDIA QUERY UNTUK HP (MAX-WIDTH: 768px)
-           ====================================================== */
+        /* --- MEDIA QUERY HP (FIXED JUDUL) --- */
         @media (max-width: 768px) {
-    /* Judul di Sidebar tetap disembunyikan agar tidak tumpang tindih */
-    .sidebar h2 { display: none; } 
+            .sidebar { width: 65px !important; } 
+            .sidebar h2 { display: none; } /* Tetap sembunyi di sidebar agar tidak berantakan */
+            .sidebar-menu a { padding: 15px 5px; text-align: center; font-size: 9px; border-left: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-    /* Header dibuat agar teksnya tidak menumpuk ke samping */
-    header { 
-        padding: 10px !important; 
-        flex-direction: column !important; 
-        align-items: center !important;
-        text-align: center;
-    }
+            .main { margin-left: 65px !important; width: calc(100% - 65px) !important; }
 
-    /* Ukuran font judul di header saat di HP */
-    header h2 { 
-        font-size: 13px !important; 
-        display: block !important; /* Memastikan judul tetap muncul */
-        margin-bottom: 5px;
-    }
-}
+            header { 
+                padding: 10px !important; 
+                flex-direction: column !important; 
+                height: auto !important;
+                text-align: center;
+                gap: 5px;
+            }
+            /* Memastikan judul RT tetap muncul di header HP */
+            header h2 { 
+                font-size: 12px !important; 
+                display: block !important; 
+            }
+            .ketua { font-size: 8px !important; padding: 3px 10px !important; }
 
             .running-box { height: 30px !important; font-size: 10px !important; }
 
@@ -120,11 +118,10 @@
     
 <div class="main">
     <header>
-    <div style="text-align: left;">
-        <h2>Sistem Informasi RT 07 RW 09</h2>
+        <h2>Sistem Informasi RT 07 RW 09 Bumi Indah City</h2>
         <div class="ketua">Ketua: Bpk. Muhammad Zainudin</div>
-    </div>
-</header>
+    </header>
+
     <div class="running-box">
         <div id="marquee">📢 INFO: Memuat pengumuman...</div>
     </div>
@@ -162,6 +159,7 @@ function showSection(id) {
     event.currentTarget.classList.add('active');
 }
 
+// API URLs (Tetap sesuai kodingan asli Anda)
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
@@ -194,18 +192,15 @@ async function fetchData() {
     });
 
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
-    if(d && d.length > 0) {
-        // GANTI x.judul MENJADI x.konten SUPAYA TEKS LENGKAP MUNCUL
-        let txt = d.reverse().map(x => x.konten || x.judul).join(" &nbsp;&nbsp;&nbsp; ★ &nbsp;&nbsp;&nbsp; ");
-        
-        const marqueeEl = document.getElementById("marquee");
-        marqueeEl.innerHTML = "📢 INFO: " + txt + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        
-        // Sesuaikan kecepatan biar enak dibaca
-        let durasi = (txt.length / 10) + 5; 
-        marqueeEl.style.animationDuration = (durasi < 15 ? 15 : durasi) + "s";
-    }
-});
+        if(d && d.length > 0) {
+            let txt = d.reverse().map(x => x.konten || x.judul).join(" &nbsp;&nbsp;&nbsp; ★ &nbsp;&nbsp;&nbsp; ");
+            const marqueeEl = document.getElementById("marquee");
+            marqueeEl.innerHTML = "📢 INFO: " + txt + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            let durasi = (txt.length / 10) + 5; 
+            marqueeEl.style.animationDuration = (durasi < 15 ? 15 : durasi) + "s";
+        }
+    });
+
     fetch(API_KALENDER).then(r => r.json()).then(d => {
         const container = document.getElementById("list-agenda-index");
         if(d && d.length > 0) {
