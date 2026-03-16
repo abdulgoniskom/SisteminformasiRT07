@@ -72,21 +72,24 @@
            SATU-SATUNYA MEDIA QUERY UNTUK HP (MAX-WIDTH: 768px)
            ====================================================== */
         @media (max-width: 768px) {
-            .sidebar { width: 65px !important; } 
-            .sidebar h2 { display: none; }
-            .sidebar-menu a { padding: 15px 5px; text-align: center; font-size: 9px; border-left: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    /* Judul di Sidebar tetap disembunyikan agar tidak tumpang tindih */
+    .sidebar h2 { display: none; } 
 
-            .main { margin-left: 65px !important; width: calc(100% - 65px) !important; }
+    /* Header dibuat agar teksnya tidak menumpuk ke samping */
+    header { 
+        padding: 10px !important; 
+        flex-direction: column !important; 
+        align-items: center !important;
+        text-align: center;
+    }
 
-            header { 
-                padding: 10px !important; 
-                flex-direction: column !important; 
-                height: auto !important;
-                text-align: center;
-                gap: 5px;
-            }
-            header h2 { font-size: 11px !important; }
-            .ketua { font-size: 8px !important; padding: 3px 10px !important; }
+    /* Ukuran font judul di header saat di HP */
+    header h2 { 
+        font-size: 13px !important; 
+        display: block !important; /* Memastikan judul tetap muncul */
+        margin-bottom: 5px;
+    }
+}
 
             .running-box { height: 30px !important; font-size: 10px !important; }
 
@@ -117,10 +120,11 @@
     
 <div class="main">
     <header>
+    <div style="text-align: left;">
         <h2>Sistem Informasi RT 07 RW 09</h2>
         <div class="ketua">Ketua: Bpk. Muhammad Zainudin</div>
-    </header>
-
+    </div>
+</header>
     <div class="running-box">
         <div id="marquee">📢 INFO: Memuat pengumuman...</div>
     </div>
