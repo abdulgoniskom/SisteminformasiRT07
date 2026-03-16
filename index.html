@@ -99,12 +99,44 @@
             .white-box { padding: 15px !important; }
             canvas { height: 180px !important; }
         }
+        /* Sembunyikan judul HP di Desktop */
+.mobile-title { display: none; }
+
+/* Styling judul desktop */
+.sidebar h2 { 
+    text-align: center; 
+    padding: 20px 10px; 
+    font-size: 16px; 
+    background: #1a252f; 
+}
+
+/* --- Pengaturan Khusus HP --- */
+@media (max-width: 768px) {
+    .sidebar h2.desktop-title { display: none; } /* Sembunyikan judul panjang */
+    
+    .mobile-title { 
+        display: block; 
+        text-align: center;
+        padding: 10px 0;
+        font-size: 11px; /* Ukuran pas untuk lebar 65px */
+        font-weight: bold;
+        background: #1a252f;
+        color: #1abc9c; /* Warna hijau toska agar mencolok */
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar { width: 65px !important; }
+    .main { margin-left: 65px !important; }
+}
     </style>
 </head>
 <body>
     
 <div class="sidebar" id="mySidebar">
-    <h2>RT 07 RW 09</h2>
+    <h2 class="desktop-title">RT 07 RW 09</h2>
+    
+    <div class="mobile-title">RT 07 RW 09</div>
+
     <div class="sidebar-menu">
         <a onclick="showSection('dashboard')" class="active">Dashboard</a>
         <a href="kas.html">Kas RT</a>
@@ -114,8 +146,7 @@
         <a href="arsip.html">Arsip</a>
         <a href="struktur.html">Struktur</a>
     </div>
-</div>
-    
+</div>    
 <div class="main">
     <header>
         <h2>Sistem Informasi RT 07 RW 09 Bumi Indah City</h2>
