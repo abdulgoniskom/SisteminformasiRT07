@@ -47,9 +47,9 @@
         </div>
         
         <input type="hidden" id="oldNama">
-        <input type="text" id="namaBarang" placeholder="Nama Barang (Misal: Tenda)">
+        <input type="text" id="namaBarang" placeholder="Nama Barang">
         <input type="number" id="jumlah" placeholder="Jumlah">
-        <input type="text" id="satuan" placeholder="Satuan (Misal: Pcs/Set)">
+        <input type="text" id="satuan" placeholder="Satuan (Pcs/Unit/Set)">
         <select id="status">
             <option value="Tersedia">Tersedia</option>
             <option value="Dipinjam">Dipinjam</option>
@@ -70,15 +70,15 @@
                     </tr>
                 </thead>
                 <tbody id="tabelInventaris">
-                    <tr><td colspan="4" style="text-align:center;">Sedang mengambil data...</td></tr>
+                    <tr><td colspan="4" style="text-align:center;">Memuat data barang...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <div class="card" style="border-left: 5px solid #25d366;">
-        <p style="font-size: 13px;"><b>Butuh Pinjaman?</b><br>Silakan hubungi pengurus RT untuk cek tanggal peminjaman.</p>
-        <a href="https://wa.me/628123456789" class="btn-wa">💬 Hubungi via WhatsApp</a>
+        <p style="font-size: 13px;"><b>Butuh Pinjaman?</b><br>Silakan hubungi pengurus RT untuk peminjaman barang.</p>
+        <a href="https://wa.me/6281297178846" class="btn-wa">💬 Hubungi via WhatsApp</a>
     </div>
 
     <center>
@@ -90,10 +90,10 @@
 
 <script>
     // MASUKKAN URL WEB APP BAPAK DI SINI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ9cm5qdv7zyi9FK1MiVHzIqFSJ1byZ5t83QatTcIeYO67QLVsncKUFYktjgR-r0M/exec"; 
-    let TOKEN_ADMIN = "";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-uD8DvG_C51Xr6GV9Vv8RvQJZFCl0WGRZ5q7KAbIqSk5fLWt_GndudmIWIC5fmiI/exec"; 
+    let TOKEN_SAYA = "";
 
-    // 1. Fungsi Ambil Data (Warga & Admin)
+    // 1. Fungsi Ambil Data (Tampilan Warga)
     function loadInventaris() {
         fetch(SCRIPT_URL + "?sheet=Inventaris")
         .then(r => r.json())
@@ -101,4 +101,108 @@
             let html = "";
             data.forEach(item => {
                 let sClass = item.status === "Tersedia" ? "status-ada" : "status-kosong";
-                let btnAksi = TOKEN_ADMIN ? `<td><button class="btn-aksi btn-edit"
+                // Tombol Edit/Hapus hanya muncul jika TOKEN_SAYA terisi (sudah login)
+                let btnAksi = TOKEN_SAYA ? `<td><button class="btn-aksi btn-edit" onclick='isiForm(${JSON.stringify(item)})'>Edit</button><button class="btn-aksi btn-hapus" onclick="hapusBarang('${item.nama_barang}')">X</button></td>` : "";
+                
+                html += `<tr>
+                    <td>${item.nama_barang}</td>
+                    <td>${item.jumlah} ${item.satuan}</td>
+                    <td class="${sClass}">${item.status}</td>
+                    ${btnAksi}
+                </tr>`;
+            });
+            document.getElementById("tabelInventaris").innerHTML = html || '<tr><td colspan="4">Data Kosong</td></tr>';
+            document.getElementById("thAksi").style.display = TOKEN_SAYA ? "table-cell" : "none";
+        });
+    }
+
+    // 2. Fungsi Login Admin
+    function loginAdmin() {
+        let p = prompt("Masukkan Password Pengurus:");
+        if(!p) return;
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "cekLoginAdmin", password: p })
+        })
+        .then(r => r.text())
+        .then(res => {
+            if(res === "AUTH_OK") {
+                TOKEN_SAYA = p; // Password disimpan di variabel sementara
+                document.getElementById("panelAdmin").style.display = "block";
+                document.getElementById("btnLogin").style.display = "none";
+                loadInventaris(); // Refresh tabel agar tombol aksi muncul
+                alert("Login Berhasil, Pak!");
+            } else {
+                alert("Password Salah!");
+            }
+        });
+    }
+
+    // 3. Fungsi Logout
+    function logoutAdmin() {
+        TOKEN_SAYA = "";
+        document.getElementById("panelAdmin").style.display = "none";
+        document.getElementById("btnLogin").style.display = "inline-block";
+        loadInventaris();
+        alert("Sudah Keluar.");
+    }
+
+    // 4. Fungsi Simpan (Tambah atau Update)
+    function simpanBarang() {
+        let old = document.getElementById("oldNama").value;
+        let data = {
+            action: old ? "updateInventaris" : "tambahInventaris",
+            password: TOKEN_SAYA,
+            oldNama: old,
+            nama: document.getElementById("namaBarang").value,
+            jumlah: document.getElementById("jumlah").value,
+            satuan: document.getElementById("satuan").value,
+            status: document.getElementById("status").value
+        };
+
+        if(!data.nama) return alert("Nama barang wajib diisi!");
+
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) })
+        .then(() => {
+            alert("Berhasil!");
+            resetForm();
+            loadInventaris();
+        });
+    }
+
+    // 5. Fungsi Hapus
+    function hapusBarang(nama) {
+        if(!confirm("Hapus " + nama + " dari daftar?")) return;
+        fetch(SCRIPT_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "hapusInventaris", password: TOKEN_SAYA, nama: nama }) 
+        }).then(() => {
+            alert("Terhapus!");
+            loadInventaris();
+        });
+    }
+
+    // Fungsi Pembantu
+    function isiForm(item) {
+        document.getElementById("oldNama").value = item.nama_barang;
+        document.getElementById("namaBarang").value = item.nama_barang;
+        document.getElementById("jumlah").value = item.jumlah;
+        document.getElementById("satuan").value = item.satuan;
+        document.getElementById("status").value = item.status;
+        document.getElementById("btnSimpan").innerText = "Update Data Barang";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+        document.getElementById("oldNama").value = "";
+        document.getElementById("namaBarang").value = "";
+        document.getElementById("jumlah").value = "";
+        document.getElementById("satuan").value = "";
+        document.getElementById("btnSimpan").innerText = "💾 Simpan Data";
+    }
+
+    window.onload = loadInventaris;
+</script>
+</body>
+</html>
