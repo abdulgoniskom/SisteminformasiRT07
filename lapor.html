@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotak Saran & Laporan - RT 07</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background:#eef2f7; padding: 15px; }
+        
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .header-lapor { text-align: center; margin-bottom: 20px; }
+        .header-lapor h2 { color: #eb5757; font-size: 20px; }
+        .header-lapor p { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333; margin-top: 15px; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; 
+            border-radius: 8px; font-size: 14px; background: #f9f9f9;
+        }
+
+        button { 
+            width: 100%; padding: 15px; background: #eb5757; color: white; 
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 20px;
+        }
+        button:active { background: #c0392b; }
+        
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-lapor">
+        <h2>📣 Kotak Saran & Laporan</h2>
+        <p>Sampaikan keluhan atau saran Bapak/Ibu demi kenyamanan bersama di RT 07</p>
+    </div>
+
+    <form id="formLapor">
+        <label>Nama Pelapor</label>
+        <input type="text" id="nama" placeholder="Boleh nama samaran/Anonim">
+
+        <label>Kategori Laporan</label>
+        <select id="kategori" required>
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Fasilitas Umum">Fasilitas Umum (Jalan/Lampu/Got)</option>
+            <option value="Keamanan">Keamanan & Ketertiban</option>
+            <option value="Kebersihan">Kebersihan Lingkungan</option>
+            <option value="Saran Kegiatan">Saran Kegiatan Warga</option>
+            <option value="Lainnya">Lain-lain</option>
+        </select>
+
+        <label>Isi Laporan / Saran</label>
+        <textarea id="isi" rows="5" placeholder="Tuliskan sedetail mungkin..." required></textarea>
+
+        <label>Nomor HP/WA (Opsional)</label>
+        <input type="number" id="wa" placeholder="Agar Pak RT bisa merespon">
+
+        <button type="submit" id="btnKirim">Kirim Laporan</button>
+    </form>
+    
+    <a href="fitur.html" class="btn-back">← Kembali ke Fitur Warga</a>
+</div>
+
+<script>
+    // MASUKKAN URL APP SCRIPT BAPAK DI SINI
+    const SCRIPT_URL = "URL_APP_SCRIPT_BAPAK"; 
+
+    document.getElementById('formLapor').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btnKirim');
+        btn.innerHTML = "Mengirim...";
+        btn.disabled = true;
+
+        const data = {
+            action: "insert_laporan", 
+            nama: document.getElementById('nama').value || "Anonim",
+            kategori: document.getElementById('kategori').value,
+            isi: document.getElementById('isi').value,
+            wa: document.getElementById('wa').value || "-"
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        .then(res => {
+            alert("Terima kasih! Laporan Anda telah diterima oleh pengurus RT 07.");
+            location.reload();
+        })
+        .catch(err => {
+            alert("Gagal mengirim. Silakan coba lagi nanti.");
+            console.error(err);
+        })
+        .finally(() => {
+            btn.innerHTML = "Kirim Laporan";
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
