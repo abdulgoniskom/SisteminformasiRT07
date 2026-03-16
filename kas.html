@@ -80,16 +80,11 @@ select {
     background-size: 16px;
 }
 
-/* Desktop: Kembali jadi sejajar */
-@media (min-width: 769px) {
-    .toolbar { 
-        display: flex; 
-        grid-template-columns: none;
-    }
-    .toolbar button { grid-column: auto; width: auto; }
-    select { width: auto; min-width: 150px; }
-}
-    </style>
+@media (max-width: 768px) {
+            .sidebar { left: -220px; }
+            .sidebar.open { left: 0; }
+            .main { margin-left: 0; }
+        }    </style>
 </head>
 <body>
 
