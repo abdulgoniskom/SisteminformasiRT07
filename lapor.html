@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,24 +7,14 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
         body { background:#eef2f7; padding: 15px; }
-        
         .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .header-lapor { text-align: center; margin-bottom: 20px; }
         .header-lapor h2 { color: #eb5757; font-size: 20px; }
         .header-lapor p { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
-
         label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333; margin-top: 15px; }
-        input, select, textarea { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; 
-            border-radius: 8px; font-size: 14px; background: #f9f9f9;
-        }
-
-        button { 
-            width: 100%; padding: 15px; background: #eb5757; color: white; 
-            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 20px;
-        }
-        button:active { background: #c0392b; }
-        
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #f9f9f9; }
+        button { width: 100%; padding: 15px; background: #eb5757; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 20px; }
+        button:disabled { background: #ccc; }
         .btn-back { display: block; text-align: center; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 13px; }
     </style>
 </head>
@@ -33,7 +23,7 @@
 <div class="container">
     <div class="header-lapor">
         <h2>📣 Kotak Saran & Laporan</h2>
-        <p>Sampaikan keluhan atau saran Bapak/Ibu demi kenyamanan bersama di RT 07</p>
+        <p>Laporan akan tersimpan di sistem dan terkirim ke WhatsApp Pak RT</p>
     </div>
 
     <form id="formLapor">
@@ -54,46 +44,64 @@
         <textarea id="isi" rows="5" placeholder="Tuliskan sedetail mungkin..." required></textarea>
 
         <label>Nomor HP/WA (Opsional)</label>
-        <input type="number" id="wa" placeholder="Agar Pak RT bisa merespon">
+        <input type="number" id="wa" placeholder="Agar Pak RT bisa merespon balik">
 
-        <button type="submit" id="btnKirim">Kirim Laporan</button>
+        <button type="submit" id="btnKirim">Kirim Laporan & Hubungi WA</button>
     </form>
     
     <a href="fitur.html" class="btn-back">← Kembali ke Fitur Warga</a>
 </div>
 
 <script>
-    // MASUKKAN URL APP SCRIPT BAPAK DI SINI
-    const SCRIPT_URL = "URL_APP_SCRIPT_BAPAK"; 
+    // 1. GANTI URL INI DENGAN URL WEB APP BAPAK
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2gn-nf2LXdUhyyhEPlDlBRw7QqmZwNCephPcYbArFisB6pXT9HiOtH8nCk-X4UBNA/exec"; 
+    // 2. GANTI DENGAN NOMOR WA BAPAK (AWALI DENGAN 62)
+    const NOMOR_WA_PAK_RT = "6281297178846"; 
 
     document.getElementById('formLapor').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const btn = document.getElementById('btnKirim');
-        btn.innerHTML = "Mengirim...";
+        const nama = document.getElementById('nama').value || "Anonim";
+        const kategori = document.getElementById('kategori').value;
+        const isi = document.getElementById('isi').value;
+        const waWarga = document.getElementById('wa').value || "-";
+
+        btn.innerHTML = "⏳ Mengirim ke Sistem...";
         btn.disabled = true;
 
         const data = {
-            action: "insert_laporan", 
-            nama: document.getElementById('nama').value || "Anonim",
-            kategori: document.getElementById('kategori').value,
-            isi: document.getElementById('isi').value,
-            wa: document.getElementById('wa').value || "-"
+            action: "insert_laporan",
+            nama: nama,
+            kategori: kategori,
+            isi: isi,
+            wa: waWarga
         };
 
+        // Langkah 1: Simpan ke Google Sheets
         fetch(SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify(data)
         })
         .then(res => {
-            alert("Terima kasih! Laporan Anda telah diterima oleh pengurus RT 07.");
-            location.reload();
+            // Langkah 2: Buka WhatsApp
+            alert("Data berhasil tersimpan di Arsip RT. Klik OK untuk meneruskan ke WhatsApp Pak RT.");
+            
+            const teksWA = window.encodeURIComponent(
+                `*LAPORAN WARGA RT 07*\n` +
+                `--------------------------\n` +
+                `👤 *Pengirim:* ${nama}\n` +
+                `📂 *Kategori:* ${kategori}\n` +
+                `📝 *Laporan:* ${isi}\n` +
+                `📞 *Kontak Balik:* ${waWarga}\n` +
+                `--------------------------\n` +
+                `_Dikirim via Sistem Informasi RT 07_`
+            );
+
+            window.location.href = `https://wa.me/${NOMOR_WA_PAK_RT}?text=${teksWA}`;
         })
         .catch(err => {
-            alert("Gagal mengirim. Silakan coba lagi nanti.");
-            console.error(err);
-        })
-        .finally(() => {
+            alert("Gagal menyimpan ke sistem, tapi Anda bisa tetap lapor via WA.");
             btn.innerHTML = "Kirim Laporan";
             btn.disabled = false;
         });
