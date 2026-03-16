@@ -3,103 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeri Kegiatan RT 07</title>
+    <title>Galeri RT 07</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
         body { background:#eef2f7; padding: 15px; }
-        
         .container { max-width: 800px; margin: auto; }
         .header { text-align: center; margin-bottom: 25px; }
-        .header h2 { color: #9b59b6; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .gallery-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .gallery-item img { width: 100%; height: 150px; object-fit: cover; display: block; background: #ddd; }
+        .gallery-info { padding: 10px; text-align: center; }
+        .gallery-info b { font-size: 12px; display: block; }
         
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .gallery-item {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            display: block;
-            background: #ddd; /* Warna saat loading */
-        }
-
-        .gallery-info {
-            padding: 10px;
-            text-align: center;
-        }
-
-        .gallery-info b { font-size: 12px; color: #333; display: block; text-transform: capitalize; }
-        .gallery-info span { font-size: 10px; color: #7f8c8d; }
-
-        .btn-back { display: block; text-align: center; margin-top: 30px; color: #7f8c8d; text-decoration: none; font-size: 13px; }
-
-        @media (min-width: 768px) {
-            .gallery-grid { grid-template-columns: repeat(3, 1fr); }
-        }
+        /* Form Admin */
+        #adminBox { display: none; background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px solid #9b59b6; }
+        input { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-post { background: #9b59b6; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-admin-toggle { display: block; text-align: center; margin-top: 50px; color: #ccc; font-size: 11px; text-decoration: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h2>📸 Galeri Kegiatan</h2>
-        <p style="font-size: 12px; color: #7f8c8d;">Momen kebersamaan warga RT 07 RW 09</p>
+        <h2>📸 Galeri RT 07</h2>
+        <p style="font-size: 12px; color: #7f8c8d;">Momen warga Bumi Indah City</p>
+    </div>
+
+    <div id="adminBox">
+        <h3 style="margin-bottom:10px; color:#9b59b6">Input Foto Baru</h3>
+        <input type="text" id="inpNama" placeholder="Nama Kegiatan (Contoh: Kerja Bakti)">
+        <input type="text" id="inpTgl" placeholder="Tanggal (Contoh: 16/03/2026)">
+        <input type="text" id="inpLink" placeholder="Tempel Link Google Drive Di Sini">
+        <button class="btn-post" onclick="simpanFoto()">Simpan ke Galeri</button>
+        <button onclick="document.getElementById('adminBox').style.display='none'" style="border:none; background:none; width:100%; margin-top:10px; color:red; font-size:12px">Batal</button>
     </div>
 
     <div class="gallery-grid" id="kontenGaleri">
-        <p style="grid-column: span 2; text-align: center; color: #999;">Memuat foto kegiatan...</p>
+        <p style="grid-column: span 2; text-align: center;">Memuat...</p>
     </div>
-    
-    <a href="fitur.html" class="btn-back">← Kembali ke Fitur Warga</a>
+
+    <a href="#" class="btn-admin-toggle" onclick="cekLogin()">Login Admin</a>
+    <a href="fitur.html" style="display:block; text-align:center; margin-top:20px; text-decoration:none; color:#7f8c8d">← Kembali</a>
 </div>
 
 <script>
-    // PENTING: Gunakan link URL Web App HASIL DEPLOY TERBARU (New Version)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjoZYjRCp6eQci74Apwua7myXUZKnKyCCMYNex1Jl17GemLc3XuaiOMd-QvfNSM0Q/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztvzOLcD0Phz0nLtJAXVvOSPecinyHqjQlxIa8_va3Kooi_WbZXjhCnWlAfcDOXdo/exec";
+    let adminPass = "";
 
     function loadGaleri() {
-        fetch(SCRIPT_URL + "?sheet=Galeri")
+        fetch(SCRIPT_URL)
         .then(r => r.json())
         .then(data => {
             let html = "";
-            // Jika data ada, kita tampilkan
-            if(data && data.length > 0) {
-                // Gunakan reverse() agar foto yang baru Bapak input di bawah muncul paling atas di web
-                data.reverse().forEach(item => { 
-                    // Pastikan nama variabel (link_foto, nama_kegiatan, tanggal) 
-                    // sama persis dengan header di Spreadsheet Bapak
-                    html += `
-                    <div class="gallery-item">
-                        <img src="${item.link_foto}" alt="Kegiatan" onerror="this.src='https://via.placeholder.com/300x200?text=Foto+Tidak+Muncul'">
-                        <div class="gallery-info">
-                            <b>${item.nama_kegiatan || 'Kegiatan RT'}</b>
-                            <span>${item.tanggal || ''}</span>
-                        </div>
-                    </div>`;
-                });
-                document.getElementById("kontenGaleri").innerHTML = html;
-            } else {
-                document.getElementById("kontenGaleri").innerHTML = '<p style="grid-column: span 2;">Belum ada foto di database.</p>';
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            document.getElementById("kontenGaleri").innerHTML = '<p style="grid-column: span 2; color:red;">Gagal memuat galeri. Cek koneksi atau link App Script.</p>';
+            data.reverse().forEach(item => {
+                html += `<div class="gallery-item">
+                    <img src="${item.link_foto}" onerror="this.src='https://via.placeholder.com/300x200?text=Format+Drive+Salah'">
+                    <div class="gallery-info"><b>${item.nama_kegiatan}</b><span>${item.tanggal}</span></div>
+                </div>`;
+            });
+            document.getElementById("kontenGaleri").innerHTML = html || "Belum ada foto.";
+        });
+    }
+
+    function cekLogin() {
+        let p = prompt("Masukkan Password Admin:");
+        if (!p) return;
+        fetch(SCRIPT_URL + "?action=login&password=" + p)
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                adminPass = p;
+                document.getElementById('adminBox').style.display = 'block';
+                window.scrollTo(0,0);
+            } else { alert("Password Salah!"); }
+        });
+    }
+
+    function simpanFoto() {
+        let data = {
+            password: adminPass,
+            nama: document.getElementById('inpNama').value,
+            tanggal: document.getElementById('inpTgl').value,
+            link: document.getElementById('inpLink').value
+        };
+        if(!data.nama || !data.link) return alert("Isi semua data!");
+
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) })
+        .then(() => {
+            alert("Berhasil disimpan!");
+            location.reload();
         });
     }
 
     window.onload = loadGaleri;
 </script>
-
 </body>
 </html>
