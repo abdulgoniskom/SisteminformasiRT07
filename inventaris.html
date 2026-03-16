@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventaris RT 07</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background:#eef2f7; padding: 15px; }
+        
+        .container { max-width: 600px; margin: auto; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { color: #f2994a; }
+        
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th { background: #f2994a; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        
+        .status-ada { color: #27ae60; font-weight: bold; }
+        .status-kosong { color: #eb5757; font-weight: bold; }
+
+        .btn-wa { 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 12px; background: #25d366; color: white; 
+            text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px;
+        }
+        
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>📦 Inventaris RT 07</h2>
+        <p style="font-size: 12px; color: #7f8c8d;">Daftar aset milik warga RT 07 RW 09</p>
+    </div>
+
+    <div class="card">
+        <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px;">Daftar Barang:</p>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Barang</th>
+                        <th>Jumlah</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelInventaris">
+                    <tr><td colspan="3" style="text-align:center;">Memuat data barang...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card" style="border-left: 5px solid #f2994a;">
+        <p style="font-size: 13px;"><b>Ingin Meminjam?</b><br>Silakan hubungi seksi perlengkapan untuk cek ketersediaan tanggal pinjam.</p>
+        <a href="https://wa.me/628123456789" class="btn-wa"> 💬 Hubungi via WhatsApp
+        </a>
+    </div>
+    
+    <a href="fitur.html" class="btn-back">← Kembali ke Fitur Warga</a>
+</div>
+
+<script>
+    const SCRIPT_URL = "URL_APP_SCRIPT_BAPAK"; // Pakai API URL yang sama
+
+    function loadInventaris() {
+        fetch(SCRIPT_URL + "?sheet=Inventaris")
+        .then(r => r.json())
+        .then(data => {
+            let html = "";
+            data.forEach(item => {
+                let statusClass = item.status === "Tersedia" ? "status-ada" : "status-kosong";
+                html += `<tr>
+                    <td>${item.nama_barang}</td>
+                    <td>${item.jumlah} ${item.satuan}</td>
+                    <td class="${statusClass}">${item.status}</td>
+                </tr>`;
+            });
+            document.getElementById("tabelInventaris").innerHTML = html || '<tr><td colspan="3">Data kosong</td></tr>';
+        })
+        .catch(() => {
+            document.getElementById("tabelInventaris").innerHTML = '<tr><td colspan="3">Gagal memuat data</td></tr>';
+        });
+    }
+
+    window.onload = loadInventaris;
+</script>
+
+</body>
+</html>
