@@ -34,6 +34,11 @@
             transition: 0.2s;
         }
 
+        /* Menu Denah dibuat lebar penuh di bawah agar ganjilnya rapi */
+        .full-width {
+            grid-column: span 2;
+        }
+
         .item-fitur:active { transform: scale(0.95); background: #f9f9f9; }
         .item-fitur span { font-size: 12px; font-weight: bold; }
         .emoji { font-size: 30px; }
@@ -74,6 +79,11 @@
     <a href="galeri.html" class="item-fitur">
         <div class="emoji">📸</div>
         <span style="color: #9b59b6;">Galeri</span>
+    </a>
+
+    <a href="denah.html" class="item-fitur full-width">
+        <div class="emoji">📍</div>
+        <span style="color: #27ae60;">Peta & Denah Wilayah</span>
     </a>
 </div>
 
