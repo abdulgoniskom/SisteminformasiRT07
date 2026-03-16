@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitur Warga RT 07</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background:#eef2f7; padding: 15px; text-align: center; }
+        
+        .header { margin: 20px 0 30px; }
+        .header h1 { font-size: 18px; color: #2c3e50; }
+        
+        /* Grid Menu HP */
+        .grid-fitur {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 kolom rapi di HP */
+            gap: 15px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .item-fitur {
+            background: white;
+            padding: 25px 10px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .item-fitur:active { transform: scale(0.95); background: #f9f9f9; }
+        .item-fitur span { font-size: 12px; font-weight: bold; }
+        .emoji { font-size: 30px; }
+
+        .btn-kembali {
+            display: inline-block;
+            margin-top: 40px;
+            color: #2f80ed;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Layanan & Fitur Warga</h1>
+    <p style="font-size: 12px; color: #7f8c8d;">RT 07 RW 09 Bumi Indah City</p>
+</div>
+
+<div class="grid-fitur">
+    <a href="surat.html" class="item-fitur">
+        <div class="emoji">📄</div>
+        <span style="color: #2f80ed;">Persuratan</span>
+    </a>
+
+    <a href="lapor.html" class="item-fitur">
+        <div class="emoji">📣</div>
+        <span style="color: #eb5757;">Kotak Saran</span>
+    </a>
+
+    <a href="inventaris.html" class="item-fitur">
+        <div class="emoji">📦</div>
+        <span style="color: #f2994a;">Inventaris</span>
+    </a>
+
+    <a href="galeri.html" class="item-fitur">
+        <div class="emoji">📸</div>
+        <span style="color: #9b59b6;">Galeri</span>
+    </a>
+</div>
+
+<a href="index.html" class="btn-kembali">← Kembali ke Dashboard</a>
+
+</body>
+</html>
