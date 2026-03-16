@@ -9,23 +9,29 @@
         body { background:#eef2f7; padding: 15px; }
         .container { max-width: 800px; margin: auto; }
         .header { text-align: center; margin-bottom: 25px; }
+        
+        /* Grid Foto */
         .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .gallery-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); position: relative; }
-        .gallery-item img { width: 100%; height: 160px; object-fit: cover; display: block; background: #ccc; }
+        .gallery-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .gallery-item img { width: 100%; height: 160px; object-fit: cover; display: block; background: #ddd; }
         .gallery-info { padding: 10px; text-align: center; }
-        .gallery-info b { font-size: 13px; display: block; color: #333; }
+        .gallery-info b { font-size: 13px; display: block; color: #333; text-transform: capitalize; }
+        .gallery-info span { font-size: 11px; color: #7f8c8d; }
         
-        /* Admin Panel */
-        #adminBox { display: none; background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 3px solid #9b59b6; }
-        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        .btn-post { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        /* Admin Box */
+        #adminBox { display: none; background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 3px solid #9b59b6; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        #adminBox h3 { color: #9b59b6; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .btn-post { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
         
-        /* Tabel Kelola */
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+        /* Tabel Admin */
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px; }
         .admin-table th, .admin-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         .btn-del { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
 
-        .btn-admin-toggle { display: inline-block; background: #9b59b6; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; margin: 30px 0; }
+        .footer-nav { text-align: center; margin-top: 40px; padding-bottom: 30px; }
+        .btn-admin { display: inline-block; background: #9b59b6; color: white; padding: 10px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
         @media (min-width: 768px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
@@ -33,77 +39,112 @@
 
 <div class="container">
     <div class="header">
-        <h2 style="color:#9b59b6">📸 Galeri RT 07</h2>
-        <p style="font-size: 12px; color: #7f8c8d;">Kelola Momen Warga</p>
+        <h2 style="color:#9b59b6">📸 Galeri Kegiatan RT 07</h2>
+        <p style="font-size: 12px; color: #7f8c8d;">Momen Kebersamaan Warga</p>
     </div>
 
     <div id="adminBox">
-        <h3>Panel Kontrol Admin</h3>
+        <h3>Panel Admin</h3>
         <input type="text" id="inpNama" placeholder="Nama Kegiatan">
-        <input type="text" id="inpTgl" placeholder="Tanggal">
-        <input type="text" id="inpLink" placeholder="Link Google Drive">
+        <input type="text" id="inpTgl" placeholder="Tanggal (contoh: 17/08/2025)">
+        <input type="text" id="inpLink" placeholder="Tempel Link Foto Google Drive">
         <button class="btn-post" onclick="simpanFoto()">🚀 Tambah Foto Baru</button>
         
-        <h4 style="margin-top:20px">Daftar Foto (Klik Hapus jika salah)</h4>
+        <h4 style="margin: 15px 0 5px;">Hapus Data:</h4>
         <div style="overflow-x:auto">
-            <table class="admin-table" id="tabelAdmin">
+            <table class="admin-table">
                 <thead><tr><th>Kegiatan</th><th>Aksi</th></tr></thead>
                 <tbody id="listFotoAdmin"></tbody>
             </table>
         </div>
-        <button onclick="location.reload()" style="width:100%; margin-top:15px; padding:10px; border-radius:8px; border:1px solid #ccc; cursor:pointer">Keluar / Selesai</button>
+        <button onclick="location.reload()" style="width:100%; margin-top:15px; background:#f8f9fa; border:1px solid #ccc; padding:10px; border-radius:8px; cursor:pointer">Keluar Panel Admin</button>
     </div>
 
-    <div class="gallery-grid" id="kontenGaleri"></div>
+    <div class="gallery-grid" id="kontenGaleri">
+        <p style="grid-column: span 2; text-align: center; color: #999;">Memuat momen warga...</p>
+    </div>
 
-    <center>
-        <a href="#" class="btn-admin-toggle" id="btnAdmin" onclick="cekLogin()">⚙️ Login Admin</a>
-        <a href="fitur.html" style="display:block; color:#7f8c8d; text-decoration:none">← Kembali</a>
-    </center>
+    <div class="footer-nav">
+        <a href="#" class="btn-admin" id="btnAdmin" onclick="cekLogin()">⚙️ Login Admin Galeri</a>
+        <a href="fitur.html" style="display:block; color:#7f8c8d; text-decoration:none; font-size:14px">← Kembali ke Menu Utama</a>
+    </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhqYn-W--K8Lhl94DGURZ-zwFdQDjRWQ3gJLUViWAk89B8MGvPBpcDw42zPKvIQRA/exec";
+    // MASUKKAN URL APP SCRIPT BARU BAPAK DI SINI
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLz65womLWC006gtcZnji5gC-PYOGlBtPz8vg4NHs66XaQPkK2cw2qfdBkJzoSXpY/exec";
     let adminPass = "";
 
     function loadGaleri() {
-        fetch(SCRIPT_URL).then(r => r.json()).then(data => {
+        fetch(SCRIPT_URL)
+        .then(r => r.json())
+        .then(data => {
             let html = "";
             let adminHtml = "";
-            data.reverse().forEach(item => {
-                html += `<div class="gallery-item">
+            // Urutkan dari yang terbaru
+            const dataUrut = data.slice().reverse();
+
+            dataUrut.forEach(item => {
+                html += `
+                <div class="gallery-item">
                     <img src="${item.link_foto}" onerror="this.src='https://via.placeholder.com/300x200?text=Cek+Akses+Drive'">
-                    <div class="gallery-info"><b>${item.nama_kegiatan}</b><span>${item.tanggal}</span></div>
+                    <div class="gallery-info">
+                        <b>${item.nama_kegiatan}</b>
+                        <span>📅 ${item.tanggal}</span>
+                    </div>
                 </div>`;
-                adminHtml += `<tr><td>${item.nama_kegiatan}</td><td><button class="btn-del" onclick="hapusFoto(${item.rowNumber})">Hapus</button></td></tr>`;
+                
+                adminHtml += `
+                <tr>
+                    <td>${item.nama_kegiatan}</td>
+                    <td><button class="btn-del" onclick="hapusFoto(${item.rowNumber})">Hapus</button></td>
+                </tr>`;
             });
-            document.getElementById("kontenGaleri").innerHTML = html;
+            document.getElementById("kontenGaleri").innerHTML = html || "Belum ada foto.";
             document.getElementById("listFotoAdmin").innerHTML = adminHtml;
         });
     }
 
     function cekLogin() {
-        let p = prompt("Password Admin:");
+        let p = prompt("Masukkan Password Admin RT 07:");
         if (!p) return;
-        fetch(SCRIPT_URL + "?action=login&password=" + p).then(r => r.json()).then(res => {
+        fetch(SCRIPT_URL + "?action=login&password=" + p)
+        .then(r => r.json())
+        .then(res => {
             if (res.success) {
                 adminPass = p;
                 document.getElementById('adminBox').style.display = 'block';
                 document.getElementById('btnAdmin').style.display = 'none';
-                window.scrollTo(0,0);
-            } else { alert("Salah!"); }
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else { alert("Password Salah, Pak!"); }
         });
     }
 
     function simpanFoto() {
-        let data = { password: adminPass, action: "add", nama: document.getElementById('inpNama').value, tanggal: document.getElementById('inpTgl').value, link: document.getElementById('inpLink').value };
-        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) }).then(() => { alert("Berhasil!"); loadGaleri(); });
+        let data = { 
+            password: adminPass, 
+            action: "add", 
+            nama: document.getElementById('inpNama').value, 
+            tanggal: document.getElementById('inpTgl').value, 
+            link: document.getElementById('inpLink').value 
+        };
+        if(!data.nama || !data.link) return alert("Isi Nama dan Link dulu, Pak!");
+
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) })
+        .then(() => { 
+            alert("Berhasil Ditambah!"); 
+            document.getElementById('inpNama').value = "";
+            document.getElementById('inpTgl').value = "";
+            document.getElementById('inpLink').value = "";
+            loadGaleri(); 
+        });
     }
 
     function hapusFoto(row) {
-        if (!confirm("Yakin mau hapus foto ini, Pak?")) return;
+        if (!confirm("Hapus foto ini dari galeri?")) return;
         let data = { password: adminPass, action: "delete", rowNumber: row };
-        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) }).then(() => { alert("Terhapus!"); loadGaleri(); });
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) })
+        .then(() => { alert("Terhapus!"); loadGaleri(); });
     }
 
     window.onload = loadGaleri;
