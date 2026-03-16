@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta & Denah RT 07</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background:#eef2f7; padding: 15px; }
+        
+        .container { max-width: 600px; margin: auto; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { color: #27ae60; }
+        
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
+
+        /* Area Gambar Denah */
+        .denah-img { 
+            width: 100%; border-radius: 8px; border: 2px solid #27ae60; 
+            margin-bottom: 15px; display: block;
+        }
+
+        /* Fitur Cari Rumah */
+        .search-box { margin-bottom: 15px; }
+        input { 
+            width: 100%; padding: 12px; border: 2px solid #27ae60; 
+            border-radius: 8px; font-size: 14px; outline: none;
+        }
+
+        .list-rumah { max-height: 300px; overflow-y: auto; }
+        .rumah-item { 
+            padding: 10px; border-bottom: 1px solid #eee; 
+            display: flex; justify-content: space-between; font-size: 14px;
+        }
+        .rumah-item b { color: #27ae60; }
+
+        .btn-back { display: block; text-align: center; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>📍 Peta & Denah RT 07</h2>
+        <p style="font-size: 12px; color: #7f8c8d;">Navigasi wilayah RT 07 RW 09 Bumi Indah City</p>
+    </div>
+
+    <div class="card">
+        <img src="https://via.placeholder.com/600x400?text=Gambar+Denah+RT+07" class="denah-img" alt="Denah Wilayah">
+        <p style="font-size: 11px; color: #999; text-align: center;">Klik gambar untuk memperbesar</p>
+    </div>
+
+    <div class="card">
+        <div class="search-box">
+            <label style="font-size: 13px; font-weight: bold; color: #333;">Cari Nomor Rumah / Blok:</label>
+            <input type="text" id="inputCari" onkeyup="cariRumah()" placeholder="Contoh: A12 atau B05...">
+        </div>
+
+        <div class="list-rumah" id="daftarRumah">
+            <p style="text-align: center; font-size: 12px; color: #999;">Memuat data lokasi...</p>
+        </div>
+    </div>
+    
+    <a href="fitur.html" class="btn-back">← Kembali ke Fitur Warga</a>
+</div>
+
+<script>
+    const SCRIPT_URL = "URL_APP_SCRIPT_BAPAK"; 
+
+    function loadLokasi() {
+        // Bapak bisa pakai data dari sheet "Data_Warga" yang sudah ada
+        fetch(SCRIPT_URL + "?sheet=Data_Warga")
+        .then(r => r.json())
+        .then(data => {
+            let html = "";
+            data.forEach(warga => {
+                html += `
+                <div class="rumah-item">
+                    <span>${warga.nama}</span>
+                    <b>${warga.alamat || 'Blok ??'}</b>
+                </div>`;
+            });
+            document.getElementById("daftarRumah").innerHTML = html;
+        })
+        .catch(() => {
+            document.getElementById("daftarRumah").innerHTML = "Gagal memuat data lokasi.";
+        });
+    }
+
+    function cariRumah() {
+        let input = document.getElementById("inputCari").value.toUpperCase();
+        let items = document.getElementsByClassName("rumah-item");
+        
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].innerHTML.toUpperCase().includes(input)) {
+                items[i].style.display = "";
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+    }
+
+    window.onload = loadLokasi;
+</script>
+
+</body>
+</html>
