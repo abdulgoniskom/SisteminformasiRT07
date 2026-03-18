@@ -3,34 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Kas RT 07</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Sistem Kas RT 07 - Admin</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
-        body { background:#f4f7fa; display:flex; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background:#f0f2f5; display:flex; color: #333; }
+        
+        /* Sidebar Styling */
         .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; transition: 0.3s; z-index: 1000; left: 0; }
         .sidebar.closed { left: -220px; }
-        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid #3e4f5f; font-size:16px; }
-        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
-        .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
-        .main { margin-left:220px; width:100%; transition: 0.3s; }
+        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid #3e4f5f; font-size:16px; letter-spacing: 1px; }
+        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; border-left: 4px solid transparent; transition: 0.2s; }
+        .sidebar a:hover, .sidebar a.active { background:#34495e; border-left-color: #1abc9c; }
+        
+        /* Main Content */
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
         .main.expanded { margin-left: 0; }
-        header { background:#2f80ed; color:white; padding:15px; display:flex; justify-content:space-between; align-items: center; sticky; top: 0; }
+        header { background:#2f80ed; color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items: center; position: sticky; top: 0; z-index: 999; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
         .container { padding:20px; max-width:1100px; margin:auto; }
-        .card { background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-        button { border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold; color:white; }
-        .btn-blue { background:#2f80ed; }
-        .btn-green { background:#27ae60; }
-        .btn-red { background:#e74c3c; }
-        .btn-orange { background:#f39c12; }
-        table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
-        th, td { border-bottom:1px solid #eee; padding:10px; text-align:center; }
-        th { background:#f8f9fa; }
-        .formInput { display:none; border-top: 2px dashed #ddd; margin-top:20px; padding-top:20px; }
-        input, select { padding:8px; border:1px solid #ddd; border-radius:5px; width:100%; }
-        @media (max-width: 768px) { .sidebar { left:-220px; } .sidebar.open { left:0; } .main { margin-left:0; } .aksi-btns { display: flex; flex-direction: column; gap: 5px; } }
+        .card { background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
+        
+        /* Form & Flex Logic */
+        .flex-box { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+        .flex-box > div { flex: 1; min-width: 150px; }
+        label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
+        input:focus { border-color: #2f80ed; }
+
+        /* Buttons */
+        button { border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:bold; transition: 0.2s; }
+        .btn-blue { background:#2f80ed; color:white; }
+        .btn-green { background:#27ae60; color:white; }
+        .btn-red { background:#e74c3c; color:white; }
+        .btn-orange { background:#f39c12; color:white; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Table Styling */
+        .table-container { overflow-x: auto; }
+        table { width:100%; border-collapse:collapse; margin-top:10px; background: white; }
+        th { background:#f8f9fa; color: #777; font-size: 12px; text-transform: uppercase; padding: 15px; border-bottom: 2px solid #eee; }
+        td { padding:15px; border-bottom:1px solid #eee; text-align:center; font-size: 13px; }
+        .masuk { color:#27ae60; font-weight:bold; }
+        .keluar { color:#e74c3c; font-weight:bold; }
+
+        @media (max-width: 768px) {
+            .sidebar { left:-220px; }
+            .sidebar.open { left:0; }
+            .main { margin-left:0; }
+            .flex-box > div { flex: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -49,52 +72,101 @@
     <header>
         <div style="display:flex; align-items:center;">
             <div onclick="toggleSidebar()" style="font-size:24px; cursor:pointer; margin-right:15px;">☰</div>
-            <h2 style="font-size:15px;">Admin Kas RT 07</h2>
+            <h2 style="font-size:16px;">Sistem Kas RT 07</h2>
         </div>
-        <button id="loginBtn" class="btn-blue">Login</button>
-        <button id="logoutBtn" class="btn-red" style="display:none">Logout</button>
+        <div>
+            <button id="loginBtn" class="btn-blue" style="padding: 8px 15px;">Login Admin</button>
+            <button id="logoutBtn" style="display:none; padding: 8px 15px;" class="btn-red" onclick="location.reload()">Logout</button>
+        </div>
     </header>
 
     <div class="container">
-        <div class="card">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-                <select id="sheet" onchange="loadData()"><option value="Kas_RT">Kas RT</option><option value="Kas_Agustusan">Kas Agustusan</option></select>
-                <select id="filterBulan" onchange="loadData()">
-                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
-                    <option value="12" selected>Desember</option>
-                </select>
-            </div>
-            <button onclick="cetakPDF()" class="btn-green" style="width:100%">🧾 Cetak Laporan PDF</button>
-
-            <div class="formInput" id="formInput">
-                <h3 id="formTitle">📝 Tambah Transaksi</h3>
-                <input type="hidden" id="editRowId">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                    <input type="date" id="tanggal" onchange="autoSetPeriode()">
-                    <input type="text" id="ket" placeholder="Keterangan">
-                    <input type="number" id="masuk" placeholder="Masuk (Rp)">
-                    <input type="number" id="keluar" placeholder="Keluar (Rp)">
-                    <select id="inBln"><option value="12">Laporan Des</option><option value="1">Laporan Jan</option></select>
-                    <input type="number" id="inThn" value="2025">
-                </div>
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button id="btnSimpan" onclick="simpan()" class="btn-blue" style="flex:2;">Simpan Data</button>
-                    <button id="btnBatal" onclick="resetForm()" class="btn-red" style="flex:1; display:none;">Batal</button>
-                </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <div class="card" style="margin-bottom:0; border-left: 5px solid #2f80ed;">
+                <label>Saldo Akhir Saat Ini</label>
+                <h2 id="saldoDisplay">Rp 0</h2>
             </div>
         </div>
 
-        <div class="card" style="overflow-x:auto;">
+        <div class="card">
+            <div class="flex-box">
+                <div>
+                    <label>Pilih Jenis Kas:</label>
+                    <select id="sheet" onchange="loadData()"><option value="Kas_RT">Kas RT</option><option value="Kas_Agustusan">Kas Agustusan</option></select>
+                </div>
+                <div>
+                    <label>Filter Laporan Bulan:</label>
+                    <select id="filterBulan" onchange="loadData()">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3" selected>Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="cetakPDF()" class="btn-green" style="width:100%;">🧾 Cetak Laporan PDF</button>
+
+            <div id="formAdmin" class="card" style="display:none; margin-top: 20px; border: 1px dashed #2f80ed; background: #fdfdfd;">
+                <h3 id="judulForm" style="margin-bottom:15px; color: #2f80ed;">TAMBAH TRANSAKSI</h3>
+                <input type="hidden" id="editRowId">
+                
+                <div class="flex-box">
+                    <div>
+                        <label>Tgl Kalender (Waktu Input):</label>
+                        <input type="date" id="tgl" onchange="updateBulanLaporan()">
+                    </div>
+                    <div>
+                        <label>Target Laporan Bulan:</label>
+                        <select id="inBln">
+                            <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                            <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                            <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                            <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Tahun Laporan:</label>
+                        <select id="inThn"><option value="2025">2025</option><option value="2026" selected>2026</option></select>
+                    </div>
+                </div>
+
+                <div style="margin-top:10px;">
+                    <label>Keterangan Transaksi:</label>
+                    <input type="text" id="keterangan" placeholder="Contoh: Iuran Kas Bulanan Warga...">
+                </div>
+
+                <div class="flex-box" style="margin-top:15px;">
+                    <div><label>Masuk (Rp):</label><input type="number" id="inMasuk" placeholder="0"></div>
+                    <div><label>Keluar (Rp):</label><input type="number" id="inKeluar" placeholder="0"></div>
+                </div>
+
+                <button id="btnSimpan" class="btn-blue" onclick="prosesSimpan()" style="width:100%; margin-top:10px;">SIMPAN DATA</button>
+                <button id="btnBatal" onclick="resetForm()" style="background:#95a5a6; width:100%; margin-top:8px; display:none; color:white">BATAL EDIT</button>
+            </div>
+        </div>
+
+        <div class="card table-container">
             <table>
-                <thead><tr><th>Tgl</th><th>Keterangan</th><th>Masuk</th><th>Keluar</th><th>Saldo</th><th class="admin-only" style="display:none">Aksi</th></tr></thead>
-                <tbody id="tabel"></tbody>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Keterangan</th>
+                        <th>Masuk</th>
+                        <th>Keluar</th>
+                        <th>Saldo</th>
+                        <th class="admin-only" style="display:none">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bodiTabel">
+                    <tr><td colspan="6">Memuat data...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxFO0_ty70BIBIoCGoWmZUr5G_BIXIbTmV_HVtoHvkJG9r1FoN9xI-3jP6emycY0rk/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbwnWKaBtJWup2vZFKQFedBX3pDzWcw42w09zGiGszpBIgNU_C87RcT2FODN35CuLCo/exec"; // GANTI DENGAN URL WEB APP ANDA
     let masterData = [];
     let isAdmin = false;
 
@@ -104,16 +176,25 @@
         window.innerWidth > 768 ? (s.classList.toggle("closed"), m.classList.toggle("expanded")) : s.classList.toggle("open");
     }
 
-    function autoSetPeriode() {
-        const d = new Date(document.getElementById("tanggal").value);
-        let m = d.getMonth(); let y = d.getFullYear();
-        if (m === 0) { document.getElementById("inBln").value = "12"; document.getElementById("inThn").value = y - 1; }
-        else { document.getElementById("inBln").value = m; document.getElementById("inThn").value = y; }
+    function updateBulanLaporan() {
+        const tglInput = document.getElementById("tgl").value;
+        if (!tglInput) return;
+        const d = new Date(tglInput);
+        let m = d.getMonth() + 1;
+        let y = d.getFullYear();
+        if (d.getDate() <= 10) { 
+            m -= 1; 
+            if (m === 0) { m = 12; y -= 1; } 
+        }
+        document.getElementById("inBln").value = m;
+        document.getElementById("inThn").value = y;
     }
 
     function loadData() {
         const s = document.getElementById("sheet").value;
         const fB = document.getElementById("filterBulan").value;
+        const bodi = document.getElementById("bodiTabel");
+
         fetch(`${API_URL}?sheet=${s}`).then(r => r.json()).then(data => {
             masterData = data;
             let html = ""; let sJalan = 0;
@@ -124,78 +205,100 @@
                     html += `<tr>
                         <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
                         <td style="text-align:left">${d.keterangan}</td>
-                        <td style="color:green">${m.toLocaleString()}</td>
-                        <td style="color:red">${k.toLocaleString()}</td>
-                        <td style="font-weight:bold">${sJalan.toLocaleString()}</td>
+                        <td class="masuk">Rp ${m.toLocaleString()}</td>
+                        <td class="keluar">Rp ${k.toLocaleString()}</td>
+                        <td style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
                         <td class="admin-only" style="${isAdmin ? '' : 'display:none'}">
-                            <div class="aksi-btns">
-                                <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:4px 8px; font-size:10px;">Edit</button>
-                                <button onclick="hapusData(${d.row_id})" class="btn-red" style="padding:4px 8px; font-size:10px;">Hapus</button>
-                            </div>
+                            <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:5px 10px; font-size:11px;">EDIT</button>
+                            <button onclick="hapusData(${d.row_id})" class="btn-red" style="padding:5px 10px; font-size:11px;">HAPUS</button>
                         </td>
                     </tr>`;
                 }
             });
-            document.getElementById("tabel").innerHTML = html || '<tr><td colspan="6">Data Kosong</td></tr>';
+            bodi.innerHTML = html || '<tr><td colspan="6">Tidak ada data di bulan ini.</td></tr>';
+            document.getElementById("saldoDisplay").innerText = "Rp " + sJalan.toLocaleString();
         });
     }
 
-    async function simpan() {
+    async function prosesSimpan() {
         const rowId = document.getElementById("editRowId").value;
-        const payload = {
+        const p = {
             action: rowId ? "update_kas" : "insert_kas",
             row_id: rowId,
             sheet: document.getElementById("sheet").value,
-            tanggal: document.getElementById("tanggal").value,
-            keterangan: document.getElementById("ket").value,
-            masuk: document.getElementById("masuk").value,
-            keluar: document.getElementById("keluar").value,
+            tanggal: document.getElementById("tgl").value,
+            keterangan: document.getElementById("keterangan").value,
+            masuk: document.getElementById("inMasuk").value || 0,
+            keluar: document.getElementById("inKeluar").value || 0,
             bulan_laporan: document.getElementById("inBln").value,
             tahun_laporan: document.getElementById("inThn").value
         };
-        await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+
+        if(!p.tanggal || !p.keterangan) return alert("Lengkapi data!");
+        
+        document.getElementById("btnSimpan").innerText = "Menyimpan...";
+        await fetch(API_URL, { method: "POST", body: JSON.stringify(p) });
         alert("Berhasil!"); resetForm(); loadData();
     }
 
     function editData(rowId) {
-        const item = masterData.find(d => d.row_id === rowId);
-        document.getElementById("editRowId").value = item.row_id;
-        document.getElementById("tanggal").value = new Date(item.tanggal).toISOString().split('T')[0];
-        document.getElementById("ket").value = item.keterangan;
-        document.getElementById("masuk").value = item.masuk;
-        document.getElementById("keluar").value = item.keluar;
-        document.getElementById("inBln").value = item.bulan_laporan;
-        document.getElementById("inThn").value = item.tahun_laporan;
-        document.getElementById("formTitle").innerText = "Edit Transaksi Row: " + rowId;
-        document.getElementById("btnBatal").style.display = "inline";
-        window.scrollTo(0,0);
+        const d = masterData.find(i => i.row_id === rowId);
+        document.getElementById("editRowId").value = d.row_id;
+        document.getElementById("tgl").value = new Date(d.tanggal).toISOString().split('T')[0];
+        document.getElementById("keterangan").value = d.keterangan;
+        document.getElementById("inMasuk").value = d.masuk;
+        document.getElementById("inKeluar").value = d.keluar;
+        document.getElementById("inBln").value = d.bulan_laporan;
+        document.getElementById("inThn").value = d.tahun_laporan;
+        document.getElementById("judulForm").innerText = "EDIT DATA (ROW " + rowId + ")";
+        document.getElementById("btnBatal").style.display = "block";
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     async function hapusData(rowId) {
-        if(confirm("Hapus data ini?")) {
-            const p = { action: "delete_kas", row_id: rowId, sheet: document.getElementById("sheet").value };
-            await fetch(API_URL, { method: "POST", body: JSON.stringify(p) });
+        if(confirm("Hapus baris ini?")) {
+            await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "delete_kas", row_id: rowId, sheet: document.getElementById("sheet").value}) });
             loadData();
         }
     }
 
     function resetForm() {
         document.getElementById("editRowId").value = "";
-        document.getElementById("formTitle").innerText = "📝 Tambah Transaksi";
+        document.getElementById("judulForm").innerText = "TAMBAH TRANSAKSI";
         document.getElementById("btnBatal").style.display = "none";
-        document.querySelectorAll(".formInput input").forEach(i => i.value = "");
+        document.getElementById("btnSimpan").innerText = "SIMPAN DATA";
+        document.querySelectorAll("#formAdmin input").forEach(i => i.value = "");
     }
 
     document.getElementById("loginBtn").onclick = () => {
-        if(prompt("Pass:") === "Bumiindah07") {
+        if(prompt("Password Admin:") === "Bumiindah07") {
             isAdmin = true;
-            document.getElementById("formInput").style.display="block";
-            document.getElementById("loginBtn").style.display="none";
-            document.getElementById("logoutBtn").style.display="inline";
-            document.querySelectorAll(".admin-only").forEach(el => el.style.display="");
+            document.getElementById("formAdmin").style.display = "block";
+            document.getElementById("loginBtn").style.display = "none";
+            document.getElementById("logoutBtn").style.display = "inline";
+            document.querySelectorAll(".admin-only").forEach(el => el.style.display = "");
             loadData();
         }
     };
+
+    function cetakPDF() {
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+        doc.setFontSize(16); doc.text("LAPORAN KAS RT 07", 105, 15, { align: "center" });
+        doc.setFontSize(10); doc.text("Periode: " + document.getElementById("filterBulan").options[document.getElementById("filterBulan").selectedIndex].text, 105, 22, { align: "center" });
+        
+        let rows = [];
+        document.querySelectorAll("#bodiTabel tr").forEach(tr => {
+            let td = tr.querySelectorAll("td");
+            if(td.length > 1) rows.push([td[0].innerText, td[1].innerText, td[2].innerText, td[3].innerText, td[4].innerText]);
+        });
+
+        doc.autoTable({ head: [['Tanggal', 'Keterangan', 'Masuk', 'Keluar', 'Saldo']], body: rows, startY: 30, theme: 'grid' });
+        
+        let finalY = doc.lastAutoTable.finalY + 15;
+        doc.text("Ketua RT 07", 40, finalY); doc.text("Bendahara", 150, finalY);
+        doc.text("( Muhammad Zainudin )", 40, finalY + 20); doc.text("( Abdul Goni )", 150, finalY + 20);
+        doc.save("Laporan_Kas_RT07.pdf");
+    }
 
     loadData();
 </script>
