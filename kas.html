@@ -142,33 +142,32 @@
             let html = ""; 
             let sJalan = 0; // Kunci Saldo Pindahan Kumulatif
 
-            data.forEach(d => {
-                let m = Number(d.masuk) || 0;
-                let k = Number(d.keluar) || 0;
-                sJalan += (m - k); // Hitung saldo terus menerus
+    data.forEach(d => {
+    let m = Number(d.masuk) || 0;
+    let k = Number(d.keluar) || 0;
+    sJalan += (m - k); 
 
-                const matchTahun = (fT === "all") || (String(d.tahun_laporan) === fT);
-                const matchBulan = (fB === "all") || (String(d.bulan_laporan) === fB);
+    const matchTahun = (fT === "all") || (String(d.tahun_laporan) === fT);
+    const matchBulan = (fB === "all") || (String(d.bulan_laporan) === fB);
 
-                if (matchTahun && matchBulan) {
-                    html += `<tr>
-                        <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
-                        <td style="text-align:left">${d.keterangan}</td>
-                        <td style="color:#27ae60; font-weight:bold">Rp ${m.toLocaleString()}</td>
-                        <td style="color:#e74c3c; font-weight:bold">Rp ${k.toLocaleString()}</td>
-                        <td>${d.bukti ? `<a href="${d.bukti}" target="_blank" class="btn-view">Lihat</a>` : '-'}</td>
-                        <td style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
-                        <td class="admin-only" style="${isAdmin ? '' : 'display:none'}">
-                            <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:4px 8px; font-size:10px;">EDIT</button>
-                        </td>
-                    </tr>`;
-                }
-            });
-            bodi.innerHTML = html || '<tr><td colspan="7">Tidak ada data.</td></tr>';
-            document.getElementById("saldoDisplay").innerText = "Rp " + sJalan.toLocaleString();
-        });
+    if (matchTahun && matchBulan) {
+        // Logika agar Rp 0 tampil sebagai "-"
+        const tampilMasuk = m > 0 ? `Rp ${m.toLocaleString()}` : "-";
+        const tampilKeluar = k > 0 ? `Rp ${k.toLocaleString()}` : "-";
+
+        html += `<tr>
+            <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+            <td style="text-align:left">${d.keterangan}</td>
+            <td style="color:#27ae60; font-weight:bold">${tampilMasuk}</td>
+            <td style="color:#e74c3c; font-weight:bold">${tampilKeluar}</td>
+            <td>${d.bukti ? `<a href="${d.bukti}" target="_blank" class="btn-view">Lihat</a>` : '-'}</td>
+            <td style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
+            <td class="admin-only" style="${isAdmin ? '' : 'display:none'}">
+                <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:4px 8px; font-size:10px;">EDIT</button>
+            </td>
+        </tr>`;
     }
-
+});
     function cetakPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
