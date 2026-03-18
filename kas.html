@@ -93,7 +93,7 @@
                     </select>
                 </div>
             </div>
-            <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:15px;">🧾 Cetak Laporan PDF</button>
+            <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:15px;">🧾 Cetak Laporan Kas</button>
         </div>
 
         <div class="card" style="overflow-x:auto;">
@@ -165,7 +165,7 @@
             </div>
         </div>
 
-        <label>Link Bukti (G-Drive/Foto):</label>
+        <label>Link Bukti :</label>
         <input type="text" id="formBukti" placeholder="https://...">
 
         <button onclick="simpanData()" class="btn-green" style="width:100%; padding:15px; font-size:16px; margin-top:10px;">SIMPAN DATA</button>
@@ -180,7 +180,7 @@
 <button id="btnAdd" onclick="bukaModal()" class="btn-blue" style="display:none; position:fixed; bottom:25px; right:25px; border-radius:50px; padding:15px 20px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">+ Tambah Kas</button>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzDvnVK6fB6dRtZsEdxHGNqnvIwaXW8V1usgEhRYcDxNk96C473uQthRylAMh-z5sY/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyz2vLe-57uRWJ1wIn425hC7J0dDX-PJHDyl4VFMzPV2a-91kLJybzGX6MVi5w5Gpk/exec"; 
     let masterData = [];
     let isAdmin = false;
 
@@ -229,17 +229,53 @@
     }
 
     function adminLogin() {
-        const p = prompt("Password Admin:");
-        if(p === "Bumiindah07") {
+    const user = prompt("Masukkan Username Admin:");
+    if (!user) return; // Batal jika username kosong
+    
+    const pass = prompt("Masukkan Password Admin:");
+    if (!pass) return; // Batal jika password kosong
+
+    // Menampilkan loading sederhana
+    document.getElementById("loginBtn").innerText = "Checking...";
+
+    const payload = {
+        action: "login_admin",
+        username: user,
+        password: pass,
+        sheet: "Kas_RT" // Ini hanya formalitas agar diterima doPost
+    };
+
+    fetch(API_URL, { 
+        method: "POST", 
+        body: JSON.stringify(payload) 
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.status === "success") {
             isAdmin = true;
+            
+            // Tampilkan elemen khusus admin
             document.getElementById("thAksi").style.display = "";
             document.getElementById("btnAdd").style.display = "block";
-            document.getElementById("loginBtn").innerText = "Logout Admin";
-            document.getElementById("loginBtn").onclick = () => location.reload();
-            loadData();
-        } else { alert("Password Salah!"); }
-    }
-
+            
+            // Ubah tombol login jadi logout
+            const btn = document.getElementById("loginBtn");
+            btn.innerText = "Logout Admin";
+            btn.classList.replace("btn-blue", "btn-red");
+            btn.onclick = () => location.reload(); // Logout dengan refresh halaman
+            
+            loadData(); // Refresh tabel agar kolom "Aksi" muncul
+            alert("Login Berhasil! Selamat Datang Pak RT.");
+        } else {
+            alert("Username atau Password Salah!");
+            document.getElementById("loginBtn").innerText = "Login Admin";
+        }
+    })
+    .catch(err => {
+        alert("Terjadi kesalahan koneksi!");
+        document.getElementById("loginBtn").innerText = "Login Admin";
+    });
+}
     // FUNGSI MODAL
     function bukaModal(id = null) {
         document.getElementById("modalForm").style.display = "flex";
