@@ -206,18 +206,27 @@ async function fetchData() {
     });
 
     fetch(API + "?sheet=Kas_RT").then(r => r.json()).then(d => {
-        let masuk = 0, keluar = 0, blnIni = 0, skr = new Date();
-        d.forEach(i => {
-            let m = Number(i.masuk||0), k = Number(i.keluar||0);
-            masuk += m; keluar += k;
-            let t = new Date(i.tanggal);
-            if(t.getMonth() === skr.getMonth() && t.getFullYear() === skr.getFullYear()) blnIni += k;
-        });
-        document.getElementById("totalKasRT").innerText = formatRp(masuk - keluar);
-        document.getElementById("pengeluaranBulan").innerText = formatRp(blnIni);
-        updateChart(d);
+    let totalMasuk = 0;
+    let totalKeluar = 0;
+
+    d.forEach(i => {
+        // Ambil semua data masuk dan keluar tanpa filter tanggal
+        let m = Number(i.masuk || 0);
+        let k = Number(i.keluar || 0);
+        
+        totalMasuk += m; 
+        totalKeluar += k;
     });
 
+    // 1. Kartu Biru: Saldo Saat Ini (Uang yang pegang Bendahara)
+    document.getElementById("totalKasRT").innerText = formatRp(totalMasuk - totalKeluar);
+    
+    // 2. Kartu Merah: Total Seluruh Pengeluaran (Akumulasi semua bulan)
+    document.getElementById("pengeluaranBulan").innerText = formatRp(totalKeluar);
+    
+    // Update Grafik (Tetap per bulan agar visualnya bagus)
+    updateChart(d);
+});
     fetch(API + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
         let total = 0; d.forEach(i => total += (Number(i.masuk||0) - Number(i.keluar||0)));
         document.getElementById("kasAgustusan").innerText = formatRp(total);
