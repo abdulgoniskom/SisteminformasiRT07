@@ -70,15 +70,15 @@
                         <option value="Kas_Agustusan">Kas Agustusan</option>
                     </select>
                 </div>
-                <div>
-                    <label>Filter Tahun:</label>
-                    <select id="filterTahun" onchange="loadData()">
-                        <option value="all">-- Semua Tahun --</option>
-                        <option value="2025">2025</option>
-                        <option value="2026" selected>2026</option>
-                        <option value="2027">2027</option>
-                    </select>
-                </div>
+       <div>
+       <label>Filter Tahun:</label>
+        <select id="filterTahun" onchange="loadData()">
+        <option value="all" selected>-- Semua Tahun --</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+    </select>
+</div>
                 <div>
                     <label>Filter Bulan:</label>
                     <select id="filterBulan" onchange="loadData()">
@@ -170,44 +170,122 @@
     }
 
     function cetakPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const fB = document.getElementById("filterBulan");
-        const fT = document.getElementById("filterTahun");
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    const fB = document.getElementById("filterBulan");
+    const fT = document.getElementById("filterTahun");
+    const pilihBulan = fB.value;
+    const pilihTahun = fT.value;
+    
+    const namaBulan = fB.options[fB.selectedIndex].text;
+    const namaTahun = fT.options[fT.selectedIndex].text;
+    const jenisKas = document.getElementById("sheet").value.replace('_', ' ');
+
+    // Header Laporan
+    doc.setFontSize(16);
+    doc.text(`LAPORAN ${jenisKas.toUpperCase()} RT 07 RW 09`, 105, 15, { align: "center" });
+    doc.setFontSize(12);
+    doc.text("Perumahan Bumi Indah Citty", 105, 22, { align: "center" });
+    
+    doc.setFontSize(11);
+    doc.text(`Jenis Kas : ${jenisKas.replace('Kas ', '')}`, 15, 35);
+    doc.text(`Periode   : ${namaBulan} ${namaTahun}`, 15, 41);
+    doc.text(`Tanggal Cetak : ${new Date().toLocaleDateString("id-ID")}`, 15, 47);
+
+    let rows = [];
+    let saldoPindahan = 0;
+    let totalMasuk = 0;
+    let totalKeluar = 0;
+
+    // Hitung Saldo Pindahan (Semua transaksi SEBELUM periode filter)
+    masterData.forEach(d => {
+        const m = Number(d.masuk) || 0;
+        const k = Number(d.keluar) || 0;
         
-        const periode = `${fB.options[fB.selectedIndex].text} ${fT.options[fT.selectedIndex].text}`;
+        const tglData = new Date(d.tanggal);
+        const blnData = d.bulan_laporan;
+        const thnData = d.tahun_laporan;
 
-        doc.setFontSize(14);
-        doc.text("LAPORAN KAS RT 07", 105, 15, { align: "center" });
-        doc.setFontSize(10);
-        doc.text("Periode: " + periode, 105, 22, { align: "center" });
-
-        let rows = [];
-        document.querySelectorAll("#bodiTabel tr").forEach(tr => {
-            const tds = tr.querySelectorAll("td");
-            if (tds.length > 1) {
-                rows.push([tds[0].innerText, tds[1].innerText, tds[2].innerText, tds[3].innerText, tds[5].innerText]);
+        // Jika filter bukan "Semua", hitung saldo pindahan
+        if (pilihBulan !== "all" || pilihTahun !== "all") {
+            // Logika: Jika tahun data < tahun pilih ATAU (tahun sama DAN bulan data < bulan pilih)
+            if (thnData < pilihTahun || (thnData == pilihTahun && blnData < pilihBulan)) {
+                saldoPindahan += (m - k);
             }
-        });
+        }
+    });
 
-        doc.autoTable({
-            head: [['TANGGAL', 'KETERANGAN', 'MASUK', 'KELUAR', 'SALDO']],
-            body: rows,
-            startY: 30,
-            theme: 'grid',
-            headStyles: { fillGray: [44, 62, 80], halign: 'center' },
-            columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' } }
-        });
-
-        let finalY = doc.lastAutoTable.finalY + 15;
-        doc.text("Ketua RT 07", 40, finalY);
-        doc.text("Bendahara", 150, finalY);
-        doc.text("( Muhammad Zainudin )", 40, finalY + 20);
-        doc.text("( Abdul Goni )", 150, finalY + 20);
-
-        doc.save(`Laporan_Kas_${periode}.pdf`);
+    // Tambahkan Baris Saldo Pindahan di awal jika ada
+    if (pilihBulan !== "all" || pilihTahun !== "all") {
+        rows.push([
+            "", 
+            "Saldo Pindahan Bulan Lalu", 
+            "-", 
+            "-", 
+            `Rp ${saldoPindahan.toLocaleString()}`
+        ]);
     }
 
+    let saldoJalan = saldoPindahan;
+
+    // Tambahkan Data Transaksi yang Sesuai Filter
+    masterData.forEach(d => {
+        const m = Number(d.masuk) || 0;
+        const k = Number(d.keluar) || 0;
+        
+        const matchTahun = (pilihTahun === "all") || (String(d.tahun_laporan) === pilihTahun);
+        const matchBulan = (pilihBulan === "all") || (String(d.bulan_laporan) === pilihBulan);
+
+        if (matchTahun && matchBulan) {
+            saldoJalan += (m - k);
+            totalMasuk += m;
+            totalKeluar += k;
+            rows.push([
+                new Date(d.tanggal).toLocaleDateString("id-ID"),
+                d.keterangan,
+                m > 0 ? `Rp ${m.toLocaleString()}` : "-",
+                k > 0 ? `Rp ${k.toLocaleString()}` : "-",
+                `Rp ${saldoJalan.toLocaleString()}`
+            ]);
+        }
+    });
+
+    // Buat Tabel
+    doc.autoTable({
+        head: [['Tanggal', 'Keterangan', 'Masuk', 'Keluar', 'Saldo']],
+        body: rows,
+        startY: 55,
+        theme: 'grid',
+        headStyles: { fillBlue: [47, 128, 237], halign: 'center' },
+        columnStyles: {
+            2: { halign: 'right' },
+            3: { halign: 'right' },
+            4: { halign: 'right' }
+        }
+    });
+
+    // Ringkasan di bawah tabel
+    let finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(10);
+    doc.text(`Total Pemasukan : Rp ${totalMasuk.toLocaleString()}`, 15, finalY);
+    doc.text(`Total Pengeluaran : Rp ${totalKeluar.toLocaleString()}`, 15, finalY + 6);
+    doc.setFont(undefined, 'bold');
+    doc.text(`Saldo Akhir : Rp ${saldoJalan.toLocaleString()}`, 15, finalY + 12);
+    doc.setFont(undefined, 'normal');
+
+    // Tanda Tangan
+    let ttdY = finalY + 25;
+    doc.text(`Tangerang, ${new Date().toLocaleDateString("id-ID")}`, 150, ttdY);
+    doc.text("Mengetahui,", 15, ttdY + 10);
+    doc.text("Ketua RT 07", 15, ttdY + 20);
+    doc.text("Bendahara RT 07", 150, ttdY + 20);
+    
+    doc.text("( Muhammad Zainudin )", 15, ttdY + 45);
+    doc.text("( Abdul Goni )", 150, ttdY + 45);
+
+    doc.save(`Laporan_Kas_${namaBulan}_${namaTahun}.pdf`);
+}
     function adminLogin() {
         if(prompt("Password Admin:") === "Bumiindah07") {
             isAdmin = true;
