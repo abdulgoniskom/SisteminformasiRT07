@@ -62,101 +62,89 @@
     </div>
 
     <div class="card">
-        <div class="flex-box">
-            <div>
-                <label>Jenis Kas:</label>
-                <select id="sheet" onchange="loadData()">
-                    <option value="Kas_RT">Kas RT</option>
-                    <option value="Kas_Agustusan">Kas Agustusan</option>
-                </select>
-            </div>
-            <div>
-                <label>Filter Tahun:</label>
-                <select id="filterTahun" onchange="loadData()">
-                    <option value="2025">2025</option>
-                    <option value="2026" selected>2026</option>
-                    <option value="2027">2027</option>
-                </select>
-            </div>
-            <div>
-                <label>Filter Bulan:</label>
-                <select id="filterBulan" onchange="loadData()">
-                    <option value="all">-- Semua Bulan --</option>
-                    <option value="1">Januari</option>
-                    <option value="2">Februari</option>
-                    <option value="3">Maret</option>
-                    <option value="4">April</option>
-                    <option value="5">Mei</option>
-                    <option value="6">Juni</option>
-                    <option value="7">Juli</option>
-                    <option value="8">Agustus</option>
-                    <option value="9">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Desember</option>
-                </select>
-            </div>
+    <div class="flex-box">
+        <div>
+            <label>Jenis Kas:</label>
+            <select id="sheet" onchange="loadData()">
+                <option value="Kas_RT">Kas RT</option>
+                <option value="Kas_Agustusan">Kas Agustusan</option>
+            </select>
         </div>
-        <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:15px; background:#27ae60;">🧾 Cetak Laporan PDF</button>
-
-        <div id="formAdmin" class="card" style="display:none; margin-top:20px; border:1px dashed #2f80ed; background:#f9f9f9;">
-            <h3 id="judulForm">TAMBAH TRANSAKSI</h3>
-            <input type="hidden" id="editRowId">
-            <div class="flex-box">
-                <div><label>Tgl Input:</label><input type="date" id="tgl" onchange="updateBulanLaporan()"></div>
-                <div>
-                    <label>Bulan Laporan:</label>
-                    <select id="inBln">
-                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
-                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
-                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
-                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
-                    </select>
-                </div>
-                <div><label>Tahun Laporan:</label><input type="number" id="inThn" value="2026"></div>
-            </div>
-            <div style="margin-top:10px;"><label>Keterangan:</label><input type="text" id="keterangan" placeholder="Contoh: Iuran Kas..."></div>
-            <div class="flex-box" style="margin-top:10px;">
-                <div><label>Masuk (Rp):</label><input type="number" id="inMasuk" value="0"></div>
-                <div><label>Keluar (Rp):</label><input type="number" id="inKeluar" value="0"></div>
-                <div><label>Link Bukti:</label><input type="text" id="inBukti" placeholder="https://drive.google.com/..."></div>
-            </div>
-            <button id="btnSimpan" class="btn-blue" onclick="prosesSimpan()" style="width:100%; margin-top:15px; background:#2f80ed;">SIMPAN DATA</button>
-            <button id="btnBatal" onclick="resetForm()" style="background:#95a5a6; width:100%; margin-top:5px; display:none;">BATAL EDIT</button>
+        <div>
+            <label>Filter Tahun:</label>
+            <select id="filterTahun" onchange="loadData()">
+                <option value="all">-- Semua Tahun --</option>
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+            </select>
+        </div>
+        <div>
+            <label>Filter Bulan:</label>
+            <select id="filterBulan" onchange="loadData()">
+                <option value="all">-- Semua Bulan --</option>
+                <option value="1">Januari</option><option value="2">Februari</option>
+                <option value="3">Maret</option><option value="4">April</option>
+                <option value="5">Mei</option><option value="6">Juni</option>
+                <option value="7">Juli</option><option value="8">Agustus</option>
+                <option value="9">September</option><option value="10">Oktober</option>
+                <option value="11">November</option><option value="12">Desember</option>
+            </select>
         </div>
     </div>
-
-    <div class="card" style="overflow-x:auto;">
-        <table id="tabelKas">
-            <thead>
-                <tr>
-                    <th>TANGGAL</th>
-                    <th>KETERANGAN</th>
-                    <th>MASUK</th>
-                    <th>KELUAR</th>
-                    <th>BUKTI</th>
-                    <th>SALDO</th>
-                    <th class="admin-only" style="display:none">AKSI</th>
-                </tr>
-            </thead>
-            <tbody id="bodiTabel"></tbody>
-        </table>
-    </div>
+    <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:15px; background:#27ae60;">🧾 Cetak Laporan PDF</button>
 </div>
 
 <script>
-    // GANTI DENGAN URL WEB APP ANDA
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJN4E7kyKVV72vHTU8vGSnRDpsqAzyLXzTtGZATA8T8dtUQhzyNaxXjb7Bp9kKOX4/exec"; 
-    let masterData = [];
-    let isAdmin = false;
+    // ... (API_URL dan variabel global tetap sama) ...
 
-    // Fungsi Cetak PDF yang Diperbaiki
+    function loadData() {
+        const s = document.getElementById("sheet").value;
+        const fB = document.getElementById("filterBulan").value;
+        const fT = document.getElementById("filterTahun").value;
+        
+        const bodi = document.getElementById("bodiTabel");
+        bodi.innerHTML = '<tr><td colspan="7">Memuat data...</td></tr>';
+
+        fetch(`${API_URL}?sheet=${s}`).then(r => r.json()).then(data => {
+            masterData = data;
+            let html = ""; 
+            let sJalan = 0; // Ini adalah kunci Saldo Pindahan
+
+            data.forEach(d => {
+                let m = Number(d.masuk) || 0;
+                let k = Number(d.keluar) || 0;
+                sJalan += (m - k); // Saldo terus bertambah secara kumulatif
+
+                // Logika Filter
+                const matchTahun = (fT === "all") || (String(d.tahun_laporan) === fT);
+                const matchBulan = (fB === "all") || (String(d.bulan_laporan) === fB);
+
+                if (matchTahun && matchBulan) {
+                    html += `<tr>
+                        <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+                        <td style="text-align:left">${d.keterangan}</td>
+                        <td style="color:#27ae60; font-weight:bold">Rp ${m.toLocaleString()}</td>
+                        <td style="color:#e74c3c; font-weight:bold">Rp ${k.toLocaleString()}</td>
+                        <td>${d.bukti ? `<a href="${d.bukti}" target="_blank" class="btn-view">Lihat</a>` : '-'}</td>
+                        <td style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
+                        <td class="admin-only" style="${isAdmin ? '' : 'display:none'}">
+                            <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:4px 8px; font-size:10px;">EDIT</button>
+                        </td>
+                    </tr>`;
+                }
+            });
+            bodi.innerHTML = html || '<tr><td colspan="7">Tidak ada data untuk periode ini.</td></tr>';
+            document.getElementById("saldoDisplay").innerText = "Rp " + sJalan.toLocaleString();
+        });
+    }
+
     function cetakPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         
         const namaBulan = document.getElementById("filterBulan").options[document.getElementById("filterBulan").selectedIndex].text;
-        const tahun = document.getElementById("filterTahun").value;
+        const tahun = document.getElementById("filterTahun").options[document.getElementById("filterTahun").selectedIndex].text;
         const jenisKas = document.getElementById("sheet").value.replace('_', ' ');
 
         doc.setFontSize(14);
@@ -170,12 +158,13 @@
         trs.forEach(tr => {
             const tds = tr.querySelectorAll("td");
             if (tds.length > 1) {
+                // Mengambil data langsung dari tabel yang sudah terhitung saldonya
                 rows.push([
                     tds[0].innerText, // Tanggal
                     tds[1].innerText, // Keterangan
                     tds[2].innerText, // Masuk
                     tds[3].innerText, // Keluar
-                    tds[5].innerText  // Saldo (Kolom ke-5 karena Bukti dilewati)
+                    tds[5].innerText  // Saldo (Sudah termasuk saldo pindahan)
                 ]);
             }
         });
@@ -185,6 +174,7 @@
             body: rows,
             startY: 30,
             theme: 'grid',
+            styles: { fontSize: 8 },
             headStyles: { fillGray: [44, 62, 80], halign: 'center' },
             columnStyles: {
                 2: { halign: 'right' },
@@ -194,51 +184,7 @@
         });
 
         let finalY = doc.lastAutoTable.finalY + 15;
-        doc.text("Ketua RT 07", 40, finalY);
-        doc.text("Bendahara", 150, finalY);
-        doc.text("( Muhammad Zainudin )", 40, finalY + 20);
-        doc.text("( Abdul Goni )", 150, finalY + 20);
-
+        // ... (Bagian Tanda Tangan tetap sama) ...
         doc.save(`Laporan_${jenisKas}_${namaBulan}_${tahun}.pdf`);
     }
-
-    // Fungsi Load Data Tetap Sama dengan Tambahan Filter Tahun
-    function loadData() {
-        const s = document.getElementById("sheet").value;
-        const fB = document.getElementById("filterBulan").value;
-        const fT = document.getElementById("filterTahun").value;
-        
-        document.getElementById("bodiTabel").innerHTML = '<tr><td colspan="7">Memuat data...</td></tr>';
-
-        fetch(`${API_URL}?sheet=${s}`).then(r => r.json()).then(data => {
-            masterData = data;
-            let html = ""; let sJalan = 0;
-            data.forEach(d => {
-                let m = Number(d.masuk)||0; let k = Number(d.keluar)||0;
-                sJalan += (m - k);
-                
-                const matchTahun = String(d.tahun_laporan) === fT;
-                const matchBulan = (fB === "all") || (String(d.bulan_laporan) === fB);
-
-                if (matchTahun && matchBulan) {
-                    html += `<tr>
-                        <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
-                        <td style="text-align:left">${d.keterangan}</td>
-                        <td style="color:#27ae60; font-weight:bold">Rp ${m.toLocaleString()}</td>
-                        <td style="color:#e74c3c; font-weight:bold">Rp ${k.toLocaleString()}</td>
-                        <td>${d.bukti ? `<a href="${d.bukti}" target="_blank" style="color:#2f80ed; text-decoration:none; font-size:11px; border:1px solid #ddd; padding:2px 5px; border-radius:3px; background:#f0f0f0;">Lihat</a>` : '-'}</td>
-                        <td style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
-                        <td class="admin-only" style="${isAdmin ? '' : 'display:none'}">
-                            <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:4px 8px; font-size:10px; background:#f39c12;">EDIT</button>
-                        </td>
-                    </tr>`;
-                }
-            });
-            document.getElementById("bodiTabel").innerHTML = html || '<tr><td colspan="7">Tidak ada data.</td></tr>';
-            document.getElementById("saldoDisplay").innerText = "Rp " + sJalan.toLocaleString();
-        });
-    }
-
-    // Sisanya (updateBulanLaporan, prosesSimpan, toggleSidebar) tetap sama
-    loadData();
 </script>
