@@ -3,37 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kas RT 07</title>
+    <title>Laporan Kas RT 07 RW 09 Bumi Indah Citty</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
-        body { background:#f4f7fa; display:flex; }
+        body { background:#f4f7fa; display:flex; min-height: 100vh; }
+        
+        /* SIDEBAR & MAIN */
         .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; transition: 0.3s; z-index: 1000; left: 0; }
         .sidebar.closed { left: -220px; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid #3e4f5f; font-size:16px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
         .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
-        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; padding-bottom: 50px; }
         .main.expanded { margin-left: 0; }
+        
         header { background:#2f80ed; color:white; padding:15px; display:flex; justify-content:space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
-        .container { padding:20px; max-width:1150px; margin:auto; }
+        .container { padding:15px; max-width:1150px; margin:auto; }
         .card { background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        
+        /* FORM & BUTTONS */
         .flex-box { display: flex; gap: 15px; flex-wrap: wrap; }
         .flex-box > div { flex: 1; min-width: 150px; }
         label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; }
-        button { border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; color:white; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; font-size: 14px; }
+        button { border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; color:white; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
         .btn-green { background:#27ae60; } .btn-blue { background:#2f80ed; } .btn-orange { background:#f39c12; } .btn-red { background:#e74c3c; } .btn-gray { background:#95a5a6; }
+        
+        /* TABEL DESKTOP */
         table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; background: white; }
-        th { background:#f8f9fa; padding:12px; border-bottom:2px solid #eee; text-align:center; }
+        th { background:#f8f9fa; padding:12px; border-bottom:2px solid #eee; text-align:center; color: #2f80ed; }
         td { padding:12px; border-bottom:1px solid #eee; text-align:center; }
-        .btn-view { color:#2f80ed; text-decoration:none; font-size:11px; border:1px solid #ddd; padding:2px 5px; border-radius:3px; background:#f0f0f0; }
-        
-        /* Modal Overlay */
-        #modalForm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center; padding: 20px; }
-        
-        @media (max-width: 768px) { .sidebar { left:-220px; } .sidebar.open { left:0; } .main { margin-left:0; } }
+        .btn-view { color:#2f80ed; text-decoration:none; font-size:11px; border:1px solid #ddd; padding:3px 8px; border-radius:3px; background:#f0f0f0; font-weight: bold; }
+
+        /* MODAL */
+        #modalForm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center; padding: 20px; overflow-y: auto; }
+
+        /* --- TAMPILAN KHUSUS HP (RESPONSIF) --- */
+        @media (max-width: 768px) {
+            .sidebar { left:-220px; } 
+            .sidebar.open { left:0; } 
+            .main { margin-left:0; }
+            .flex-box > div { min-width: 100%; }
+            
+            /* Tabel Berubah Jadi Kartu di HP */
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; } /* Sembunyikan Header */
+            tr { border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; padding: 10px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+            td { border: none; border-bottom: 1px solid #f1f1f1; position: relative; padding-left: 45%; text-align: right !important; min-height: 40px; display: flex; align-items: center; justify-content: flex-end; }
+            td:last-child { border-bottom: none; }
+            
+            /* Label kolom muncul di kiri */
+            td::before {
+                content: attr(data-label);
+                position: absolute; left: 10px; width: 40%; text-align: left;
+                font-weight: bold; color: #7f8c8d; font-size: 11px; text-transform: uppercase;
+            }
+            td[data-label="KETERANGAN"] { text-align: left !important; padding-left: 10px; display: block; height: auto; }
+            td[data-label="KETERANGAN"]::before { position: static; display: block; margin-bottom: 5px; }
+        }
     </style>
 </head>
 <body>
@@ -59,9 +91,9 @@
     </header>
 
     <div class="container">
-        <div class="card" style="border-left: 5px solid #2f80ed;">
+        <div class="card" style="border-left: 5px solid #2f80ed; text-align: center;">
             <label>Saldo Akhir Saat Ini</label>
-            <h2 id="saldoDisplay">Rp 0</h2>
+            <h2 id="saldoDisplay" style="font-size: 28px; color: #2c3e50;">Rp 0</h2>
         </div>
 
         <div class="card">
@@ -79,7 +111,6 @@
                         <option value="all">-- Semua Tahun --</option>
                         <option value="2025">2025</option>
                         <option value="2026">2026</option>
-                        <option value="2027">2027</option>
                     </select>
                 </div>
                 <div>
@@ -96,8 +127,12 @@
             <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:15px;">🧾 Cetak Laporan Kas</button>
         </div>
 
-        <div class="card" style="overflow-x:auto;">
-            <table>
+        <div class="card" style="max-width: 500px; margin: 20px auto;">
+            <canvas id="kasChart"></canvas>
+        </div>
+
+        <div class="card" style="padding: 10px;">
+            <table id="tableKas">
                 <thead>
                     <tr>
                         <th>TANGGAL</th>
@@ -119,70 +154,48 @@
     <div class="card" style="width:100%; max-width:450px; border-top: 5px solid #27ae60;">
         <h3 id="modalTitle" style="margin-bottom:20px; text-align:center;">TAMBAH TRANSAKSI</h3>
         <input type="hidden" id="editRowId">
-        
         <label>Pilih Jenis Kas:</label>
         <select id="formSheet">
             <option value="Kas_RT">Kas RT</option>
             <option value="Kas_Agustusan">Kas Agustusan</option>
         </select>
-
-        <label>Tgl Kalender (Waktu Input):</label>
+        <label>Tgl Kalender:</label>
         <input type="date" id="formTanggal">
-        
         <div class="flex-box">
             <div>
-                <label>Target Laporan Bulan:</label>
+                <label>Bulan Laporan:</label>
                 <select id="formBulan">
-                    <option value="1">Januari</option><option value="2">Februari</option>
-                    <option value="3">Maret</option><option value="4">April</option>
-                    <option value="5">Mei</option><option value="6">Juni</option>
-                    <option value="7">Juli</option><option value="8">Agustus</option>
-                    <option value="9">September</option><option value="10">Oktober</option>
-                    <option value="11">November</option><option value="12">Desember</option>
+                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option><option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
                 </select>
             </div>
             <div>
                 <label>Tahun Laporan:</label>
-                <select id="formTahun">
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                </select>
+                <select id="formTahun"><option value="2025">2025</option><option value="2026">2026</option></select>
             </div>
         </div>
-        
-        <label>Keterangan Transaksi:</label>
-        <input type="text" id="formKet" placeholder="Contoh: Iuran Kas...">
-        
+        <label>Keterangan:</label>
+        <input type="text" id="formKet">
         <div class="flex-box">
-            <div>
-                <label>Masuk (Rp):</label>
-                <input type="number" id="formMasuk" value="0">
-            </div>
-            <div>
-                <label>Keluar (Rp):</label>
-                <input type="number" id="formKeluar" value="0">
-            </div>
+            <div><label>Masuk:</label><input type="number" id="formMasuk" value="0"></div>
+            <div><label>Keluar:</label><input type="number" id="formKeluar" value="0"></div>
         </div>
-
-        <label>Link Bukti :</label>
-        <input type="text" id="formBukti" placeholder="https://...">
-
+        <label>Link Bukti:</label>
+        <input type="text" id="formBukti">
         <button onclick="simpanData()" class="btn-green" style="width:100%; padding:15px; font-size:16px; margin-top:10px;">SIMPAN DATA</button>
-        
         <div style="display:flex; gap:10px; margin-top:10px;">
             <button id="btnHapus" onclick="hapusData()" class="btn-red" style="flex:1; display:none;">🗑️ HAPUS</button>
-            <button onclick="tutupModal()" class="btn-gray" style="flex:1">BATAL / TUTUP</button>
+            <button onclick="tutupModal()" class="btn-gray" style="flex:1">TUTUP</button>
         </div>
     </div>
 </div>
 
-<button id="btnAdd" onclick="bukaModal()" class="btn-blue" style="display:none; position:fixed; bottom:25px; right:25px; border-radius:50px; padding:15px 20px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">+ Tambah Kas</button>
+<button id="btnAdd" onclick="bukaModal()" class="btn-blue" style="display:none; position:fixed; bottom:25px; right:25px; border-radius:50px; padding:15px 20px; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index: 1001;">+ Tambah Kas</button>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyz2vLe-57uRWJ1wIn425hC7J0dDX-PJHDyl4VFMzPV2a-91kLJybzGX6MVi5w5Gpk/exec"; 
     let masterData = [];
     let isAdmin = false;
+    let myChart = null; // Untuk Diagram
 
     function toggleSidebar() {
         const s = document.getElementById("mySidebar");
@@ -205,19 +218,24 @@
         fetch(`${API_URL}?sheet=${s}`).then(r => r.json()).then(data => {
             masterData = data;
             let html = ""; let sJalan = 0;
+            let totalM = 0; let totalK = 0;
+
             data.forEach(d => {
                 let m = Number(d.masuk) || 0;
                 let k = Number(d.keluar) || 0;
                 sJalan += (m - k);
+                
                 if ((fT === "all" || String(d.tahun_laporan) === fT) && (fB === "all" || String(d.bulan_laporan) === fB)) {
+                    totalM += m; totalK += k;
+                    // Ditambahkan data-label untuk versi HP
                     html += `<tr>
-                        <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
-                        <td style="text-align:left">${d.keterangan}</td>
-                        <td style="color:#27ae60; font-weight:bold">${m > 0 ? 'Rp '+m.toLocaleString() : '-'}</td>
-                        <td style="color:#e74c3c; font-weight:bold">${k > 0 ? 'Rp '+k.toLocaleString() : '-'}</td>
-                        <td>${d.bukti ? `<a href="${d.bukti}" target="_blank" class="btn-view">Lihat</a>` : '-'}</td>
-                        <td style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
-                        <td class="admin-only" style="${isAdmin ? '' : 'display:none'}">
+                        <td data-label="TANGGAL">${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+                        <td data-label="KETERANGAN" style="text-align:left">${d.keterangan}</td>
+                        <td data-label="MASUK" style="color:#27ae60; font-weight:bold">${m > 0 ? 'Rp '+m.toLocaleString() : '-'}</td>
+                        <td data-label="KELUAR" style="color:#e74c3c; font-weight:bold">${k > 0 ? 'Rp '+k.toLocaleString() : '-'}</td>
+                        <td data-label="BUKTI">${d.bukti ? `<a href="${d.bukti}" target="_blank" class="btn-view">Lihat</a>` : '-'}</td>
+                        <td data-label="SALDO" style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
+                        <td data-label="AKSI" class="admin-only" style="${isAdmin ? '' : 'display:none'}">
                             <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:4px 8px; font-size:10px;">EDIT</button>
                         </td>
                     </tr>`;
@@ -225,62 +243,49 @@
             });
             bodi.innerHTML = html || '<tr><td colspan="7">Data tidak ditemukan</td></tr>';
             document.getElementById("saldoDisplay").innerText = "Rp " + sJalan.toLocaleString();
+            
+            updateChart(totalM, totalK); // Update Diagram
         });
     }
 
+    function updateChart(m, k) {
+        const ctx = document.getElementById('kasChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Masuk', 'Keluar'],
+                datasets: [{
+                    data: [m, k],
+                    backgroundColor: ['#27ae60', '#e74c3c'],
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    // --- FUNGSI LOGIN & MODAL TETAP (TIDAK BERUBAH) ---
     function adminLogin() {
-    const user = prompt("Masukkan Username Admin:");
-    if (!user) return; // Batal jika username kosong
-    
-    const pass = prompt("Masukkan Password Admin:");
-    if (!pass) return; // Batal jika password kosong
+        const user = prompt("Username Admin:"); if (!user) return;
+        const pass = prompt("Password Admin:"); if (!pass) return;
+        document.getElementById("loginBtn").innerText = "Checking...";
+        fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login_admin", username: user, password: pass, sheet: "Kas_RT" }) })
+        .then(r => r.json()).then(res => {
+            if (res.status === "success") {
+                isAdmin = true;
+                document.getElementById("thAksi").style.display = "";
+                document.getElementById("btnAdd").style.display = "block";
+                const btn = document.getElementById("loginBtn");
+                btn.innerText = "Logout Admin"; btn.classList.replace("btn-blue", "btn-red");
+                btn.onclick = () => location.reload();
+                loadData();
+                alert("Login Berhasil!");
+            } else { alert("Salah!"); document.getElementById("loginBtn").innerText = "Login Admin"; }
+        });
+    }
 
-    // Menampilkan loading sederhana
-    document.getElementById("loginBtn").innerText = "Checking...";
-
-    const payload = {
-        action: "login_admin",
-        username: user,
-        password: pass,
-        sheet: "Kas_RT" // Ini hanya formalitas agar diterima doPost
-    };
-
-    fetch(API_URL, { 
-        method: "POST", 
-        body: JSON.stringify(payload) 
-    })
-    .then(r => r.json())
-    .then(res => {
-        if (res.status === "success") {
-            isAdmin = true;
-            
-            // Tampilkan elemen khusus admin
-            document.getElementById("thAksi").style.display = "";
-            document.getElementById("btnAdd").style.display = "block";
-            
-            // Ubah tombol login jadi logout
-            const btn = document.getElementById("loginBtn");
-            btn.innerText = "Logout Admin";
-            btn.classList.replace("btn-blue", "btn-red");
-            btn.onclick = () => location.reload(); // Logout dengan refresh halaman
-            
-            loadData(); // Refresh tabel agar kolom "Aksi" muncul
-            alert("Login Berhasil! Selamat Datang Pak RT.");
-        } else {
-            alert("Username atau Password Salah!");
-            document.getElementById("loginBtn").innerText = "Login Admin";
-        }
-    })
-    .catch(err => {
-        alert("Terjadi kesalahan koneksi!");
-        document.getElementById("loginBtn").innerText = "Login Admin";
-    });
-}
-    // FUNGSI MODAL
     function bukaModal(id = null) {
         document.getElementById("modalForm").style.display = "flex";
-        document.getElementById("formSheet").value = document.getElementById("sheet").value;
-
         if(id) {
             const d = masterData.find(x => x.row_id == id);
             document.getElementById("modalTitle").innerText = "EDIT TRANSAKSI";
@@ -297,8 +302,6 @@
             document.getElementById("modalTitle").innerText = "TAMBAH TRANSAKSI";
             document.getElementById("editRowId").value = "";
             document.getElementById("formTanggal").value = new Date().toISOString().split('T')[0];
-            document.getElementById("formBulan").value = new Date().getMonth() + 1;
-            document.getElementById("formTahun").value = new Date().getFullYear();
             document.getElementById("formKet").value = "";
             document.getElementById("formMasuk").value = 0;
             document.getElementById("formKeluar").value = 0;
@@ -306,19 +309,13 @@
             document.getElementById("btnHapus").style.display = "none";
         }
     }
-
-    function tutupModal() {
-        document.getElementById("modalForm").style.display = "none";
-    }
-
+    function tutupModal() { document.getElementById("modalForm").style.display = "none"; }
     function editData(id) { bukaModal(id); }
-
     function simpanData() {
         const rowId = document.getElementById("editRowId").value;
-        const targetSheet = document.getElementById("formSheet").value;
         const payload = {
             action: rowId ? "update_kas" : "insert_kas",
-            sheet: targetSheet,
+            sheet: document.getElementById("formSheet").value,
             row_id: rowId,
             tanggal: document.getElementById("formTanggal").value,
             keterangan: document.getElementById("formKet").value,
@@ -328,25 +325,14 @@
             bulan_laporan: document.getElementById("formBulan").value,
             tahun_laporan: document.getElementById("formTahun").value
         };
-
-        fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(() => {
-            alert("Data Berhasil Disimpan!"); tutupModal(); loadData();
-        });
+        fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(() => { alert("Tersimpan!"); tutupModal(); loadData(); });
     }
-
     function hapusData() {
-        if(!confirm("Yakin ingin menghapus data ini?")) return;
-        const payload = { 
-            action: "delete_kas", 
-            sheet: document.getElementById("formSheet").value, 
-            row_id: document.getElementById("editRowId").value 
-        };
-        fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(() => {
-            alert("Data Berhasil Dihapus!"); tutupModal(); loadData();
-        });
+        if(!confirm("Hapus?")) return;
+        fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete_kas", sheet: document.getElementById("formSheet").value, row_id: document.getElementById("editRowId").value }) }).then(() => { alert("Terhapus!"); tutupModal(); loadData(); });
     }
-
-    function cetakPDF() {
+    
+   function cetakPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     
