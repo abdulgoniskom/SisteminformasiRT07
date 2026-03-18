@@ -116,38 +116,56 @@
 </div>
 
 <div id="modalForm">
-    <div class="card" style="width:100%; max-width:450px;">
-        <h3 id="modalTitle" style="margin-bottom:15px;">Form Data Kas</h3>
+    <div class="card" style="width:100%; max-width:450px; border-top: 5px solid #27ae60;">
+        <h3 id="modalTitle" style="margin-bottom:20px; text-align:center;">TAMBAH TRANSAKSI</h3>
         <input type="hidden" id="editRowId">
         
-        <label>Tanggal:</label>
-        <input type="date" id="formTanggal" style="margin-bottom:10px;">
+        <label>Pilih Jenis Kas:</label>
+        <select id="formSheet" style="margin-bottom:15px; background: #f9f9f9;">
+            <option value="Kas_RT">Kas RT</option>
+            <option value="Kas_Agustusan">Kas Agustusan</option>
+        </select>
+
+        <label>Tgl Kalender (Waktu Input):</label>
+        <input type="date" id="formTanggal" style="margin-bottom:15px; background: #eeeeee;">
         
-        <label>Keterangan:</label>
-        <input type="text" id="formKet" placeholder="Masukkan keterangan..." style="margin-bottom:10px;">
-        
-        <div class="flex-box" style="margin-bottom:10px;">
+        <div class="flex-box" style="margin-bottom:15px;">
             <div>
-                <label>Masuk (Rp):</label>
-                <input type="number" id="formMasuk" value="0">
+                <label>Target Laporan Bulan:</label>
+                <select id="formBulan">
+                    <option value="1">Januari</option><option value="2">Februari</option>
+                    <option value="3">Maret</option><option value="4">April</option>
+                    <option value="5">Mei</option><option value="6">Juni</option>
+                    <option value="7">Juli</option><option value="8">Agustus</option>
+                    <option value="9">September</option><option value="10">Oktober</option>
+                    <option value="11">November</option><option value="12">Desember</option>
+                </select>
             </div>
             <div>
-                <label>Keluar (Rp):</label>
-                <input type="number" id="formKeluar" value="0">
+                <label>Tahun Laporan:</label>
+                <select id="formTahun">
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
             </div>
         </div>
+        
+        <label>Keterangan Transaksi:</label>
+        <input type="text" id="formKet" placeholder="Contoh: Iuran Kas Bulan..." style="margin-bottom:15px;">
+        
+        <label>Masuk (Rp):</label>
+        <input type="number" id="formMasuk" value="0" style="margin-bottom:15px;">
 
-        <label>Link Bukti:</label>
-        <input type="text" id="formBukti" placeholder="Link G-Drive atau Foto" style="margin-bottom:15px;">
+        <label>Keluar (Rp):</label>
+        <input type="number" id="formKeluar" value="0" style="margin-bottom:20px;">
 
-        <div style="display:flex; gap:10px;">
-            <button onclick="simpanData()" class="btn-blue" style="flex:1">💾 Simpan</button>
-            <button onclick="tutupModal()" class="btn-red" style="flex:1">Batal</button>
-        </div>
-        <button id="btnHapus" onclick="hapusData()" class="btn-red" style="width:100%; margin-top:10px; display:none;">🗑️ Hapus Data</button>
+        <button onclick="simpanData()" class="btn-green" style="width:100%; padding:15px; font-size:16px;">SIMPAN DATA</button>
+        <button onclick="tutupModal()" style="width:100%; margin-top:10px; background:none; color:#666; font-size:12px;">Batal / Tutup</button>
+        <button id="btnHapus" onclick="hapusData()" class="btn-red" style="width:100%; margin-top:10px; display:none;">🗑️ HAPUS DATA</button>
     </div>
 </div>
-
+    
 <button id="btnAdd" onclick="bukaModal()" class="btn-blue" style="display:none; position:fixed; bottom:25px; right:25px; border-radius:50px; padding:15px 20px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">+ Tambah Kas</button>
 
 <script>
@@ -216,49 +234,110 @@
     }
 
     function bukaModal(id = null) {
-        document.getElementById("modalForm").style.display = "flex";
-        if(id) {
-            const d = masterData.find(x => x.row_id == id);
-            document.getElementById("modalTitle").innerText = "Edit Data Kas";
-            document.getElementById("editRowId").value = id;
-            document.getElementById("formTanggal").value = new Date(d.tanggal).toISOString().split('T')[0];
-            document.getElementById("formKet").value = d.keterangan;
-            document.getElementById("formMasuk").value = d.masuk;
-            document.getElementById("formKeluar").value = d.keluar;
-            document.getElementById("formBukti").value = d.bukti || "";
-            document.getElementById("btnHapus").style.display = "block";
-        } else {
-            document.getElementById("modalTitle").innerText = "Tambah Data Kas";
-            document.getElementById("editRowId").value = "";
-            document.getElementById("formTanggal").value = new Date().toISOString().split('T')[0];
-            document.getElementById("formKet").value = ""; document.getElementById("formMasuk").value = 0;
-            document.getElementById("formKeluar").value = 0; document.getElementById("formBukti").value = "";
-            document.getElementById("btnHapus").style.display = "none";
-        }
+    document.getElementById("modalForm").style.display = "flex";
+    const currentSheet = document.getElementById("sheet").value;
+    document.getElementById("formSheet").value = currentSheet; // Set otomatis sesuai filter aktif
+
+    if(id) {
+        const d = masterData.find(x => x.row_id == id);
+        document.getElementById("modalTitle").innerText = "EDIT TRANSAKSI";
+        document.getElementById("editRowId").value = id;
+        document.getElementById("formTanggal").value = new Date(d.tanggal).toISOString().split('T')[0];
+        document.getElementById("formBulan").value = d.bulan_laporan;
+        document.getElementById("formTahun").value = d.tahun_laporan;
+        document.getElementById("formKet").value = d.keterangan;
+        document.getElementById("formMasuk").value = d.masuk;
+        document.getElementById("formKeluar").value = d.keluar;
+        document.getElementById("btnHapus").style.display = "block";
+    } else {
+        document.getElementById("modalTitle").innerText = "TAMBAH TRANSAKSI";
+        document.getElementById("editRowId").value = "";
+        document.getElementById("formTanggal").value = new Date().toISOString().split('T')[0];
+        document.getElementById("formBulan").value = new Date().getMonth() + 1;
+        document.getElementById("formTahun").value = new Date().getFullYear();
+        document.getElementById("formKet").value = "";
+        document.getElementById("formMasuk").value = 0;
+        document.getElementById("formKeluar").value = 0;
+        document.getElementById("btnHapus").style.display = "none";
     }
+}
 
-    function tutupModal() { document.getElementById("modalForm").style.display = "none"; }
+function simpanData() {
+    const rowId = document.getElementById("editRowId").value;
+    const targetSheet = document.getElementById("formSheet").value;
+    
+    const payload = {
+        action: rowId ? "update_kas" : "insert_kas",
+        sheet: targetSheet,
+        row_id: rowId,
+        tanggal: document.getElementById("formTanggal").value,
+        keterangan: document.getElementById("formKet").value,
+        masuk: document.getElementById("formMasuk").value,
+        keluar: document.getElementById("formKeluar").value,
+        bukti: "", // Bisa ditambah input link bukti jika perlu
+        bulan_laporan: document.getElementById("formBulan").value,
+        tahun_laporan: document.getElementById("formTahun").value
+    };
 
-    function simpanData() {
-        const rowId = document.getElementById("editRowId").value;
-        const tgl = document.getElementById("formTanggal").value;
-        const payload = {
-            action: rowId ? "update_kas" : "insert_kas",
-            sheet: document.getElementById("sheet").value,
-            row_id: rowId,
-            tanggal: tgl,
-            keterangan: document.getElementById("formKet").value,
-            masuk: document.getElementById("formMasuk").value,
-            keluar: document.getElementById("formKeluar").value,
-            bukti: document.getElementById("formBukti").value,
-            bulan_laporan: new Date(tgl).getMonth() + 1,
-            tahun_laporan: new Date(tgl).getFullYear()
-        };
-        fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(() => {
-            alert("Data Berhasil Disimpan!"); tutupModal(); loadData();
-        });
+    fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(() => {
+        alert("Data Berhasil Disimpan ke " + targetSheet.replace('_', ' ') + "!");
+        tutupModal();
+        loadData(); // Refresh tabel
+    });
+}function bukaModal(id = null) {
+    document.getElementById("modalForm").style.display = "flex";
+    const currentSheet = document.getElementById("sheet").value;
+    document.getElementById("formSheet").value = currentSheet; // Set otomatis sesuai filter aktif
+
+    if(id) {
+        const d = masterData.find(x => x.row_id == id);
+        document.getElementById("modalTitle").innerText = "EDIT TRANSAKSI";
+        document.getElementById("editRowId").value = id;
+        document.getElementById("formTanggal").value = new Date(d.tanggal).toISOString().split('T')[0];
+        document.getElementById("formBulan").value = d.bulan_laporan;
+        document.getElementById("formTahun").value = d.tahun_laporan;
+        document.getElementById("formKet").value = d.keterangan;
+        document.getElementById("formMasuk").value = d.masuk;
+        document.getElementById("formKeluar").value = d.keluar;
+        document.getElementById("btnHapus").style.display = "block";
+    } else {
+        document.getElementById("modalTitle").innerText = "TAMBAH TRANSAKSI";
+        document.getElementById("editRowId").value = "";
+        document.getElementById("formTanggal").value = new Date().toISOString().split('T')[0];
+        document.getElementById("formBulan").value = new Date().getMonth() + 1;
+        document.getElementById("formTahun").value = new Date().getFullYear();
+        document.getElementById("formKet").value = "";
+        document.getElementById("formMasuk").value = 0;
+        document.getElementById("formKeluar").value = 0;
+        document.getElementById("btnHapus").style.display = "none";
     }
+}
 
+function simpanData() {
+    const rowId = document.getElementById("editRowId").value;
+    const targetSheet = document.getElementById("formSheet").value;
+    
+    const payload = {
+        action: rowId ? "update_kas" : "insert_kas",
+        sheet: targetSheet,
+        row_id: rowId,
+        tanggal: document.getElementById("formTanggal").value,
+        keterangan: document.getElementById("formKet").value,
+        masuk: document.getElementById("formMasuk").value,
+        keluar: document.getElementById("formKeluar").value,
+        bukti: "", // Bisa ditambah input link bukti jika perlu
+        bulan_laporan: document.getElementById("formBulan").value,
+        tahun_laporan: document.getElementById("formTahun").value
+    };
+
+    fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(() => {
+        alert("Data Berhasil Disimpan ke " + targetSheet.replace('_', ' ') + "!");
+        tutupModal();
+        loadData(); // Refresh tabel
+    });
+}
     function hapusData() {
         if(!confirm("Hapus data ini?")) return;
         const payload = { 
