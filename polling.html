@@ -35,6 +35,7 @@
 
         h2 { font-size: 1.2rem; color: var(--text); margin-bottom: 25px; line-height: 1.4; }
 
+        /* Tombol Vote */
         .btn-vote { 
             display: block; 
             width: 100%; 
@@ -48,49 +49,40 @@
             cursor: pointer; 
             transition: 0.3s; 
         }
-
         .btn-setuju { color: var(--success); border-color: var(--success); }
         .btn-setuju:hover { background: var(--success); color: white; }
-
         .btn-tidak { color: var(--danger); border-color: var(--danger); }
         .btn-tidak:hover { background: var(--danger); color: white; }
 
+        /* Hasil Grafik */
         .result-box { margin-top: 25px; text-align: left; display: none; }
         .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
-        
         .bar-bg { background: #dfe6e9; border-radius: 50px; height: 14px; margin-bottom: 20px; overflow: hidden; }
         .bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.1, 0.5, 0.5, 1); }
-        
         .bg-setuju { background: var(--success); }
         .bg-tidak { background: var(--danger); }
 
         .voted-badge { 
-            background: #f1f2f6; 
-            color: #7f8c8d; 
-            padding: 8px; 
-            border-radius: 8px; 
-            font-size: 12px; 
-            display: inline-block;
-            margin-top: 15px;
+            background: #f1f2f6; color: #7f8c8d; padding: 8px; border-radius: 8px; 
+            font-size: 12px; display: inline-block; margin-top: 15px;
         }
 
         /* Modal Admin */
         .modal-admin {
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.8); 
-            z-index: 1000;
+            display: none; position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;
         }
         .modal-content {
-            background: white; 
-            width: 85%; 
-            max-width: 350px; 
-            margin: 100px auto; 
-            padding: 25px; 
-            border-radius: 15px; 
-            text-align: center;
+            background: white; width: 85%; max-width: 380px; 
+            margin: 80px auto; padding: 25px; border-radius: 15px; text-align: center;
+        }
+        input, textarea { 
+            width: 100%; padding: 12px; margin: 10px 0; 
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; 
+        }
+        .btn-admin { 
+            width: 100%; padding: 12px; border: none; border-radius: 8px; 
+            font-weight: bold; cursor: pointer; margin-top: 10px; 
         }
     </style>
 </head>
@@ -99,7 +91,7 @@
 <div class="card">
     <div id="poll-area">
         <h2 id="topikRapat">Memuat Topik Polling...</h2>
-        <div id="tombol-pilihan">
+        <div id="tombol-pilihan" style="display:none;">
             <button class="btn-vote btn-setuju" onclick="prosesVote('setuju')">👍 SETUJU</button>
             <button class="btn-vote btn-tidak" onclick="prosesVote('tidak')">👎 TIDAK SETUJU</button>
         </div>
@@ -107,46 +99,46 @@
 
     <div id="result-area" class="result-box">
         <h3 style="font-size: 16px; text-align: center;">Hasil Polling Saat Ini</h3>
-        
-        <div class="info-row">
-            <span>Setuju</span>
-            <span id="txtSetuju">0 Suara (0%)</span>
-        </div>
+        <div class="info-row"><span>Setuju</span><span id="txtSetuju">0 Suara</span></div>
         <div class="bar-bg"><div id="barSetuju" class="bar-fill bg-setuju"></div></div>
-
-        <div class="info-row">
-            <span>Tidak Setuju</span>
-            <span id="txtTidak">0 Suara (0%)</span>
-        </div>
+        <div class="info-row"><span>Tidak Setuju</span><span id="txtTidak">0 Suara</span></div>
         <div class="bar-bg"><div id="barTidak" class="bar-fill bg-tidak"></div></div>
-
-        <div style="text-align:center">
-            <span class="voted-badge">✅ Anda sudah memberikan suara</span>
-        </div>
+        <div style="text-align:center"><span class="voted-badge">✅ Suara Anda sudah masuk</span></div>
     </div>
 </div>
 
-<div style="margin-top: 25px;">
-    <button onclick="bukaModalLogin()" style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 11px;">⚙️ Admin Sistem</button>
+<div style="margin-top: 30px;">
+    <button onclick="bukaModal()" style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 11px;">⚙️ Panel Admin RT 07</button>
 </div>
 
-<div id="modalLogin" class="modal-admin">
+<div id="modalAdmin" class="modal-admin">
     <div class="modal-content">
-        <h3>🔐 Reset Data Polling</h3>
-        <p style="font-size: 13px; color: #666;">Masukkan password admin untuk mengosongkan hasil suara.</p>
-        <input type="password" id="passAdmin" placeholder="Password Admin" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
-        <button onclick="eksekusiReset()" style="width:100%; padding:12px; background:#eb5757; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">⚠️ KOSONGKAN SEKARANG</button>
-        <button onclick="tutupModal()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Batal</button>
+        <h3 id="judulAdmin">🔐 Login Admin Polling</h3>
+        
+        <div id="step-login">
+            <input type="password" id="passAdmin" placeholder="Masukkan Password Admin">
+            <button onclick="cekPassword()" class="btn-admin" style="background:#6c5ce7; color:white;">Masuk</button>
+        </div>
+
+        <div id="step-kontrol" style="display:none;">
+            <p style="text-align:left; font-size:13px; font-weight:bold; margin:0;">Buat Polling Baru:</p>
+            <textarea id="inputTopik" placeholder="Tulis pertanyaan/topik rapat di sini..." rows="3"></textarea>
+            <button onclick="buatPollingBaru()" class="btn-admin" style="background:#27ae60; color:white;">🚀 Terbitkan Polling Baru</button>
+            
+            <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+            
+            <button onclick="resetKosong()" class="btn-admin" style="background:#eb5757; color:white; font-size:12px;">⚠️ Kosongkan & Matikan Polling</button>
+        </div>
+
+        <button onclick="tutupModal()" style="background:none; border:none; color:gray; margin-top:20px; cursor:pointer;">Batal / Tutup</button>
     </div>
 </div>
 
 <script>
-    // URL Web App Apps Script Bapak
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbw2crmFmnv4U9W_K5WavLzejltRgxuSB9SvxANov8JkJUj4jrjvKf_jMssw5X3MXQ8/exec";
+    // URL WEB APP APPS SCRIPT BAPAK
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbz_bvrbxAr3gVduJlLSoFqfnzzswgxm83jSPs-oBztqyhLECu4ctV4Y70QvC4aPU70/exec";
 
-    window.onload = function() {
-        muatData();
-    };
+    window.onload = muatData;
 
     function muatData() {
         fetch(scriptUrl + "?action=read")
@@ -160,34 +152,29 @@
                     document.getElementById('result-area').style.display = 'none';
                     topikElem.style.color = "#ccc";
                     return;
-                } else {
-                    topikElem.style.color = "var(--text)";
                 }
 
-                // Cek pengunci berdasarkan nama topik
-                const historyVote = localStorage.getItem('voted_topik_name');
-                if (historyVote === data.topik) {
+                // Cek apakah HP ini sudah vote untuk topik ini
+                const sudahVote = localStorage.getItem('voted_topik');
+                if (sudahVote === data.topik) {
                     tampilkanGrafik(data);
                 } else {
-                    document.getElementById('poll-area').style.display = 'block';
                     document.getElementById('tombol-pilihan').style.display = 'block';
                     document.getElementById('result-area').style.display = 'none';
+                    topikElem.style.color = "var(--text)";
                 }
-            })
-            .catch(err => {
-                document.getElementById('topikRapat').innerText = "Gagal memuat data.";
             });
     }
 
     function prosesVote(pilihan) {
-        const topikAktif = document.getElementById('topikRapat').innerText;
-        if (confirm(`Anda yakin memilih "${pilihan.toUpperCase()}"?`)) {
-            document.getElementById('tombol-pilihan').innerHTML = "<p style='color:#aaa'>Mengirim suara...</p>";
+        const topikSekarang = document.getElementById('topikRapat').innerText;
+        if (confirm(`Kirim pilihan "${pilihan.toUpperCase()}"?`)) {
+            document.getElementById('tombol-pilihan').innerHTML = "<p style='color:#aaa'>Mengirim...</p>";
             fetch(`${scriptUrl}?action=vote&pilihan=${pilihan}`)
                 .then(res => res.json())
                 .then(res => {
                     alert(res.msg);
-                    localStorage.setItem('voted_topik_name', topikAktif);
+                    localStorage.setItem('voted_topik', topikSekarang);
                     muatData(); 
                 });
         }
@@ -196,41 +183,55 @@
     function tampilkanGrafik(data) {
         document.getElementById('tombol-pilihan').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
-
         const v1 = Number(data.v1) || 0;
         const v2 = Number(data.v2) || 0;
         const total = v1 + v2;
-
         const p1 = total === 0 ? 0 : Math.round((v1 / total) * 100);
         const p2 = total === 0 ? 0 : Math.round((v2 / total) * 100);
-
-        document.getElementById('txtSetuju').innerText = `${v1} Suara (${p1}%)`;
-        document.getElementById('txtTidak').innerText = `${v2} Suara (${p2}%)`;
-
+        document.getElementById('txtSetuju').innerText = `${v1} Orang (${p1}%)`;
+        document.getElementById('txtTidak').innerText = `${v2} Orang (${p2}%)`;
         setTimeout(() => {
             document.getElementById('barSetuju').style.width = p1 + '%';
             document.getElementById('barTidak').style.width = p2 + '%';
         }, 100);
     }
 
-    // --- FUNGSI ADMIN ---
-    function bukaModalLogin() { document.getElementById('modalLogin').style.display = 'block'; }
-    function tutupModal() { document.getElementById('modalLogin').style.display = 'none'; }
+    // --- LOGIKA ADMIN ---
+    function bukaModal() { document.getElementById('modalAdmin').style.display = 'block'; }
+    function tutupModal() { 
+        document.getElementById('modalAdmin').style.display = 'none';
+        document.getElementById('step-login').style.display = 'block';
+        document.getElementById('step-kontrol').style.display = 'none';
+    }
 
-    function eksekusiReset() {
+    function cekPassword() {
         const pass = document.getElementById('passAdmin').value;
-        // Ganti "rahasia123" dengan password admin Bapak di Code.gs
+        // Password harus sama dengan di Code.gs (rahasia123)
         if (pass === "rahasia123") {
-            if (confirm("Hapus semua hasil suara?")) {
-                fetch(scriptUrl + "?action=reset")
-                    .then(res => res.json())
-                    .then(res => {
-                        alert(res.msg);
-                        location.reload();
-                    });
-            }
-        } else {
-            alert("Password Salah!");
+            document.getElementById('step-login').style.display = 'none';
+            document.getElementById('step-kontrol').style.display = 'block';
+            document.getElementById('judulAdmin').innerText = "⚙️ Kendali Polling";
+        } else { alert("Password Salah!"); }
+    }
+
+    function buatPollingBaru() {
+        const topikBaru = document.getElementById('inputTopik').value;
+        if (!topikBaru) return alert("Ketik topiknya dulu, Pak!");
+        if (confirm("Terbitkan topik ini? Skor akan direset ke 0.")) {
+            fetch(scriptUrl, {
+                method: "POST",
+                body: JSON.stringify({ topik: topikBaru })
+            })
+            .then(res => res.json())
+            .then(res => { alert(res.msg); location.reload(); });
+        }
+    }
+
+    function resetKosong() {
+        if (confirm("Kosongkan semua data polling?")) {
+            fetch(scriptUrl + "?action=reset")
+                .then(res => res.json())
+                .then(res => { alert(res.msg); location.reload(); });
         }
     }
 </script>
