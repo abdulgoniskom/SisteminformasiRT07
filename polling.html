@@ -17,6 +17,7 @@
             background: #f0f3f7; 
             margin: 0; 
             display: flex; 
+            flex-direction: column;
             align-items: center; 
             justify-content: center; 
             min-height: 100vh;
@@ -73,8 +74,24 @@
             margin-top: 15px;
         }
 
-        /* Loading sederhana */
-        .loader { font-style: italic; color: #aaa; font-size: 14px; }
+        /* Modal Admin */
+        .modal-admin {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white; 
+            width: 85%; 
+            max-width: 350px; 
+            margin: 100px auto; 
+            padding: 25px; 
+            border-radius: 15px; 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -109,8 +126,22 @@
     </div>
 </div>
 
+<div style="margin-top: 25px;">
+    <button onclick="bukaModalLogin()" style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 11px;">⚙️ Admin Sistem</button>
+</div>
+
+<div id="modalLogin" class="modal-admin">
+    <div class="modal-content">
+        <h3>🔐 Reset Data Polling</h3>
+        <p style="font-size: 13px; color: #666;">Masukkan password admin untuk mengosongkan hasil suara.</p>
+        <input type="password" id="passAdmin" placeholder="Password Admin" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+        <button onclick="eksekusiReset()" style="width:100%; padding:12px; background:#eb5757; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">⚠️ KOSONGKAN SEKARANG</button>
+        <button onclick="tutupModal()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Batal</button>
+    </div>
+</div>
+
 <script>
-    // MASUKKAN URL WEB APP ANDA
+    // URL Web App Apps Script Bapak
     const scriptUrl = "https://script.google.com/macros/s/AKfycbw2crmFmnv4U9W_K5WavLzejltRgxuSB9SvxANov8JkJUj4jrjvKf_jMssw5X3MXQ8/exec";
 
     window.onload = function() {
@@ -124,47 +155,41 @@
                 const topikElem = document.getElementById('topikRapat');
                 topikElem.innerText = data.topik;
                 
-                // 1. Cek apakah polling dikosongkan/reset
                 if (data.topik === "- Belum Ada Polling Aktif -") {
                     document.getElementById('tombol-pilihan').style.display = 'none';
                     document.getElementById('result-area').style.display = 'none';
-                    topikElem.innerHTML = "<span style='color:#ccc'>Belum ada polling aktif</span>";
+                    topikElem.style.color = "#ccc";
                     return;
+                } else {
+                    topikElem.style.color = "var(--text)";
                 }
 
-                // 2. Cek apakah HP ini sudah pernah vote UNTUK TOPIK INI
-                // Kita kunci berdasarkan nama topik
+                // Cek pengunci berdasarkan nama topik
                 const historyVote = localStorage.getItem('voted_topik_name');
-                
                 if (historyVote === data.topik) {
                     tampilkanGrafik(data);
                 } else {
-                    // Jika topik baru, pastikan area pilih muncul
                     document.getElementById('poll-area').style.display = 'block';
                     document.getElementById('tombol-pilihan').style.display = 'block';
                     document.getElementById('result-area').style.display = 'none';
                 }
             })
             .catch(err => {
-                document.getElementById('topikRapat').innerText = "Koneksi terputus...";
+                document.getElementById('topikRapat').innerText = "Gagal memuat data.";
             });
     }
 
     function prosesVote(pilihan) {
         const topikAktif = document.getElementById('topikRapat').innerText;
-
         if (confirm(`Anda yakin memilih "${pilihan.toUpperCase()}"?`)) {
-            document.getElementById('tombol-pilihan').innerHTML = "<p class='loader'>Mengirim suara...</p>";
-            
+            document.getElementById('tombol-pilihan').innerHTML = "<p style='color:#aaa'>Mengirim suara...</p>";
             fetch(`${scriptUrl}?action=vote&pilihan=${pilihan}`)
                 .then(res => res.json())
                 .then(res => {
                     alert(res.msg);
-                    // Simpan nama topik ke localStorage sebagai tanda sudah vote topik ini
                     localStorage.setItem('voted_topik_name', topikAktif);
                     muatData(); 
-                })
-                .catch(err => alert("Gagal mengirim suara. Coba lagi."));
+                });
         }
     }
 
@@ -186,6 +211,27 @@
             document.getElementById('barSetuju').style.width = p1 + '%';
             document.getElementById('barTidak').style.width = p2 + '%';
         }, 100);
+    }
+
+    // --- FUNGSI ADMIN ---
+    function bukaModalLogin() { document.getElementById('modalLogin').style.display = 'block'; }
+    function tutupModal() { document.getElementById('modalLogin').style.display = 'none'; }
+
+    function eksekusiReset() {
+        const pass = document.getElementById('passAdmin').value;
+        // Ganti "rahasia123" dengan password admin Bapak di Code.gs
+        if (pass === "rahasia123") {
+            if (confirm("Hapus semua hasil suara?")) {
+                fetch(scriptUrl + "?action=reset")
+                    .then(res => res.json())
+                    .then(res => {
+                        alert(res.msg);
+                        location.reload();
+                    });
+            }
+        } else {
+            alert("Password Salah!");
+        }
     }
 </script>
 
