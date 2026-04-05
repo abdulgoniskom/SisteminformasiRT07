@@ -5,30 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Undangan Digital RT 07</title>
     <style>
-        body { font-family: 'Segoe UI', serif; background: #f4f7f6; padding: 20px; color: #333; }
-        .container { max-width: 700px; margin: auto; }
+        /* CSS UMUM */
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; margin: 0; }
+        
+        .container { max-width: 800px; margin: auto; }
         
         /* Desain Surat */
-        .surat-box { background: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 15px rgba(0,0,0,0.1); min-height: 800px; position: relative; }
+        .surat-box { 
+            background: white; 
+            padding: 50px; 
+            border: 1px solid #ccc; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.1); 
+            min-height: 29.7cm; /* Standar tinggi A4 */
+            position: relative;
+            width: 100%;
+        }
+
         .kop { text-align: center; border-bottom: 4px double #000; margin-bottom: 25px; padding-bottom: 10px; }
-        .kop h2 { margin: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 22px; }
-        .isi-surat { line-height: 1.8; text-align: justify; font-size: 16px; }
-        .detail-tabel { margin: 25px 0; padding: 15px; background: #fdfdfd; border: 1px dashed #bbb; border-radius: 5px; }
-        .detail-tabel td { padding: 5px 10px; vertical-align: top; }
-        .ttd { margin-top: 60px; text-align: right; margin-right: 40px; }
+        .kop h2 { margin: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 22px; color: #000; }
+        .kop p { margin: 5px 0; font-size: 14px; }
+
+        .isi-surat { line-height: 1.6; text-align: justify; font-size: 16px; }
+        
+        /* Detail Tabel Agar Tidak Terpotong */
+        .detail-tabel { 
+            margin: 25px 0; 
+            padding: 15px; 
+            background: #fdfdfd; 
+            border: 1px dashed #bbb; 
+            border-radius: 5px; 
+        }
+        .detail-tabel table { width: 100%; border-collapse: collapse; }
+        .detail-tabel td { padding: 8px 5px; vertical-align: top; font-size: 16px; }
+        .detail-tabel td:first-child { width: 130px; font-weight: bold; }
+
+        .ttd { margin-top: 50px; text-align: right; padding-right: 50px; }
 
         /* Modals & UI */
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; overflow-y: auto; }
         .admin-card { background:white; width:90%; max-width:480px; margin:40px auto; padding:25px; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        input, select, textarea { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; font-size: 14px; }
+        input, select, textarea { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
         .btn { padding:14px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px; font-size: 15px; }
         .btn-blue { background:#2f80ed; color:white; }
         .btn-green { background:#27ae60; color:white; }
-        
-        @media print { 
-            .no-print { display: none !important; } 
-            body { background:white; padding:0; } 
-            .surat-box { box-shadow:none; border:none; width:100%; padding: 20px; }
+
+        /* ==========================================
+           PENGATURAN KHUSUS CETAK PDF (PRINT)
+           ========================================== */
+        @media print {
+            @page {
+                size: A4;
+                margin: 1.5cm; /* Memberi jarak aman agar tidak terpotong printer */
+            }
+            body { background: white; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+            .surat-box { 
+                box-shadow: none !important; 
+                border: none !important; 
+                padding: 0 !important; 
+                min-height: auto !important; 
+                width: 100% !important;
+            }
+            .kop { border-bottom: 3pt double #000 !important; }
+            /* Mencegah bagian penting terpisah halaman */
+            .detail-tabel, .ttd { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -53,10 +95,10 @@
 
             <div class="detail-tabel">
                 <table>
-                    <tr><td>📅 <b>Hari / Tgl</b></td><td>: <span id="vTgl">...</span></td></tr>
-                    <tr><td>⏰ <b>Waktu</b></td><td>: <span id="vJam">...</span></td></tr>
-                    <tr><td>📍 <b>Tempat</b></td><td>: <span id="vLok">...</span></td></tr>
-                    <tr><td>📝 <b>Acara</b></td><td>: <span id="vAge">...</span></td></tr>
+                    <tr><td>📅 Hari / Tgl</td><td>: <span id="vTgl">...</span></td></tr>
+                    <tr><td>⏰ Waktu</td><td>: <span id="vJam">...</span></td></tr>
+                    <tr><td>📍 Tempat</td><td>: <span id="vLok">...</span></td></tr>
+                    <tr><td>📝 Acara</td><td>: <span id="vAge">...</span></td></tr>
                 </table>
             </div>
 
@@ -67,7 +109,7 @@
         <div class="ttd">
             <p>Hormat kami,<br>Ketua RT 07</p>
             <br><br><br>
-            <p><b>( ........................... )</b></p>
+            <p><b>( Muhammad Zainudin )</b></p>
         </div>
     </div>
 
@@ -98,21 +140,18 @@
             <option value="Tasyakuran">Undangan Tasyakuran</option>
             <option value="Lainnya">Undangan Lainnya</option>
         </select>
-
-        <input type="text" id="inputPerihal" placeholder="Judul Perihal (Contoh: Undangan Rapat Bulanan)">
-        <input type="text" id="inputTgl" placeholder="Hari, Tanggal (Contoh: Minggu, 12 April 2026)">
-        <input type="text" id="inputJam" placeholder="Waktu (Contoh: 19.30 WIB - Selesai)">
+        <input type="text" id="inputPerihal" placeholder="Judul Perihal">
+        <input type="text" id="inputTgl" placeholder="Hari, Tanggal">
+        <input type="text" id="inputJam" placeholder="Waktu">
         <input type="text" id="inputLok" placeholder="Tempat Acara">
-        <textarea id="inputAge" placeholder="Agenda Singkat / Catatan Tambahan" rows="3"></textarea>
-        
+        <textarea id="inputAge" placeholder="Agenda Singkat" rows="3"></textarea>
         <button class="btn btn-blue" onclick="saveData()">🚀 Terbitkan & Update Surat</button>
-        <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer; width:100%;">Keluar / Logout</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer; width:100%;">Keluar</button>
     </div>
 </div>
 
 <script>
-    // GANTI INI DENGAN URL WEB APP ANDA SETELAH DEPLOY!
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbw0Dtf02ehfOShlzXkBmaOVYbyVYILrbREXXnaBG8wtlpNnbtm8qL_z0GcH4977Shc/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbx7pWsJAw6vIvvAIoujlwk-RZz27rPyIfCrbWrMukZcztf0MYSlXFdkRT33seQSKrA/exec";
 
     window.onload = function() {
         document.getElementById('tglSurat').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
@@ -122,9 +161,7 @@
     function muatDataTerbaru() {
         fetch(scriptUrl + "?action=read")
             .then(res => res.json())
-            .then(data => {
-                if(data) updateTampilanSurat(data);
-            })
+            .then(data => { if(data) updateTampilanSurat(data); })
             .catch(err => console.error("Gagal memuat data:", err));
     }
 
@@ -141,23 +178,19 @@
         else if(data.jenis === "Pengajian") teks += "Acara Pengajian Rutin warga yang akan dilaksanakan pada:";
         else if(data.jenis === "Tasyakuran") teks += "Acara Ramah Tamah / Tasyakuran yang akan dilaksanakan pada:";
         else teks += "pertemuan warga yang akan dilaksanakan pada:";
-        
         document.getElementById('vPembuka').innerText = teks;
     }
 
     function doLogin() {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
-
         fetch(`${scriptUrl}?action=login&u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`)
             .then(res => res.json())
             .then(res => {
                 if(res.status === "success") {
                     tutupModal('modalLogin');
                     document.getElementById('modalAdmin').style.display = 'block';
-                } else {
-                    alert("Akses Ditolak! Username atau Password salah.");
-                }
+                } else { alert("Akses Ditolak!"); }
             });
     }
 
@@ -170,19 +203,15 @@
             tempat: document.getElementById('inputLok').value,
             agenda: document.getElementById('inputAge').value
         };
-
-        if(!d.perihal || !d.tanggal) return alert("Mohon isi minimal Perihal dan Tanggal!");
+        if(!d.perihal || !d.tanggal) return alert("Isi minimal Perihal dan Tanggal!");
 
         fetch(scriptUrl + "?action=write", {
             method: "POST",
             body: JSON.stringify(d)
         })
         .then(res => res.json())
-        .then(res => {
-            alert(res.msg);
-            location.reload();
-        })
-        .catch(err => alert("Gagal menyimpan: " + err));
+        .then(res => { alert(res.msg); location.reload(); })
+        .catch(err => alert("Gagal: " + err));
     }
 
     function bukaLogin() { document.getElementById('modalLogin').style.display = 'block'; }
