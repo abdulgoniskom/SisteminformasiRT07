@@ -1,84 +1,164 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Undangan Rapat RT 07</title>
+    <title>Undangan RT 07</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f7; padding: 20px; color: #333; }
-        .surat-container { background: white; max-width: 600px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid #2f80ed; }
+        body { font-family: 'Segoe UI', serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 650px; margin: auto; }
         
-        /* Kop Surat */
-        .kop { text-align: center; border-bottom: 3px double #333; pb-2; margin-bottom: 20px; padding-bottom: 10px; }
-        .kop h2 { margin: 0; font-size: 20px; text-transform: uppercase; }
-        .kop p { margin: 5px 0; font-size: 13px; color: #555; }
+        /* Desain Surat */
+        .surat-box { background: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; min-height: 600px; color: #333; }
+        .kop { text-align: center; border-bottom: 3px double #000; margin-bottom: 20px; padding-bottom: 10px; }
+        .kop h2 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        .isi-surat { line-height: 1.6; text-align: justify; }
+        .detail-tabel { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 5px solid #333; }
+        .ttd { margin-top: 50px; text-align: right; }
 
-        .nomor-surat { font-size: 14px; margin-bottom: 25px; }
-        .isi-surat { line-height: 1.6; font-size: 15px; }
-        
-        .detail-rapat { background: #f8f9fa; padding: 15px; border-left: 4px solid #2f80ed; margin: 20px 0; }
-        .detail-rapat table { width: 100%; border-collapse: collapse; }
-        .detail-rapat td { padding: 5px 0; vertical-align: top; }
-        .label { width: 100px; font-weight: bold; }
+        /* UI Admin */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; }
+        .admin-card { background:white; width:90%; max-width:450px; margin:50px auto; padding:20px; border-radius:10px; }
+        input, select, textarea { width:100%; padding:10px; margin:8px 0; border:1px solid #ddd; border-radius:5px; box-sizing:border-box; }
+        .btn { padding:12px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px; }
+        .btn-blue { background:#2f80ed; color:white; }
+        .btn-print { background:#27ae60; color:white; }
 
-        .penutup { margin-top: 25px; }
-        .tanda-tangan { margin-top: 40px; display: flex; justify-content: flex-end; text-align: center; }
-        .ttd-box { width: 200px; }
-        .space { height: 60px; }
-
-        .btn-print { display: block; width: 100%; max-width: 200px; margin: 20px auto; padding: 10px; background: #2f80ed; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; }
-        
-        @media print {
-            .btn-print, .btn-kembali { display: none; }
-            body { background: white; padding: 0; }
-            .surat-container { box-shadow: none; border: none; width: 100%; }
-        }
+        @media print { .no-print { display: none; } body { background:white; padding:0; } .surat-box { box-shadow:none; border:none; width:100%; } }
     </style>
 </head>
 <body>
 
-<div class="surat-container">
-    <div class="kop">
-        <h2>Rukun Tetangga 07 / RW 09</h2>
-        <p>Perumahan Bumi Indah City, Kelurahan Sukamantri</p>
-        <p>Kecamatan Pasar Kemis, Tangerang - Banten</p>
-    </div>
-
-    <div class="nomor-surat">
-        Nomor: 004/RT07-BIC/IV/2024<br>
-        Lampiran: -<br>
-        Perihal: <b>Undangan Rapat Rutin Warga</b>
-    </div>
-
-    <div class="isi-surat">
-        <p>Kepada Yth,<br><b>Bapak/Ibu Warga RT 07</b><br>Di Tempat</p>
-        
-        <p>Assalamu’alaikum Wr. Wb. Dengan hormat, mengharap kehadiran Bapak/Ibu pada rapat warga yang akan dilaksanakan pada:</p>
-
-        <div class="detail-rapat">
-            <table>
-                <tr><td class="label">Hari / Tgl</td><td>: Sabtu, 13 April 2024</td></tr>
-                <tr><td class="label">Waktu</td><td>: 20.00 WIB s/d Selesai</td></tr>
-                <tr><td class="label">Tempat</td><td>: Balai Warga / Lapangan Fasum RT 07</td></tr>
-                <tr><td class="label">Agenda</td><td>: Pembahasan Keamanan & Persiapan Halal Bihalal</td></tr>
-            </table>
+<div class="container">
+    <div class="surat-box" id="areaCetak">
+        <div class="kop">
+            <h2>Rukun Tetangga 07 / RW 09</h2>
+            <p>Perumahan Bumi Indah City, Tangerang, Banten</p>
         </div>
 
-        <p class="penutup">Demikian undangan ini kami sampaikan, mengingat pentingnya acara tersebut kami sangat mengharapkan kehadiran Bapak/Ibu. Atas perhatiannya kami ucapkan terima kasih.</p>
+        <div class="isi-surat">
+            <p style="text-align: right;">Tangerang, <span id="tglSurat"></span></p>
+            <p>Nomor: 007/RT07/III/2026<br>
+               Perihal: <b id="vPerihal">...</b></p>
+
+            <p>Kepada Yth,<br><b>Bapak/Ibu/Sdr Warga RT 07</b><br>Di Tempat</p>
+
+            <p>Assalamu'alaikum Wr. Wb.</p>
+            <p id="vPembuka">Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara yang akan dilaksanakan pada:</p>
+
+            <div class="detail-tabel">
+                <table>
+                    <tr><td>📅 Hari / Tgl</td><td>: <span id="vTgl">...</span></td></tr>
+                    <tr><td>⏰ Waktu</td><td>: <span id="vJam">...</span></td></tr>
+                    <tr><td>📍 Tempat</td><td>: <span id="vLok">...</span></td></tr>
+                    <tr><td>📝 Acara</td><td>: <span id="vAge">...</span></td></tr>
+                </table>
+            </div>
+
+            <p>Demikian undangan ini kami sampaikan, mengingat pentingnya acara tersebut kami mengharap kehadiran tepat pada waktunya. Atas perhatiannya kami ucapkan terima kasih.</p>
+            <p>Wassalamu'alaikum Wr. Wb.</p>
+        </div>
+
+        <div class="ttd">
+            <p>Hormat kami,<br>Ketua RT 07</p>
+            <br><br><br>
+            <p><b>( ........................... )</b></p>
+        </div>
     </div>
 
-    <div class="tanda-tangan">
-        <div class="ttd-box">
-            Tangerang, 10 April 2024<br>
-            Ketua RT 07,<br>
-            <div class="space"></div>
-            <b>( ........................... )</b>
-        </div>
+    <div class="no-print" style="margin-top:20px; text-align:center;">
+        <button class="btn btn-print" onclick="window.print()">🖨️ Cetak PDF / Kertas</button>
+        <button onclick="bukaLogin()" style="background:none; border:none; color:#aaa; cursor:pointer; margin-top:20px; display:block; width:100%;">⚙️ Login Pengurus RT</button>
     </div>
 </div>
 
-<button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan PDF</button>
-<a href="index.html" style="display:block; text-align:center; color:#7f8c8d; text-decoration:none; font-size:14px;">← Kembali ke Menu</a>
+<div id="modalLogin" class="modal">
+    <div class="admin-card">
+        <h3>🔐 Login Admin</h3>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="btn btn-blue" onclick="doLogin()">Masuk</button>
+        <button onclick="tutupModal('modalLogin')" style="background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Batal</button>
+    </div>
+</div>
+
+<div id="modalAdmin" class="modal">
+    <div class="admin-card" style="max-width:500px;">
+        <h3>📝 Buat Undangan Baru</h3>
+        <label>Pilih Template Undangan:</label>
+        <select id="inputJenis">
+            <option value="Rapat Warga">Rapat Warga</option>
+            <option value="Kerja Bakti">Kerja Bakti</option>
+            <option value="Pengajian">Pengajian</option>
+            <option value="Tasyakuran">Tasyakuran</option>
+            <option value="Lainnya">Lainnya / Umum</option>
+        </select>
+
+        <input type="text" id="inputPerihal" placeholder="Judul Undangan (Contoh: Undangan Rapat Bulanan)">
+        <input type="text" id="inputTgl" placeholder="Hari, Tanggal (Contoh: Minggu, 12 April 2026)">
+        <input type="text" id="inputJam" placeholder="Waktu (Contoh: 08.00 WIB - Selesai)">
+        <input type="text" id="inputLok" placeholder="Tempat Acara">
+        <textarea id="inputAge" placeholder="Agenda/Catatan" rows="2"></textarea>
+        
+        <button class="btn btn-blue" onclick="saveData()">Update & Terbitkan</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Keluar</button>
+    </div>
+</div>
+
+<script>
+    // LOAD DATA SAAT BUKA
+    window.onload = function() {
+        document.getElementById('tglSurat').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+        google.script.run.withSuccessHandler(data => {
+            if(data) updateTampilanSurat(data);
+        }).getUndanganData();
+    };
+
+    function updateTampilanSurat(data) {
+        document.getElementById('vPerihal').innerText = data.perihal;
+        document.getElementById('vTgl').innerText = data.tanggal;
+        document.getElementById('vJam').innerText = data.waktu;
+        document.getElementById('vLok').innerText = data.tempat;
+        document.getElementById('vAge').innerText = data.agenda;
+
+        // Logika Template Otomatis
+        let teksPembuka = "Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara ";
+        if(data.jenis == "Rapat Warga") teksPembuka += "Musyawarah Rapat Warga yang akan dilaksanakan pada:";
+        else if(data.jenis == "Kerja Bakti") teksPembuka += "Kerja Bakti Sosial lingkungan yang akan dilaksanakan pada:";
+        else if(data.jenis == "Pengajian") teksPembuka += "Pengajian Rutin warga yang akan dilaksanakan pada:";
+        else if(data.jenis == "Tasyakuran") teksPembuka += "Ramah Tamah / Tasyakuran warga yang akan dilaksanakan pada:";
+        else teksPembuka += "pertemuan warga yang akan dilaksanakan pada:";
+        
+        document.getElementById('vPembuka').innerText = teksPembuka;
+    }
+
+    function doLogin() {
+        google.script.run.withSuccessHandler(res => {
+            if(res) {
+                tutupModal('modalLogin');
+                document.getElementById('modalAdmin').style.display = 'block';
+            } else alert("Akses Ditolak!");
+        }).checkLogin(document.getElementById('user').value, document.getElementById('pass').value);
+    }
+
+    function saveData() {
+        const d = {
+            jenis: document.getElementById('inputJenis').value,
+            perihal: document.getElementById('inputPerihal').value,
+            tanggal: document.getElementById('inputTgl').value,
+            waktu: document.getElementById('inputJam').value,
+            tempat: document.getElementById('inputLok').value,
+            agenda: document.getElementById('inputAge').value
+        };
+        google.script.run.withSuccessHandler(msg => {
+            alert(msg);
+            location.reload();
+        }).simpanUndangan(d);
+    }
+
+    function bukaLogin() { document.getElementById('modalLogin').style.display = 'block'; }
+    function tutupModal(id) { document.getElementById(id).style.display = 'none'; }
+</script>
 
 </body>
 </html>
