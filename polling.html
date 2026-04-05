@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polling RT 07</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 20px; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { font-size: 18px; color: #2c3e50; margin-bottom: 20px; }
+        .btn-vote { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #6c5ce7; border-radius: 10px; background: none; color: #6c5ce7; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-vote:hover { background: #6c5ce7; color: white; }
+        
+        /* Progress Bar Hasil */
+        .result-box { margin-top: 30px; text-align: left; display: none; }
+        .bar-container { background: #eee; border-radius: 5px; margin: 5px 0 15px; overflow: hidden; }
+        .bar { height: 20px; background: #6c5ce7; width: 0%; transition: 1s; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="poll-area">
+        <h2 id="question">Memuat Polling...</h2>
+        <button class="btn-vote" id="opt1" onclick="vote(1)">Opsi 1</button>
+        <button class="btn-vote" id="opt2" onclick="vote(2)">Opsi 2</button>
+    </div>
+
+    <div id="result-area" class="result-box">
+        <h3>Hasil Sementara:</h3>
+        <p id="label1"></p>
+        <div class="bar-container"><div id="bar1" class="bar"></div></div>
+        
+        <p id="label2"></p>
+        <div class="bar-container"><div id="bar2" class="bar"></div></div>
+        <p style="font-size: 12px; color: #7f8c8d;">*Suara Anda sudah masuk</p>
+    </div>
+</div>
+
+<script>
+    const webAppUrl = "URL_WEB_APP_GAS_ANDA";
+
+    // Load Data Saat Buka
+    window.onload = function() {
+        google.script.run.withSuccessHandler(data => {
+            document.getElementById('question').innerText = data.q;
+            document.getElementById('opt1').innerText = data.o1;
+            document.getElementById('opt2').innerText = data.o2;
+            window.pollData = data; // Simpan data sementara
+        }).getPollingData();
+    };
+
+    function vote(pilihan) {
+        if(localStorage.getItem('hasVoted')) {
+            alert("Anda sudah melakukan polling sebelumnya.");
+            tampilkanHasil(window.pollData);
+            return;
+        }
+
+        google.script.run.withSuccessHandler(msg => {
+            alert(msg);
+            localStorage.setItem('hasVoted', 'true');
+            location.reload(); // Refresh untuk lihat hasil terbaru
+        }).submitVote(pilihan);
+    }
+
+    function tampilkanHasil(data) {
+        document.getElementById('poll-area').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        
+        const total = data.v1 + data.v2;
+        const p1 = total === 0 ? 0 : Math.round((data.v1 / total) * 100);
+        const p2 = total === 0 ? 0 : Math.round((data.v2 / total) * 100);
+
+        document.getElementById('label1').innerText = `${data.o1}: ${data.v1} suara (${p1}%)`;
+        document.getElementById('bar1').style.width = p1 + '%';
+        
+        document.getElementById('label2').innerText = `${data.o2}: ${data.v2} suara (${p2}%)`;
+        document.getElementById('bar2').style.width = p2 + '%';
+    }
+
+    // Cek jika sudah pernah vote
+    if(localStorage.getItem('hasVoted')) {
+        setTimeout(() => { tampilkanHasil(window.pollData); }, 1000);
+    }
+</script>
+
+</body>
+</html>
