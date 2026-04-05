@@ -34,7 +34,6 @@
 
         h2 { font-size: 1.2rem; color: var(--text); margin-bottom: 25px; line-height: 1.4; }
 
-        /* Tombol Utama */
         .btn-vote { 
             display: block; 
             width: 100%; 
@@ -55,7 +54,6 @@
         .btn-tidak { color: var(--danger); border-color: var(--danger); }
         .btn-tidak:hover { background: var(--danger); color: white; }
 
-        /* Area Hasil & Grafik */
         .result-box { margin-top: 25px; text-align: left; display: none; }
         .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
         
@@ -74,6 +72,9 @@
             display: inline-block;
             margin-top: 15px;
         }
+
+        /* Loading sederhana */
+        .loader { font-style: italic; color: #aaa; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -81,8 +82,10 @@
 <div class="card">
     <div id="poll-area">
         <h2 id="topikRapat">Memuat Topik Polling...</h2>
-        <button class="btn-vote btn-setuju" onclick="prosesVote('setuju')">👍 SETUJU</button>
-        <button class="btn-vote btn-tidak" onclick="prosesVote('tidak setuju')">👎 TIDAK SETUJU</button>
+        <div id="tombol-pilihan">
+            <button class="btn-vote btn-setuju" onclick="prosesVote('setuju')">👍 SETUJU</button>
+            <button class="btn-vote btn-tidak" onclick="prosesVote('tidak')">👎 TIDAK SETUJU</button>
+        </div>
     </div>
 
     <div id="result-area" class="result-box">
@@ -108,7 +111,7 @@
 
 <script>
     // MASUKKAN URL WEB APP ANDA
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbzz9572DLFKJDLcJQDjEw2o9r1tYkMUjxgedKlXr5iV7MuHQrAVCCp16-fJWQhdOio/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbw2crmFmnv4U9W_K5WavLzejltRgxuSB9SvxANov8JkJUj4jrjvKf_jMssw5X3MXQ8/exec";
 
     window.onload = function() {
         muatData();
@@ -118,41 +121,55 @@
         fetch(scriptUrl + "?action=read")
             .then(res => res.json())
             .then(data => {
-                document.getElementById('topikRapat').innerText = data.topik;
+                const topikElem = document.getElementById('topikRapat');
+                topikElem.innerText = data.topik;
                 
-                // Cek apakah HP ini sudah pernah vote
-                if (localStorage.getItem('voted_rt07')) {
+                // 1. Cek apakah polling dikosongkan/reset
+                if (data.topik === "- Belum Ada Polling Aktif -") {
+                    document.getElementById('tombol-pilihan').style.display = 'none';
+                    document.getElementById('result-area').style.display = 'none';
+                    topikElem.innerHTML = "<span style='color:#ccc'>Belum ada polling aktif</span>";
+                    return;
+                }
+
+                // 2. Cek apakah HP ini sudah pernah vote UNTUK TOPIK INI
+                // Kita kunci berdasarkan nama topik
+                const historyVote = localStorage.getItem('voted_topik_name');
+                
+                if (historyVote === data.topik) {
                     tampilkanGrafik(data);
+                } else {
+                    // Jika topik baru, pastikan area pilih muncul
+                    document.getElementById('poll-area').style.display = 'block';
+                    document.getElementById('tombol-pilihan').style.display = 'block';
+                    document.getElementById('result-area').style.display = 'none';
                 }
             })
             .catch(err => {
-                document.getElementById('topikRapat').innerText = "Gagal memuat data rapat.";
+                document.getElementById('topikRapat').innerText = "Koneksi terputus...";
             });
     }
 
     function prosesVote(pilihan) {
-        if (localStorage.getItem('voted_rt07')) {
-            alert("Anda sudah memberikan suara sebelumnya.");
-            return;
-        }
+        const topikAktif = document.getElementById('topikRapat').innerText;
 
         if (confirm(`Anda yakin memilih "${pilihan.toUpperCase()}"?`)) {
-            // Tampilkan loading sederhana
-            document.getElementById('topikRapat').innerText = "Mengirim suara...";
+            document.getElementById('tombol-pilihan').innerHTML = "<p class='loader'>Mengirim suara...</p>";
             
             fetch(`${scriptUrl}?action=vote&pilihan=${pilihan}`)
                 .then(res => res.json())
                 .then(res => {
                     alert(res.msg);
-                    localStorage.setItem('voted_rt07', 'true');
-                    // Ambil data terbaru setelah vote untuk update grafik
+                    // Simpan nama topik ke localStorage sebagai tanda sudah vote topik ini
+                    localStorage.setItem('voted_topik_name', topikAktif);
                     muatData(); 
-                });
+                })
+                .catch(err => alert("Gagal mengirim suara. Coba lagi."));
         }
     }
 
     function tampilkanGrafik(data) {
-        document.getElementById('poll-area').style.display = 'none';
+        document.getElementById('tombol-pilihan').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
 
         const v1 = Number(data.v1) || 0;
@@ -162,11 +179,9 @@
         const p1 = total === 0 ? 0 : Math.round((v1 / total) * 100);
         const p2 = total === 0 ? 0 : Math.round((v2 / total) * 100);
 
-        // Update Teks
         document.getElementById('txtSetuju').innerText = `${v1} Suara (${p1}%)`;
         document.getElementById('txtTidak').innerText = `${v2} Suara (${p2}%)`;
 
-        // Jalankan Animasi Grafik (Sedikit delay agar transisi terlihat)
         setTimeout(() => {
             document.getElementById('barSetuju').style.width = p1 + '%';
             document.getElementById('barTidak').style.width = p2 + '%';
