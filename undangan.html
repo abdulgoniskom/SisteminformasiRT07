@@ -1,30 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Undangan RT 07</title>
+    <title>Undangan Digital RT 07</title>
     <style>
-        body { font-family: 'Segoe UI', serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 650px; margin: auto; }
+        body { font-family: 'Segoe UI', serif; background: #f4f7f6; padding: 20px; color: #333; }
+        .container { max-width: 700px; margin: auto; }
         
         /* Desain Surat */
-        .surat-box { background: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; min-height: 600px; color: #333; }
-        .kop { text-align: center; border-bottom: 3px double #000; margin-bottom: 20px; padding-bottom: 10px; }
-        .kop h2 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        .isi-surat { line-height: 1.6; text-align: justify; }
-        .detail-tabel { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 5px solid #333; }
-        .ttd { margin-top: 50px; text-align: right; }
+        .surat-box { background: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 15px rgba(0,0,0,0.1); min-height: 800px; position: relative; }
+        .kop { text-align: center; border-bottom: 4px double #000; margin-bottom: 25px; padding-bottom: 10px; }
+        .kop h2 { margin: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 22px; }
+        .isi-surat { line-height: 1.8; text-align: justify; font-size: 16px; }
+        .detail-tabel { margin: 25px 0; padding: 15px; background: #fdfdfd; border: 1px dashed #bbb; border-radius: 5px; }
+        .detail-tabel td { padding: 5px 10px; vertical-align: top; }
+        .ttd { margin-top: 60px; text-align: right; margin-right: 40px; }
 
-        /* UI Admin */
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; }
-        .admin-card { background:white; width:90%; max-width:450px; margin:50px auto; padding:20px; border-radius:10px; }
-        input, select, textarea { width:100%; padding:10px; margin:8px 0; border:1px solid #ddd; border-radius:5px; box-sizing:border-box; }
-        .btn { padding:12px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px; }
+        /* Modals & UI */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; overflow-y: auto; }
+        .admin-card { background:white; width:90%; max-width:480px; margin:40px auto; padding:25px; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        input, select, textarea { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; font-size: 14px; }
+        .btn { padding:14px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px; font-size: 15px; }
         .btn-blue { background:#2f80ed; color:white; }
-        .btn-print { background:#27ae60; color:white; }
-
-        @media print { .no-print { display: none; } body { background:white; padding:0; } .surat-box { box-shadow:none; border:none; width:100%; } }
+        .btn-green { background:#27ae60; color:white; }
+        
+        @media print { 
+            .no-print { display: none !important; } 
+            body { background:white; padding:0; } 
+            .surat-box { box-shadow:none; border:none; width:100%; padding: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -39,7 +44,7 @@
         <div class="isi-surat">
             <p style="text-align: right;">Tangerang, <span id="tglSurat"></span></p>
             <p>Nomor: 007/RT07/III/2026<br>
-               Perihal: <b id="vPerihal">...</b></p>
+               Perihal: <b id="vPerihal">Memuat data...</b></p>
 
             <p>Kepada Yth,<br><b>Bapak/Ibu/Sdr Warga RT 07</b><br>Di Tempat</p>
 
@@ -48,14 +53,14 @@
 
             <div class="detail-tabel">
                 <table>
-                    <tr><td>📅 Hari / Tgl</td><td>: <span id="vTgl">...</span></td></tr>
-                    <tr><td>⏰ Waktu</td><td>: <span id="vJam">...</span></td></tr>
-                    <tr><td>📍 Tempat</td><td>: <span id="vLok">...</span></td></tr>
-                    <tr><td>📝 Acara</td><td>: <span id="vAge">...</span></td></tr>
+                    <tr><td>📅 <b>Hari / Tgl</b></td><td>: <span id="vTgl">...</span></td></tr>
+                    <tr><td>⏰ <b>Waktu</b></td><td>: <span id="vJam">...</span></td></tr>
+                    <tr><td>📍 <b>Tempat</b></td><td>: <span id="vLok">...</span></td></tr>
+                    <tr><td>📝 <b>Acara</b></td><td>: <span id="vAge">...</span></td></tr>
                 </table>
             </div>
 
-            <p>Demikian undangan ini kami sampaikan, mengingat pentingnya acara tersebut kami mengharap kehadiran tepat pada waktunya. Atas perhatiannya kami ucapkan terima kasih.</p>
+            <p>Demikian undangan ini kami sampaikan, mengingat pentingnya acara tersebut kami mengharap kehadiran Bapak/Ibu tepat pada waktunya. Atas perhatiannya kami ucapkan terima kasih.</p>
             <p>Wassalamu'alaikum Wr. Wb.</p>
         </div>
 
@@ -66,53 +71,62 @@
         </div>
     </div>
 
-    <div class="no-print" style="margin-top:20px; text-align:center;">
-        <button class="btn btn-print" onclick="window.print()">🖨️ Cetak PDF / Kertas</button>
-        <button onclick="bukaLogin()" style="background:none; border:none; color:#aaa; cursor:pointer; margin-top:20px; display:block; width:100%;">⚙️ Login Pengurus RT</button>
+    <div class="no-print" style="margin-top:20px; text-align:center; padding-bottom: 50px;">
+        <button class="btn btn-green" onclick="window.print()">🖨️ Cetak PDF / Kertas</button>
+        <button onclick="bukaLogin()" style="background:none; border:none; color:#bbb; cursor:pointer; margin-top:25px; font-size: 11px;">⚙️ Akses Admin RT</button>
     </div>
 </div>
 
 <div id="modalLogin" class="modal">
     <div class="admin-card">
-        <h3>🔐 Login Admin</h3>
-        <input type="text" id="user" placeholder="Username">
-        <input type="password" id="pass" placeholder="Password">
+        <h3 style="text-align:center">🔐 Login Admin RT</h3>
+        <input type="text" id="userInput" placeholder="Username">
+        <input type="password" id="passInput" placeholder="Password">
         <button class="btn btn-blue" onclick="doLogin()">Masuk</button>
-        <button onclick="tutupModal('modalLogin')" style="background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Batal</button>
+        <button onclick="tutupModal('modalLogin')" style="background:none; border:none; color:red; margin-top:10px; cursor:pointer; width:100%;">Batal</button>
     </div>
 </div>
 
 <div id="modalAdmin" class="modal">
-    <div class="admin-card" style="max-width:500px;">
-        <h3>📝 Buat Undangan Baru</h3>
-        <label>Pilih Template Undangan:</label>
+    <div class="admin-card">
+        <h3 style="text-align:center">📝 Buat Undangan Baru</h3>
+        <label>Pilih Jenis Undangan:</label>
         <select id="inputJenis">
-            <option value="Rapat Warga">Rapat Warga</option>
-            <option value="Kerja Bakti">Kerja Bakti</option>
-            <option value="Pengajian">Pengajian</option>
-            <option value="Tasyakuran">Tasyakuran</option>
-            <option value="Lainnya">Lainnya / Umum</option>
+            <option value="Rapat Warga">Undangan Rapat Warga</option>
+            <option value="Kerja Bakti">Undangan Kerja Bakti</option>
+            <option value="Pengajian">Undangan Pengajian</option>
+            <option value="Tasyakuran">Undangan Tasyakuran</option>
+            <option value="Lainnya">Undangan Lainnya</option>
         </select>
 
-        <input type="text" id="inputPerihal" placeholder="Judul Undangan (Contoh: Undangan Rapat Bulanan)">
+        <input type="text" id="inputPerihal" placeholder="Judul Perihal (Contoh: Undangan Rapat Bulanan)">
         <input type="text" id="inputTgl" placeholder="Hari, Tanggal (Contoh: Minggu, 12 April 2026)">
-        <input type="text" id="inputJam" placeholder="Waktu (Contoh: 08.00 WIB - Selesai)">
+        <input type="text" id="inputJam" placeholder="Waktu (Contoh: 19.30 WIB - Selesai)">
         <input type="text" id="inputLok" placeholder="Tempat Acara">
-        <textarea id="inputAge" placeholder="Agenda/Catatan" rows="2"></textarea>
+        <textarea id="inputAge" placeholder="Agenda Singkat / Catatan Tambahan" rows="3"></textarea>
         
-        <button class="btn btn-blue" onclick="saveData()">Update & Terbitkan</button>
-        <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Keluar</button>
+        <button class="btn btn-blue" onclick="saveData()">🚀 Terbitkan & Update Surat</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer; width:100%;">Keluar / Logout</button>
     </div>
 </div>
 
 <script>
-    // LOAD DATA SAAT BUKA
+    // GANTI INI DENGAN URL WEB APP ANDA SETELAH DEPLOY!
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbw0Dtf02ehfOShlzXkBmaOVYbyVYILrbREXXnaBG8wtlpNnbtm8qL_z0GcH4977Shc/exec";
+
     window.onload = function() {
         document.getElementById('tglSurat').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-        google.script.run.withSuccessHandler(data => {
-            if(data) updateTampilanSurat(data);
-        }).getUndanganData();
+        muatDataTerbaru();
     };
+
+    function muatDataTerbaru() {
+        fetch(scriptUrl + "?action=read")
+            .then(res => res.json())
+            .then(data => {
+                if(data) updateTampilanSurat(data);
+            })
+            .catch(err => console.error("Gagal memuat data:", err));
+    }
 
     function updateTampilanSurat(data) {
         document.getElementById('vPerihal').innerText = data.perihal;
@@ -121,24 +135,30 @@
         document.getElementById('vLok').innerText = data.tempat;
         document.getElementById('vAge').innerText = data.agenda;
 
-        // Logika Template Otomatis
-        let teksPembuka = "Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara ";
-        if(data.jenis == "Rapat Warga") teksPembuka += "Musyawarah Rapat Warga yang akan dilaksanakan pada:";
-        else if(data.jenis == "Kerja Bakti") teksPembuka += "Kerja Bakti Sosial lingkungan yang akan dilaksanakan pada:";
-        else if(data.jenis == "Pengajian") teksPembuka += "Pengajian Rutin warga yang akan dilaksanakan pada:";
-        else if(data.jenis == "Tasyakuran") teksPembuka += "Ramah Tamah / Tasyakuran warga yang akan dilaksanakan pada:";
-        else teksPembuka += "pertemuan warga yang akan dilaksanakan pada:";
+        let teks = "Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara ";
+        if(data.jenis === "Rapat Warga") teks += "Musyawarah Rapat Warga yang akan dilaksanakan pada:";
+        else if(data.jenis === "Kerja Bakti") teks += "Kegiatan Kerja Bakti lingkungan yang akan dilaksanakan pada:";
+        else if(data.jenis === "Pengajian") teks += "Acara Pengajian Rutin warga yang akan dilaksanakan pada:";
+        else if(data.jenis === "Tasyakuran") teks += "Acara Ramah Tamah / Tasyakuran yang akan dilaksanakan pada:";
+        else teks += "pertemuan warga yang akan dilaksanakan pada:";
         
-        document.getElementById('vPembuka').innerText = teksPembuka;
+        document.getElementById('vPembuka').innerText = teks;
     }
 
     function doLogin() {
-        google.script.run.withSuccessHandler(res => {
-            if(res) {
-                tutupModal('modalLogin');
-                document.getElementById('modalAdmin').style.display = 'block';
-            } else alert("Akses Ditolak!");
-        }).checkLogin(document.getElementById('user').value, document.getElementById('pass').value);
+        const u = document.getElementById('userInput').value;
+        const p = document.getElementById('passInput').value;
+
+        fetch(`${scriptUrl}?action=login&u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`)
+            .then(res => res.json())
+            .then(res => {
+                if(res.status === "success") {
+                    tutupModal('modalLogin');
+                    document.getElementById('modalAdmin').style.display = 'block';
+                } else {
+                    alert("Akses Ditolak! Username atau Password salah.");
+                }
+            });
     }
 
     function saveData() {
@@ -150,10 +170,19 @@
             tempat: document.getElementById('inputLok').value,
             agenda: document.getElementById('inputAge').value
         };
-        google.script.run.withSuccessHandler(msg => {
-            alert(msg);
+
+        if(!d.perihal || !d.tanggal) return alert("Mohon isi minimal Perihal dan Tanggal!");
+
+        fetch(scriptUrl + "?action=write", {
+            method: "POST",
+            body: JSON.stringify(d)
+        })
+        .then(res => res.json())
+        .then(res => {
+            alert(res.msg);
             location.reload();
-        }).simpanUndangan(d);
+        })
+        .catch(err => alert("Gagal menyimpan: " + err));
     }
 
     function bukaLogin() { document.getElementById('modalLogin').style.display = 'block'; }
