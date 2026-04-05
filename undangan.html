@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Rapat RT 07</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f7; padding: 20px; color: #333; }
+        .surat-container { background: white; max-width: 600px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid #2f80ed; }
+        
+        /* Kop Surat */
+        .kop { text-align: center; border-bottom: 3px double #333; pb-2; margin-bottom: 20px; padding-bottom: 10px; }
+        .kop h2 { margin: 0; font-size: 20px; text-transform: uppercase; }
+        .kop p { margin: 5px 0; font-size: 13px; color: #555; }
+
+        .nomor-surat { font-size: 14px; margin-bottom: 25px; }
+        .isi-surat { line-height: 1.6; font-size: 15px; }
+        
+        .detail-rapat { background: #f8f9fa; padding: 15px; border-left: 4px solid #2f80ed; margin: 20px 0; }
+        .detail-rapat table { width: 100%; border-collapse: collapse; }
+        .detail-rapat td { padding: 5px 0; vertical-align: top; }
+        .label { width: 100px; font-weight: bold; }
+
+        .penutup { margin-top: 25px; }
+        .tanda-tangan { margin-top: 40px; display: flex; justify-content: flex-end; text-align: center; }
+        .ttd-box { width: 200px; }
+        .space { height: 60px; }
+
+        .btn-print { display: block; width: 100%; max-width: 200px; margin: 20px auto; padding: 10px; background: #2f80ed; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; }
+        
+        @media print {
+            .btn-print, .btn-kembali { display: none; }
+            body { background: white; padding: 0; }
+            .surat-container { box-shadow: none; border: none; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="surat-container">
+    <div class="kop">
+        <h2>Rukun Tetangga 07 / RW 09</h2>
+        <p>Perumahan Bumi Indah City, Kelurahan Sukamaju</p>
+        <p>Kecamatan Pasar Kemis, Tangerang - Banten</p>
+    </div>
+
+    <div class="nomor-surat">
+        Nomor: 004/RT07-BIC/IV/2024<br>
+        Lampiran: -<br>
+        Perihal: <b>Undangan Rapat Rutin Warga</b>
+    </div>
+
+    <div class="isi-surat">
+        <p>Kepada Yth,<br><b>Bapak/Ibu Warga RT 07</b><br>Di Tempat</p>
+        
+        <p>Assalamu’alaikum Wr. Wb. Dengan hormat, mengharap kehadiran Bapak/Ibu pada rapat warga yang akan dilaksanakan pada:</p>
+
+        <div class="detail-rapat">
+            <table>
+                <tr><td class="label">Hari / Tgl</td><td>: Sabtu, 13 April 2024</td></tr>
+                <tr><td class="label">Waktu</td><td>: 20.00 WIB s/d Selesai</td></tr>
+                <tr><td class="label">Tempat</td><td>: Balai Warga / Lapangan Fasum RT 07</td></tr>
+                <tr><td class="label">Agenda</td><td>: Pembahasan Keamanan & Persiapan Halal Bihalal</td></tr>
+            </table>
+        </div>
+
+        <p class="penutup">Demikian undangan ini kami sampaikan, mengingat pentingnya acara tersebut kami sangat mengharapkan kehadiran Bapak/Ibu. Atas perhatiannya kami ucapkan terima kasih.</p>
+    </div>
+
+    <div class="tanda-tangan">
+        <div class="ttd-box">
+            Tangerang, 10 April 2024<br>
+            Ketua RT 07,<br>
+            <div class="space"></div>
+            <b>( ........................... )</b>
+        </div>
+    </div>
+</div>
+
+<button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan PDF</button>
+<a href="index.html" style="display:block; text-align:center; color:#7f8c8d; text-decoration:none; font-size:14px;">← Kembali ke Menu</a>
+
+</body>
+</html>
