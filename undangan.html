@@ -166,21 +166,40 @@
     }
 
     function updateTampilanSurat(data) {
-        document.getElementById('vPerihal').innerText = data.perihal;
-        document.getElementById('vTgl').innerText = data.tanggal;
-        document.getElementById('vJam').innerText = data.waktu;
-        document.getElementById('vLok').innerText = data.tempat;
-        document.getElementById('vAge').innerText = data.agenda;
+    document.getElementById('vPerihal').innerText = data.perihal;
+    
+    // --- PERBAIKAN FORMAT TANGGAL DI SINI ---
+    let tanggalInput = data.tanggal;
+    let tanggalTampil = tanggalInput;
 
-        let teks = "Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara ";
-        if(data.jenis === "Rapat Warga") teks += "Musyawarah Rapat Warga yang akan dilaksanakan pada:";
-        else if(data.jenis === "Kerja Bakti") teks += "Kegiatan Kerja Bakti lingkungan yang akan dilaksanakan pada:";
-        else if(data.jenis === "Pengajian") teks += "Acara Pengajian Rutin warga yang akan dilaksanakan pada:";
-        else if(data.jenis === "Tasyakuran") teks += "Acara Ramah Tamah / Tasyakuran yang akan dilaksanakan pada:";
-        else teks += "pertemuan warga yang akan dilaksanakan pada:";
-        document.getElementById('vPembuka').innerText = teks;
+    // Cek jika formatnya mengandung huruf 'T' (format ISO dari database)
+    if (tanggalInput.includes('T')) {
+        const dateObj = new Date(tanggalInput);
+        // Ubah ke format Indonesia: "Jumat, 3 April 2026"
+        tanggalTampil = dateObj.toLocaleDateString('id-ID', {
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric'
+        });
     }
+    
+    document.getElementById('vTgl').innerText = tanggalTampil;
+    // ----------------------------------------
 
+    document.getElementById('vJam').innerText = data.waktu;
+    document.getElementById('vLok').innerText = data.tempat;
+    document.getElementById('vAge').innerText = data.agenda;
+
+    let teks = "Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara ";
+    if(data.jenis === "Rapat Warga") teks += "Musyawarah Rapat Warga yang akan dilaksanakan pada:";
+    else if(data.jenis === "Kerja Bakti") teks += "Kegiatan Kerja Bakti lingkungan yang akan dilaksanakan pada:";
+    else if(data.jenis === "Pengajian") teks += "Acara Pengajian Rutin warga yang akan dilaksanakan pada:";
+    else if(data.jenis === "Tasyakuran") teks += "Acara Ramah Tamah / Tasyakuran yang akan dilaksanakan pada:";
+    else teks += "pertemuan warga yang akan dilaksanakan pada:";
+    
+    document.getElementById('vPembuka').innerText = teks;
+}
     function doLogin() {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
