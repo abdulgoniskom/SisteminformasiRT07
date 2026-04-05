@@ -9,12 +9,12 @@
             --primary: #6c5ce7;
             --success: #27ae60;
             --danger: #eb5757;
-            --bg: #f8f9fa;
+            --text: #2c3e50;
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f3f7; 
             margin: 0; 
             display: flex; 
             align-items: center; 
@@ -28,25 +28,25 @@
             border-radius: 20px; 
             max-width: 400px; 
             width: 90%; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
             text-align: center;
         }
 
-        h2 { font-size: 20px; color: #2c3e50; margin-bottom: 25px; line-height: 1.5; }
+        h2 { font-size: 1.2rem; color: var(--text); margin-bottom: 25px; line-height: 1.4; }
 
-        /* Tombol Vote */
+        /* Tombol Utama */
         .btn-vote { 
             display: block; 
             width: 100%; 
-            padding: 15px; 
+            padding: 16px; 
             margin: 12px 0; 
-            border: 2px solid #ddd; 
+            border: 2px solid #dfe6e9; 
             border-radius: 12px; 
             background: white; 
             font-size: 16px; 
             font-weight: bold; 
             cursor: pointer; 
-            transition: all 0.3s ease; 
+            transition: 0.3s; 
         }
 
         .btn-setuju { color: var(--success); border-color: var(--success); }
@@ -55,183 +55,123 @@
         .btn-tidak { color: var(--danger); border-color: var(--danger); }
         .btn-tidak:hover { background: var(--danger); color: white; }
 
-        /* Progress Bar */
-        .result-box { margin-top: 25px; text-align: left; display: none; animation: fadeIn 0.5s; }
-        .label-result { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; font-weight: 600; }
-        .bar-container { background: #eee; border-radius: 10px; height: 12px; margin-bottom: 15px; overflow: hidden; }
-        .bar { height: 100%; width: 0%; transition: width 1s ease-in-out; }
-        .bar-setuju { background: var(--success); }
-        .bar-tidak { background: var(--danger); }
-
-        /* Modal */
-        .modal { 
-            display:none; 
-            position:fixed; 
-            top:0; left:0; 
-            width:100%; height:100%; 
-            background:rgba(0,0,0,0.6); 
-            z-index:1000; 
-            backdrop-filter: blur(4px);
-        }
+        /* Area Hasil & Grafik */
+        .result-box { margin-top: 25px; text-align: left; display: none; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
         
-        .modal-content { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 20px; 
-            max-width: 350px; 
-            margin: 100px auto; 
-            position: relative;
-        }
+        .bar-bg { background: #dfe6e9; border-radius: 50px; height: 14px; margin-bottom: 20px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.1, 0.5, 0.5, 1); }
+        
+        .bg-setuju { background: var(--success); }
+        .bg-tidak { background: var(--danger); }
 
-        input, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            border: 1px solid #ddd; 
+        .voted-badge { 
+            background: #f1f2f6; 
+            color: #7f8c8d; 
+            padding: 8px; 
             border-radius: 8px; 
-            box-sizing: border-box;
-            font-family: inherit;
+            font-size: 12px; 
+            display: inline-block;
+            margin-top: 15px;
         }
-
-        .btn-action { 
-            width: 100%; 
-            padding: 12px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div id="poll-area">
-        <h2 id="topikRapat">Memuat Topik Rapat...</h2>
-        <button class="btn-vote btn-setuju" onclick="vote('setuju')">👍 SETUJU</button>
-        <button class="btn-vote btn-tidak" onclick="vote('tidak setuju')">👎 TIDAK SETUJU</button>
+        <h2 id="topikRapat">Memuat Topik Polling...</h2>
+        <button class="btn-vote btn-setuju" onclick="prosesVote('setuju')">👍 SETUJU</button>
+        <button class="btn-vote btn-tidak" onclick="prosesVote('tidak setuju')">👎 TIDAK SETUJU</button>
     </div>
 
     <div id="result-area" class="result-box">
-        <h3 style="font-size: 16px; text-align: center; margin-bottom: 20px;">Hasil Sementara</h3>
+        <h3 style="font-size: 16px; text-align: center;">Hasil Polling Saat Ini</h3>
         
-        <div class="label-result">
+        <div class="info-row">
             <span>Setuju</span>
-            <span id="label1">0%</span>
+            <span id="txtSetuju">0 Suara (0%)</span>
         </div>
-        <div class="bar-container"><div id="bar1" class="bar bar-setuju"></div></div>
-        
-        <div class="label-result">
+        <div class="bar-bg"><div id="barSetuju" class="bar-fill bg-setuju"></div></div>
+
+        <div class="info-row">
             <span>Tidak Setuju</span>
-            <span id="label2">0%</span>
+            <span id="txtTidak">0 Suara (0%)</span>
         </div>
-        <div class="bar-container"><div id="bar2" class="bar bar-tidak"></div></div>
+        <div class="bar-bg"><div id="barTidak" class="bar-fill bg-tidak"></div></div>
 
-        <p style="font-size: 11px; color: #7f8c8d; text-align: center; margin-top: 15px;">*Suara Anda sudah tercatat di sistem.</p>
-    </div>
-    
-    <button onclick="bukaLogin()" style="margin-top:20px; background:none; border:none; color:#bdc3c7; font-size:12px; cursor:pointer; text-decoration: underline;">⚙️ Admin Panel</button>
-</div>
-
-<div id="modalLogin" class="modal">
-    <div class="modal-content">
-        <h3 style="margin-top:0">Akses Pengurus</h3>
-        <input type="text" id="userAdmin" placeholder="Username">
-        <input type="password" id="passAdmin" placeholder="Password">
-        <button class="btn-action" onclick="prosesLogin()">Masuk</button>
-        <button onclick="tutupLogin()" style="margin-top:10px; background:none; border:none; color:var(--danger); cursor:pointer; width: 100%;">Batal</button>
-    </div>
-</div>
-
-<div id="modalAdmin" class="modal">
-    <div class="modal-content">
-        <h3 style="margin-top:0">⚙️ Ganti Topik</h3>
-        <textarea id="newTopik" rows="3" placeholder="Contoh: Apakah warga setuju diadakan fogging hari Minggu besok?"></textarea>
-        <button class="btn-action" style="background: var(--success);" onclick="updateTopik()">Terbitkan & Reset</button>
-        <button onclick="location.reload()" style="margin-top:10px; background:none; border:none; color:gray; cursor:pointer; width: 100%;">Tutup</button>
+        <div style="text-align:center">
+            <span class="voted-badge">✅ Anda sudah memberikan suara</span>
+        </div>
     </div>
 </div>
 
 <script>
-    // 1. MASUKKAN URL WEB APP ANDA DI SINI
+    // MASUKKAN URL WEB APP ANDA
     const scriptUrl = "https://script.google.com/macros/s/AKfycbzz9572DLFKJDLcJQDjEw2o9r1tYkMUjxgedKlXr5iV7MuHQrAVCCp16-fJWQhdOio/exec";
 
-    // LOAD DATA SAAT BUKA
     window.onload = function() {
+        muatData();
+    };
+
+    function muatData() {
         fetch(scriptUrl + "?action=read")
             .then(res => res.json())
             .then(data => {
                 document.getElementById('topikRapat').innerText = data.topik;
-                window.pollData = data;
-                if (localStorage.getItem('voted_rt07')) { tampilkanHasil(data); }
-            });
-    };
-
-    function vote(pilihan) {
-        if (localStorage.getItem('voted_rt07')) return alert("Anda sudah memilih!");
-        
-        fetch(`${scriptUrl}?action=vote&pilihan=${pilihan}`)
-            .then(res => res.json())
-            .then(res => {
-                alert(res.msg);
-                localStorage.setItem('voted_rt07', 'true');
-                location.reload();
-            });
-    }
-
-    function prosesLogin() {
-        const u = document.getElementById('userAdmin').value;
-        const p = document.getElementById('passAdmin').value;
-
-        fetch(`${scriptUrl}?action=login&u=${u}&p=${p}`)
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === "success") {
-                    document.getElementById('modalLogin').style.display = 'none';
-                    document.getElementById('modalAdmin').style.display = 'block';
-                } else {
-                    alert("Login Gagal!");
+                
+                // Cek apakah HP ini sudah pernah vote
+                if (localStorage.getItem('voted_rt07')) {
+                    tampilkanGrafik(data);
                 }
+            })
+            .catch(err => {
+                document.getElementById('topikRapat').innerText = "Gagal memuat data rapat.";
             });
     }
 
-    function updateTopik() {
-        const topik = document.getElementById('newTopik').value;
-        if(!topik) return alert("Topik kosong!");
-        
-        if(confirm("Reset hasil suara dan ganti topik?")) {
-            fetch(scriptUrl + "?action=updateTopik", {
-                method: "POST",
-                body: JSON.stringify({topik: topik})
-            })
-            .then(res => res.json())
-            .then(res => {
-                alert(res.msg);
-                localStorage.removeItem('voted_rt07'); // Admin bisa vote lagi di topik baru
-                location.reload();
-            });
+    function prosesVote(pilihan) {
+        if (localStorage.getItem('voted_rt07')) {
+            alert("Anda sudah memberikan suara sebelumnya.");
+            return;
+        }
+
+        if (confirm(`Anda yakin memilih "${pilihan.toUpperCase()}"?`)) {
+            // Tampilkan loading sederhana
+            document.getElementById('topikRapat').innerText = "Mengirim suara...";
+            
+            fetch(`${scriptUrl}?action=vote&pilihan=${pilihan}`)
+                .then(res => res.json())
+                .then(res => {
+                    alert(res.msg);
+                    localStorage.setItem('voted_rt07', 'true');
+                    // Ambil data terbaru setelah vote untuk update grafik
+                    muatData(); 
+                });
         }
     }
 
-    function tampilkanHasil(data) {
+    function tampilkanGrafik(data) {
         document.getElementById('poll-area').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
-        const total = data.v1 + data.v2;
-        const p1 = total === 0 ? 0 : Math.round((data.v1 / total) * 100);
-        const p2 = total === 0 ? 0 : Math.round((data.v2 / total) * 100);
-        
-        document.getElementById('label1').innerText = `${data.v1} Suara (${p1}%)`;
-        document.getElementById('bar1').style.width = p1 + '%';
-        document.getElementById('label2').innerText = `${data.v2} Suara (${p2}%)`;
-        document.getElementById('bar2').style.width = p2 + '%';
-    }
 
-    function bukaLogin() { document.getElementById('modalLogin').style.display = 'block'; }
-    function tutupLogin() { document.getElementById('modalLogin').style.display = 'none'; }
+        const v1 = Number(data.v1) || 0;
+        const v2 = Number(data.v2) || 0;
+        const total = v1 + v2;
+
+        const p1 = total === 0 ? 0 : Math.round((v1 / total) * 100);
+        const p2 = total === 0 ? 0 : Math.round((v2 / total) * 100);
+
+        // Update Teks
+        document.getElementById('txtSetuju').innerText = `${v1} Suara (${p1}%)`;
+        document.getElementById('txtTidak').innerText = `${v2} Suara (${p2}%)`;
+
+        // Jalankan Animasi Grafik (Sedikit delay agar transisi terlihat)
+        setTimeout(() => {
+            document.getElementById('barSetuju').style.width = p1 + '%';
+            document.getElementById('barTidak').style.width = p2 + '%';
+        }, 100);
+    }
 </script>
 
 </body>
