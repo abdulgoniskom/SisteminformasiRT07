@@ -11,10 +11,10 @@
         .header { margin: 20px 0 30px; }
         .header h1 { font-size: 18px; color: #2c3e50; }
         
-        /* Grid Menu HP */
+        /* Grid Menu HP - 2 Kolom Simetris */
         .grid-fitur {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 kolom rapi di HP */
+            grid-template-columns: 1fr 1fr; 
             gap: 15px;
             max-width: 500px;
             margin: auto;
@@ -34,11 +34,7 @@
             transition: 0.2s;
         }
 
-        /* Menu Denah dibuat lebar penuh di bawah agar ganjilnya rapi */
-        .full-width {
-            grid-column: span 2;
-        }
-
+        /* Efek saat ditekan di HP */
         .item-fitur:active { transform: scale(0.95); background: #f9f9f9; }
         .item-fitur span { font-size: 12px; font-weight: bold; }
         .emoji { font-size: 30px; }
@@ -81,19 +77,24 @@
         <span style="color: #9b59b6;">Galeri</span>
     </a>
     
-<a href="undangan.html" class="item-fitur">
+    <a href="undangan.html" class="item-fitur">
         <div class="emoji">✉️</div>
         <span style="color: #2d3436;">Undangan Digital</span>
     </a>
     
     <a href="polling.html" class="item-fitur">
-    <div class="emoji">📊</div>
-    <span style="color: #6c5ce7;">Polling Warga</span>
-</a>
+        <div class="emoji">📊</div>
+        <span style="color: #6c5ce7;">Polling Warga</span>
+    </a>
     
-    <a href="denah.html" class="item-fitur full-width">
+    <a href="cctv_warga.html" class="item-fitur">
+        <div class="emoji">📹</div>
+        <span style="color: #34495e;">CCTV Lingkungan</span>
+    </a>
+
+    <a href="denah.html" class="item-fitur">
         <div class="emoji">📍</div>
-        <span style="color: #27ae60;">Peta & Denah Wilayah</span>
+        <span style="color: #27ae60;">Denah Wilayah</span>
     </a>
 </div>
 
