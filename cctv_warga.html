@@ -7,78 +7,95 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <style>
-        body { background: #eef2f7; font-family: 'Segoe UI', sans-serif; }
-        .header-cctv { background: #2c3e50; color: white; padding: 25px 15px; border-radius: 0 0 25px 25px; }
-        .card-cctv { border: none; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; background: white; }
-        .badge-live { position: absolute; top: 12px; right: 12px; z-index: 10; background: #eb5757; font-size: 10px; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .header-section { background: #2c3e50; color: white; padding: 25px 15px; border-radius: 0 0 20px 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card-cctv { border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: white; position: relative; }
+        .badge-live { position: absolute; top: 10px; right: 10px; z-index: 5; background: #e74c3c; font-size: 10px; font-weight: bold; }
+        .location-tag { padding: 12px; font-weight: 600; color: #2c3e50; font-size: 14px; }
+        #loader { padding: 60px 20px; color: #7f8c8d; }
     </style>
 </head>
 <body>
 
-<div class="header-cctv text-center">
-    <h2 style="font-size: 20px;">📹 CCTV Lingkungan</h2>
-    <p style="font-size: 12px; opacity: 0.8;">RT 07 RW 09 Bumi Indah City</p>
+<div class="header-section text-center">
+    <h1 style="font-size: 20px; margin: 0;">📹 CCTV RT 07</h1>
+    <p style="font-size: 12px; opacity: 0.8; margin: 5px 0 0;">Monitoring Lingkungan Real-time</p>
 </div>
 
-<div class="container mt-4">
-    <div id="main-content">
-        <div id="loader" class="text-center py-5">
-            <div class="spinner-border text-primary mb-2"></div>
-            <p>Memverifikasi akses...</p>
+<div class="container">
+    <div id="status-area" class="text-center">
+        <div id="loader">
+            <div class="spinner-border text-primary mb-3" role="status"></div>
+            <p>Menghubungkan ke server...</p>
         </div>
-        <div class="row g-3" id="cctv-container"></div>
     </div>
 
-    <div class="text-center mt-3">
-        <a href="fitur.html" style="text-decoration:none; font-weight:bold; color:#2f80ed;">← Kembali</a>
+    <div class="row g-3" id="cctv-grid"></div>
+
+    <div class="text-center mt-5 mb-4">
+        <a href="index.html" class="btn btn-sm btn-outline-secondary px-4" style="border-radius: 20px;"> Kembali ke Menu</a>
     </div>
 </div>
 
-<script src="https://script.google.com/macros/s/AKfycbxMWXAx_trphBfxoHwikafu67O5Cou8KwIeKoeyyP3Z9e3wqXTnuo1Ls5JI890E5hI/exec"></script>
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
 <script>
     window.onload = function() {
-        // Minta password ke warga
-        let passWarga = prompt("Masukkan Kode Akses RT 07:");
+        const password = prompt("Keamanan RT 07\nSilakan masukkan kode akses warga:");
         
-        if (!passWarga) {
-            window.location.href = "cctv_warga.html";
+        if (!password) {
+            alert("Akses dibatalkan.");
+            window.location.href = "index.html";
             return;
         }
 
-        // Kirim password ke server untuk divalidasi
+        // Memanggil fungsi di Code.gs
         google.script.run
             .withSuccessHandler(renderCCTV)
             .withFailureHandler(function(err) {
-                alert(err.message);
-                window.location.href = "cctv_warga.html";
+                document.getElementById('loader').innerHTML = `
+                    <div class="alert alert-danger mx-3">
+                        <b>Gagal Akses:</b><br>${err.message}
+                    </div>
+                    <button onclick="window.location.reload()" class="btn btn-primary btn-sm mt-2">Coba Lagi</button>
+                `;
             })
-            .getCCTVDataValidated(passWarga);
+            .getCCTVDataValidated(password);
     };
 
     function renderCCTV(data) {
-        const container = document.getElementById('cctv-container');
-        document.getElementById('loader').style.display = 'none';
+        const grid = document.getElementById('cctv-grid');
+        const loader = document.getElementById('loader');
+        
+        if (loader) loader.style.display = 'none';
 
-        if (data.length === 0) {
-            container.innerHTML = '<p class="text-center mt-4">Belum ada kamera aktif.</p>';
+        if (!data || data.length === 0) {
+            grid.innerHTML = '<div class="col-12 text-center mt-4 text-muted">Belum ada kamera aktif di lingkungan.</div>';
             return;
         }
 
-        data.forEach((item, index) => {
-            let media = item.tipe === "YouTube" 
-                ? `<div class="ratio ratio-16x9"><iframe src="${item.url}" allowfullscreen></iframe></div>`
-                : `<video id="v-${index}" class="video-js vjs-default-skin vjs-16-9" controls preload="auto"><source src="${item.url}" type="application/x-mpegURL"></video>`;
+        data.forEach((camera, index) => {
+            let player = "";
+            if (camera.tipe === "YouTube") {
+                player = `<div class="ratio ratio-16x9"><iframe src="${camera.url}" allowfullscreen></iframe></div>`;
+            } else {
+                player = `<video id="video-${index}" class="video-js vjs-default-skin vjs-16-9" controls preload="auto" width="100%">
+                            <source src="${camera.url}" type="application/x-mpegURL">
+                          </video>`;
+            }
 
-            const card = `
-                <div class="col-12 col-md-6">
+            const html = `
+                <div class="col-12 col-md-6 mb-3">
                     <div class="card card-cctv">
                         <span class="badge badge-live">● LIVE</span>
-                        ${media}
-                        <div class="card-footer bg-white border-0 py-3"><b>📍 ${item.lokasi}</b></div>
+                        <div class="card-body p-0">${player}</div>
+                        <div class="location-tag">📍 ${camera.lokasi}</div>
                     </div>
                 </div>`;
-            container.insertAdjacentHTML('beforeend', card);
-            if (item.tipe !== "YouTube") videojs(`v-${index}`);
+            grid.insertAdjacentHTML('beforeend', html);
+            
+            if (camera.tipe !== "YouTube") {
+                videojs(`video-${index}`);
+            }
         });
     }
 </script>
