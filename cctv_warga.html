@@ -7,12 +7,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <style>
-        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
         .header-section { background: #2c3e50; color: white; padding: 25px 15px; border-radius: 0 0 20px 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .card-cctv { border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: white; position: relative; }
-        .badge-live { position: absolute; top: 10px; right: 10px; z-index: 5; background: #e74c3c; font-size: 10px; font-weight: bold; }
-        .location-tag { padding: 12px; font-weight: 600; color: #2c3e50; font-size: 14px; }
+        .card-cctv { border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: white; position: relative; margin-bottom: 20px; }
+        .badge-live { position: absolute; top: 10px; right: 10px; z-index: 5; background: #e74c3c; color: white; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+        .location-tag { padding: 12px; font-weight: 600; color: #2c3e50; font-size: 14px; background: #fff; }
         #loader { padding: 60px 20px; color: #7f8c8d; }
+        iframe { border: none; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
@@ -32,7 +33,8 @@
 
     <div class="row g-3" id="cctv-grid"></div>
 
-    <div class="text-center mt-5 mb-4">
+    <div class="text-center mt-4 mb-5">
+        <a href="javascript:void(0)" onclick="location.reload()" class="btn btn-sm btn-light border mb-3">🔄 Refresh Halaman</a><br>
         <a href="fitur.html" class="btn btn-sm btn-outline-secondary px-4" style="border-radius: 20px;"> Kembali ke Menu</a>
     </div>
 </div>
@@ -44,15 +46,14 @@
         
         if (!password) {
             alert("Akses dibatalkan.");
-            window.location.href = "index.html";
+            window.location.href = "fitur.html";
             return;
         }
 
-        // Memanggil fungsi di Code.gs
         google.script.run
             .withSuccessHandler(renderCCTV)
             .withFailureHandler(function(err) {
-                document.getElementById('loader').innerHTML = `
+                document.getElementById('status-area').innerHTML = `
                     <div class="alert alert-danger mx-3">
                         <b>Gagal Akses:</b><br>${err.message}
                     </div>
@@ -64,9 +65,9 @@
 
     function renderCCTV(data) {
         const grid = document.getElementById('cctv-grid');
-        const loader = document.getElementById('loader');
+        const statusArea = document.getElementById('status-area');
         
-        if (loader) loader.style.display = 'none';
+        if (statusArea) statusArea.style.display = 'none';
 
         if (!data || data.length === 0) {
             grid.innerHTML = '<div class="col-12 text-center mt-4 text-muted">Belum ada kamera aktif di lingkungan.</div>';
@@ -74,27 +75,34 @@
         }
 
         data.forEach((camera, index) => {
-            let player = "";
+            let playerHtml = "";
             if (camera.tipe === "YouTube") {
-                player = `<div class="ratio ratio-16x9"><iframe src="${camera.url}" allowfullscreen></iframe></div>`;
+                playerHtml = `<div class="ratio ratio-16x9">
+                                <iframe src="${camera.url}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                              </div>`;
             } else {
-                player = `<video id="video-${index}" class="video-js vjs-default-skin vjs-16-9" controls preload="auto" width="100%">
-                            <source src="${camera.url}" type="application/x-mpegURL">
-                          </video>`;
+                playerHtml = `<video id="video-${index}" class="video-js vjs-default-skin vjs-16-9" controls preload="auto" width="100%" muted autoplay>
+                                <source src="${camera.url}" type="application/x-mpegURL">
+                              </video>`;
             }
 
-            const html = `
-                <div class="col-12 col-md-6 mb-3">
+            const card = `
+                <div class="col-12 col-md-6">
                     <div class="card card-cctv">
                         <span class="badge badge-live">● LIVE</span>
-                        <div class="card-body p-0">${player}</div>
+                        <div class="card-body p-0">${playerHtml}</div>
                         <div class="location-tag">📍 ${camera.lokasi}</div>
                     </div>
                 </div>`;
-            grid.insertAdjacentHTML('beforeend', html);
+            
+            grid.insertAdjacentHTML('beforeend', card);
             
             if (camera.tipe !== "YouTube") {
-                videojs(`video-${index}`);
+                videojs(`video-${index}`, {
+                    fluid: true,
+                    responsive: true,
+                    playbackRates: [0.5, 1, 1.5, 2]
+                });
             }
         });
     }
