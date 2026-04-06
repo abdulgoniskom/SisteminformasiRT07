@@ -41,7 +41,7 @@
         let passWarga = prompt("Masukkan Kode Akses RT 07:");
         
         if (!passWarga) {
-            window.location.href = "index.html";
+            window.location.href = "cctv_warga.html";
             return;
         }
 
@@ -50,7 +50,7 @@
             .withSuccessHandler(renderCCTV)
             .withFailureHandler(function(err) {
                 alert(err.message);
-                window.location.href = "index.html";
+                window.location.href = "cctv_warga.html";
             })
             .getCCTVDataValidated(passWarga);
     };
