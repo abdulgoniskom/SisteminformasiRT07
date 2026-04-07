@@ -1,110 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CCTV RT 07</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <style>
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
-        .header-section { background: #2c3e50; color: white; padding: 25px 15px; border-radius: 0 0 20px 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .card-cctv { border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: white; position: relative; margin-bottom: 20px; }
-        .badge-live { position: absolute; top: 10px; right: 10px; z-index: 5; background: #e74c3c; color: white; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 4px; }
-        .location-tag { padding: 12px; font-weight: 600; color: #2c3e50; font-size: 14px; background: #fff; }
-        #loader { padding: 60px 20px; color: #7f8c8d; }
-        iframe { border: none; width: 100%; height: 100%; }
+        body { background: #1a1a1a; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .header-section { background: linear-gradient(135deg, #2c3e50, #000000); padding: 20px 10px; border-bottom: 2px solid #3498db; margin-bottom: 20px; }
+        .card-cctv { border: none; border-radius: 12px; overflow: hidden; background: #262626; box-shadow: 0 10px 20px rgba(0,0,0,0.3); margin-bottom: 15px; }
+        .badge-live { position: absolute; top: 10px; right: 10px; z-index: 10; background: #ff0000; color: white; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .location-tag { padding: 10px 15px; font-size: 13px; color: #bdc3c7; background: #333; display: flex; align-items: center; }
+        #loader-container { padding: 100px 20px; text-align: center; }
+        .btn-refresh { border-radius: 50px; padding: 10px 25px; font-weight: bold; }
+        iframe { border: 0; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
 
 <div class="header-section text-center">
-    <h1 style="font-size: 20px; margin: 0;">📹 CCTV RT 07</h1>
-    <p style="font-size: 12px; opacity: 0.8; margin: 5px 0 0;">Monitoring Lingkungan Real-time</p>
+    <h1 style="font-size: 18px; font-weight: bold; margin: 0;">📹 MONITORING CCTV RT 07</h1>
+    <small style="color: #3498db;">Sistem Informasi Warga Digital</small>
 </div>
 
 <div class="container">
-    <div id="status-area" class="text-center">
-        <div id="loader">
-            <div class="spinner-border text-primary mb-3" role="status"></div>
-            <p>Menghubungkan ke server...</p>
-        </div>
+    <div id="loader-container">
+        <div class="spinner-grow text-primary" role="status"></div>
+        <p class="mt-3 text-muted">Menghubungkan ke Server RT...</p>
     </div>
 
     <div class="row g-3" id="cctv-grid"></div>
 
-    <div class="text-center mt-4 mb-5">
-        <a href="javascript:void(0)" onclick="location.reload()" class="btn btn-sm btn-light border mb-3">🔄 Refresh Halaman</a><br>
-        <a href="fitur.html" class="btn btn-sm btn-outline-secondary px-4" style="border-radius: 20px;"> Kembali ke Menu</a>
+    <div class="text-center mt-5 mb-5">
+        <button onclick="window.location.reload()" class="btn btn-sm btn-outline-light px-4 me-2">🔄 Segarkan</button>
+        <button onclick="alert('Kembali ke Menu Utama')" class="btn btn-sm btn-primary px-4">🏠 Menu Utama</button>
     </div>
 </div>
 
 <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
 <script>
     window.onload = function() {
-        const password = prompt("Keamanan RT 07\nSilakan masukkan kode akses warga:");
+        const password = prompt("Sistem Keamanan RT 07\nMasukkan Password Warga:");
         
         if (!password) {
-            alert("Akses dibatalkan.");
-            window.location.href = "fitur.html";
+            document.getElementById('loader-container').innerHTML = "<p class='text-danger'>Akses Ditolak. Silakan refresh.</p>";
             return;
         }
 
+        // Panggil Server
         google.script.run
-            .withSuccessHandler(renderCCTV)
-            .withFailureHandler(function(err) {
-                document.getElementById('status-area').innerHTML = `
-                    <div class="alert alert-danger mx-3">
-                        <b>Gagal Akses:</b><br>${err.message}
-                    </div>
-                    <button onclick="window.location.reload()" class="btn btn-primary btn-sm mt-2">Coba Lagi</button>
-                `;
-            })
+            .withSuccessHandler(renderData)
+            .withFailureHandler(showError)
             .getCCTVDataValidated(password);
     };
 
-    function renderCCTV(data) {
+    function renderData(data) {
+        const loader = document.getElementById('loader-container');
         const grid = document.getElementById('cctv-grid');
-        const statusArea = document.getElementById('status-area');
-        
-        if (statusArea) statusArea.style.display = 'none';
+        loader.style.display = 'none';
 
         if (!data || data.length === 0) {
-            grid.innerHTML = '<div class="col-12 text-center mt-4 text-muted">Belum ada kamera aktif di lingkungan.</div>';
+            grid.innerHTML = '<div class="col-12 text-center text-muted p-5 border border-secondary rounded">Belum ada kamera yang aktif.</div>';
             return;
         }
 
-        data.forEach((camera, index) => {
-            let playerHtml = "";
-            if (camera.tipe === "YouTube") {
-                playerHtml = `<div class="ratio ratio-16x9">
-                                <iframe src="${camera.url}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                              </div>`;
+        data.forEach((item, index) => {
+            let mediaHtml = "";
+            
+            if (item.tipe.toLowerCase() === "youtube") {
+                mediaHtml = `<div class="ratio ratio-16x9">
+                                <iframe src="${item.url}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                             </div>`;
             } else {
-                playerHtml = `<video id="video-${index}" class="video-js vjs-default-skin vjs-16-9" controls preload="auto" width="100%" muted autoplay>
-                                <source src="${camera.url}" type="application/x-mpegURL">
-                              </video>`;
+                mediaHtml = `<video id="vjs-${index}" class="video-js vjs-default-skin vjs-16-9" controls preload="auto" width="100%" muted autoplay>
+                                <source src="${item.url}" type="application/x-mpegURL">
+                             </video>`;
             }
 
             const card = `
                 <div class="col-12 col-md-6">
                     <div class="card card-cctv">
-                        <span class="badge badge-live">● LIVE</span>
-                        <div class="card-body p-0">${playerHtml}</div>
-                        <div class="location-tag">📍 ${camera.lokasi}</div>
+                        <span class="badge-live">● LIVE</span>
+                        ${mediaHtml}
+                        <div class="location-tag">📍 ${item.lokasi}</div>
                     </div>
                 </div>`;
             
             grid.insertAdjacentHTML('beforeend', card);
-            
-            if (camera.tipe !== "YouTube") {
-                videojs(`video-${index}`, {
-                    fluid: true,
-                    responsive: true,
-                    playbackRates: [0.5, 1, 1.5, 2]
-                });
+
+            if (item.tipe.toLowerCase() !== "youtube") {
+                videojs(`vjs-${index}`);
             }
         });
+    }
+
+    function showError(err) {
+        document.getElementById('loader-container').innerHTML = `
+            <div class="alert alert-danger mx-2">
+                <strong>Waduh!</strong><br>${err.message}
+            </div>
+            <button onclick="window.location.reload()" class="btn btn-primary btn-sm">Coba Lagi</button>
+        `;
     }
 </script>
 </body>
