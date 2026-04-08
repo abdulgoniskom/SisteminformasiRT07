@@ -258,15 +258,22 @@
         document.getElementById('form-title').innerText = "Tambah Program Kerja";
     }
 
-    function downloadPDF() {
-        const tbody = document.getElementById('pdf-body');
+   function downloadPDF() {
+        const tglSekarang = new Date().toLocaleDateString('id-ID', {
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric'
+        });
+
         const element = document.createElement('div');
+        element.style.padding = "20px";
         element.innerHTML = `
             <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
-                <h2>LAPORAN PROGRAM KERJA RT 07 RW 09</h2>
-                <p>Bumi Indah City, Sukamantri</p>
+                <h2 style="margin:0;">LAPORAN PROGRAM KERJA RT 07 RW 09</h2>
+                <p style="margin:5px 0;">Bumi Indah City, Desa Sukamantri, Kec. Pasar Kemis</p>
             </div>
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
                 <thead>
                     <tr style="background: #3498db; color: white;">
                         <th style="border:1px solid black; padding: 8px;">No</th>
@@ -279,19 +286,37 @@
                 <tbody>
                     ${dataProker.map((item, i) => `
                         <tr>
-                            <td style="border:1px solid black; padding: 8px;">${i+1}</td>
-                            <td style="border:1px solid black; padding: 8px;">${item.namaprogram}</td>
+                            <td style="border:1px solid black; padding: 8px; text-align:center;">${i+1}</td>
+                            <td style="border:1px solid black; padding: 8px;"><b>${item.namaprogram}</b></td>
                             <td style="border:1px solid black; padding: 8px;">${item.deskripsi}</td>
-                            <td style="border:1px solid black; padding: 8px;">${item.target}</td>
-                            <td style="border:1px solid black; padding: 8px;">${item.status}</td>
+                            <td style="border:1px solid black; padding: 8px; text-align:center;">${item.target}</td>
+                            <td style="border:1px solid black; padding: 8px; text-align:center;">${item.status}</td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-        `;
-        html2pdf().from(element).set({ margin: 10, filename: 'Proker_RT07.pdf', jsPDF: { orientation: 'landscape' } }).save();
-    }
 
+            <div style="display: flex; justify-content: flex-end; margin-top: 40px;">
+                <div style="text-align: center; width: 250px;">
+                    <p>Tangerang, ${tglSekarang}</p>
+                    <p style="margin-top: 5px;">Ketua RT 07,</p>
+                    <br><br><br><br>
+                    <p><b>MUHAMMAD ZAINUDIN</b></p>
+                    <hr style="border: 0; border-top: 1px solid black; width: 150px; margin: 5px auto;">
+                </div>
+            </div>
+        `;
+
+        const pilihan = {
+            margin: 10,
+            filename: 'Laporan_Proker_RT07.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+
+        html2pdf().set(pilihan).from(element).save();
+    }
     window.onload = loadData;
 </script>
 </body>
