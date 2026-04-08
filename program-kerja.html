@@ -8,6 +8,36 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
         body { background:#f4f7f6; display:flex; min-height: 100vh; }
+        /* HEADER STYLE - Tombol Login di Kanan */
+        header { 
+            background: white; 
+            padding: 15px 20px; 
+            display: flex; 
+            justify-content: space-between; /* Menjauhkan Judul dan Tombol */
+            align-items: center; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            gap: 15px; /* Jarak antara teks dan tombol */
+        }
+        
+        header h3 { 
+            flex: 1; /* Biar judul mengambil ruang yang tersedia */
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        #loginBtn {
+            white-space: nowrap; /* Teks tombol tidak turun ke bawah */
+            flex-shrink: 0; /* Tombol tidak gepeng saat layar kecil */
+        }
+
+        /* RESPONSIVE HP FIX */
+        @media (max-width: 768px) {
+            header { padding: 10px 15px; }
+            header h3 { font-size: 13px; }
+            .btn { padding: 6px 10px; font-size: 10px; }
+        }
         /* SIDEBAR BASE STYLE */
         .sidebar { 
             width: 200px; 
@@ -109,7 +139,6 @@
         <h3>Program Kerja RT 07 Masa Jabatan 2025-2030</h3>
         <button id="loginBtn" class="btn btn-blue" onclick="handleLogin()">Login Admin</button>
     </header>
-
     <div id="admin-form" class="white-box">
         <h4 id="form-title">Tambah Program Kerja</h4>
         <input type="hidden" id="proker-id">
