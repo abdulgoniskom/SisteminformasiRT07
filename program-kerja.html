@@ -8,34 +8,46 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
         body { background:#f4f7f6; display:flex; min-height: 100vh; }
-        .sidebar { width: 200px; background: #2c3e50; color: white; position: fixed; height: 100vh; }
-        .sidebar h2 { text-align: center; padding: 20px 10px; font-size: 16px; background: #1a252f; }
-        .sidebar-menu a { display: block; color: white; padding: 12px 20px; text-decoration: none; font-size: 14px; cursor: pointer; }
-        .sidebar-menu a:hover { background: #34495e; }
-        .main { margin-left:200px; width:calc(100% - 200px); padding: 20px; }
+        
+        /* SIDEBAR FIX UNTUK HP */
+        .sidebar { width: 200px; background: #2c3e50; color: white; position: fixed; height: 100vh; z-index: 1000; transition: 0.3s; }
+        .sidebar h2 { text-align: center; padding: 20px 10px; font-size: 16px; background: #1a252f; border-bottom: 1px solid #34495e; }
+        .sidebar-menu a { display: block; color: white; padding: 15px 20px; text-decoration: none; font-size: 14px; border-bottom: 1px solid #34495e; }
+        
+        .main { margin-left: 200px; width: calc(100% - 200px); padding: 20px; transition: 0.3s; }
+        
         header { background:white; padding:15px; display:flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
         .white-box { background:white; padding:20px; border-radius:12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
-        /* Form & Card Style */
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .proker-card { padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 6px solid #ccc; position: relative; }
-        .selesai { background: #f0fff4; border-left-color: #2ecc71 !important; }
-        .proses { background: #fffcf0; border-left-color: #f1c40f !important; }
-        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-blue { background: #2f80ed; color: white; }
-        .btn-green { background: #27ae60; color: white; }
-        .btn-red { background: #e74c3c; color: white; }
 
-        /* PDF Template (Hidden) */
-        #pdf-content { display: none; padding: 30px; color: black; }
-        .pdf-header { text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; }
-        .pdf-table { width: 100%; border-collapse: collapse; }
-        .pdf-table th, .pdf-table td { border: 1px solid black; padding: 8px; text-align: left; font-size: 12px; }
+        /* TABEL STYLE (SAMA DENGAN PDF) */
+        .table-container { width: 100%; overflow-x: auto; } /* Biar bisa scroll di HP */
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { border: 1px solid #ddd; padding: 12px 8px; text-align: left; font-size: 13px; }
+        th { background: #f8f9fa; color: #333; }
+        .status-selesai { color: #27ae60; font-weight: bold; }
+        .status-belum { color: #e67e22; font-weight: bold; }
+
+        /* FORM ADMIN */
+        #admin-form { display: none; background: #eef5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d0e3ff; }
+        input, textarea, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
         
+        .btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-blue { background: #2f80ed; color: white; }
+        .btn-red { background: #e74c3c; color: white; margin-top: 5px; }
+        .btn-green { background: #27ae60; color: white; }
+
+        /* RESPONSIVE HP */
         @media (max-width: 768px) {
-            .sidebar { width: 60px; } .sidebar h2 { display: none; }
-            .main { margin-left: 60px; width: calc(100% - 60px); }
+            .sidebar { width: 70px; }
+            .sidebar h2 { display: none; }
+            .sidebar-menu a { text-align: center; font-size: 10px; padding: 15px 5px; }
+            .main { margin-left: 70px; width: calc(100% - 70px); padding: 10px; }
+            header h3 { font-size: 14px; }
         }
+
+        /* PDF TEMPLATE (HIDDEN) */
+        #pdf-template { display: none; padding: 30px; color: black; }
     </style>
 </head>
 <body>
@@ -43,58 +55,78 @@
 <div class="sidebar">
     <h2>RT 07</h2>
     <div class="sidebar-menu">
-        <a href="index.html">Dashboard</a>
-        <a href="program-kerja.html">Program Kerja</a>
-        <a href="kas.html">Kas RT</a>
-        <a href="warga.html">Data Warga</a>
-        <a href="pengumuman.html">Pengumuman</a>
-        <a href="kalender.html">Kalender</a>
-        <a href="arsip.html" class="active">Arsip</a>
-        <a href="struktur.html">Struktur</a>
+        <a href="index.html">🏠 Home</a>
+        <a href="program-kerja.html">📋 Proker</a>
+        <a href="kas.html">💰 Kas RT</a>
     </div>
 </div>
 
 <div class="main">
     <header>
-        <h3>Program Kerja RT 07</h3>
+        <h3>Program Kerja RT 07 Masa Jabatan 2025-2030</h3>
         <button id="loginBtn" class="btn btn-blue" onclick="handleLogin()">Login Admin</button>
     </header>
 
-    <div id="admin-form" class="white-box" style="display: none;">
-        <h4 style="margin-bottom: 15px;">Tambah Program Kerja Baru</h4>
+    <div id="admin-form" class="white-box">
+        <h4 id="form-title">Tambah Program Kerja</h4>
+        <input type="hidden" id="proker-id">
         <input type="text" id="nama" placeholder="Nama Program">
         <input type="text" id="kategori" placeholder="Kategori">
-        <textarea id="deskripsi" placeholder="Deskripsi Singkat"></textarea>
-        <input type="text" id="target" placeholder="Target (Tahun)">
-        <button class="btn btn-green" onclick="tambahProker()">Simpan Program</button>
+        <textarea id="deskripsi" placeholder="Deskripsi"></textarea>
+        <input type="text" id="target" placeholder="Target Tahun">
+        <select id="status">
+            <option value="Belum">Belum Terlaksana</option>
+            <option value="Selesai">Selesai (Tercapai)</option>
+        </select>
+        <button class="btn btn-green" onclick="simpanProker()">Simpan Data</button>
+        <button class="btn" onclick="resetForm()">Batal</button>
     </div>
 
-    <button class="btn btn-red" style="margin-bottom: 20px;" onclick="downloadPDF()">📄 Cetak PDF Warga</button>
-
     <div class="white-box">
-        <div id="proker-list">Memuat data...</div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <h4 style="color: #2c3e50;">Daftar Program Kerja</h4>
+            <button class="btn btn-red" onclick="downloadPDF()">📄 Cetak PDF</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Program</th>
+                        <th>Deskripsi</th>
+                        <th>Target</th>
+                        <th>Status</th>
+                        <th class="admin-only" style="display:none;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div id="pdf-content">
-    <div class="pdf-header">
-        <h2>DAFTAR PROGRAM KERJA RT 07 RW 09</h2>
+<div id="pdf-template">
+    <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+        <h2>LAPORAN PROGRAM KERJA RT 07 RW 09</h2>
         <p>Kelurahan Sukamantri, Tangerang</p>
     </div>
-    <table class="pdf-table">
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <thead>
-            <tr>
-                <th>No</th>
-                <th>Program</th>
-                <th>Deskripsi</th>
-                <th>Target</th>
-                <th>Status</th>
+            <tr style="background: #eee;">
+                <th style="border:1px solid black;">No</th>
+                <th style="border:1px solid black;">Program</th>
+                <th style="border:1px solid black;">Deskripsi</th>
+                <th style="border:1px solid black;">Target</th>
+                <th style="border:1px solid black;">Status</th>
             </tr>
         </thead>
-        <tbody id="pdf-table-body"></tbody>
+        <tbody id="pdf-body"></tbody>
     </table>
-    <div style="margin-top: 40px; text-align: right; font-size: 14px;">
-        <p>Tangerang, <span id="pdf-date"></span></p>
+    <div style="margin-top: 50px; text-align: right;">
+        <p>Tangerang, <span id="tgl-cetak"></span></p>
         <p style="margin-top: 10px;">Ketua RT 07,</p>
         <br><br><br>
         <p><b>Muhammad Zainudin</b></p>
@@ -102,29 +134,37 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGh2IQ7yTGp4FCgD6TAIdVubXjLA-EIGi6xx3gmMfbPwjufWTYDplHsTLbmLVnD9Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlB47M4XiJitNZSY6k9pjz6yGm_vTOvyWrpT02UCSMd5xm-LzDMsTdbmlwjJXUUAY/exec"; // GANTI INI
     let isAdmin = false;
     let dataProker = [];
 
     async function loadData() {
         const res = await fetch(SCRIPT_URL + "?sheet=Proker");
         dataProker = await res.json();
-        const list = document.getElementById('proker-list');
-        list.innerHTML = "";
+        renderTable();
+    }
 
-        dataProker.forEach(item => {
-            const isDone = item.status === "Selesai";
-            list.innerHTML += `
-                <div class="proker-card ${isDone ? 'selesai' : 'proses'}">
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${isDone ? '✅' : '⏳'} ${item.namaprogram}</b>
-                        <span style="font-size:11px;">Target: ${item.target}</span>
-                    </div>
-                    <p style="font-size:13px; color:#555; margin:5px 0;">${item.deskripsi}</p>
-                    ${isAdmin ? `<button onclick="toggleStatus('${item.id}', '${isDone ? 'Belum' : 'Selesai'}')" style="cursor:pointer; font-size:10px;">Ubah ke ${isDone ? 'Belum' : 'Selesai'}</button>` : ""}
-                </div>
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = "";
+        dataProker.forEach((item, i) => {
+            const isSelesai = item.status === "Selesai";
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><b>${item.namaprogram}</b></td>
+                    <td>${item.deskripsi}</td>
+                    <td>${item.target}</td>
+                    <td class="${isSelesai ? 'status-selesai' : 'status-belum'}">${isSelesai ? '✅ Selesai' : '⏳ Belum'}</td>
+                    <td class="admin-only" style="display: ${isAdmin ? 'table-cell' : 'none'}">
+                        <button class="btn btn-blue" onclick="editData(${i})" style="padding:4px 8px;">Edit</button>
+                        <button class="btn btn-red" onclick="hapusData('${item.id}')" style="padding:4px 8px;">Hapus</button>
+                    </td>
+                </tr>
             `;
         });
+        // Tampilkan kolom aksi jika admin
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'table-cell' : 'none');
     }
 
     async function handleLogin() {
@@ -135,48 +175,71 @@
         p.append('action', 'login'); p.append('user', user); p.append('pass', pass);
         
         const res = await fetch(SCRIPT_URL, { method: "POST", body: p });
-        const result = await res.text();
-        if(result === "AUTH_SUCCESS") {
+        if(await res.text() === "AUTH_SUCCESS") {
             isAdmin = true;
             document.getElementById('admin-form').style.display = 'block';
-            document.getElementById('loginBtn').innerText = "Logout";
-            loadData();
+            document.getElementById('loginBtn').innerText = "Logout Admin";
+            renderTable();
         } else { alert("Login Gagal!"); }
     }
 
-    async function tambahProker() {
+    function editData(index) {
+        const item = dataProker[index];
+        document.getElementById('form-title').innerText = "Edit Program Kerja";
+        document.getElementById('proker-id').value = item.id;
+        document.getElementById('nama').value = item.namaprogram;
+        document.getElementById('kategori').value = item.kategori;
+        document.getElementById('deskripsi').value = item.deskripsi;
+        document.getElementById('target').value = item.target;
+        document.getElementById('status').value = item.status;
+        window.scrollTo(0,0);
+    }
+
+    async function simpanProker() {
+        const id = document.getElementById('proker-id').value || Date.now();
         const p = new URLSearchParams();
-        p.append('id', Date.now());
+        p.append('id', id);
         p.append('namaprogram', document.getElementById('nama').value);
         p.append('kategori', document.getElementById('kategori').value);
         p.append('deskripsi', document.getElementById('deskripsi').value);
         p.append('target', document.getElementById('target').value);
-        p.append('status', 'Belum');
+        p.append('status', document.getElementById('status').value);
 
         await fetch(SCRIPT_URL, { method: "POST", body: p });
-        alert("Berhasil!"); loadData();
+        alert("Berhasil!"); resetForm(); loadData();
     }
 
-    async function toggleStatus(id, newStatus) {
+    async function hapusData(id) {
+        if(!confirm("Yakin hapus program ini?")) return;
         const p = new URLSearchParams();
-        p.append('id', id); p.append('status', newStatus);
+        p.append('action', 'delete'); p.append('id', id);
         await fetch(SCRIPT_URL, { method: "POST", body: p });
         loadData();
     }
 
+    function resetForm() {
+        document.getElementById('proker-id').value = "";
+        document.getElementById('nama').value = "";
+        document.getElementById('deskripsi').value = "";
+        document.getElementById('form-title').innerText = "Tambah Program Kerja";
+    }
+
     function downloadPDF() {
-        document.getElementById('pdf-date').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-        const tbody = document.getElementById('pdf-table-body');
+        const tbody = document.getElementById('pdf-body');
         tbody.innerHTML = "";
         dataProker.forEach((item, i) => {
-            tbody.innerHTML += `<tr><td>${i+1}</td><td>${item.namaprogram}</td><td>${item.deskripsi}</td><td>${item.target}</td><td>${item.status}</td></tr>`;
+            tbody.innerHTML += `<tr>
+                <td style="border:1px solid black;">${i+1}</td>
+                <td style="border:1px solid black;">${item.namaprogram}</td>
+                <td style="border:1px solid black;">${item.deskripsi}</td>
+                <td style="border:1px solid black;">${item.target}</td>
+                <td style="border:1px solid black;">${item.status}</td>
+            </tr>`;
         });
-
-        const element = document.getElementById('pdf-content');
+        document.getElementById('tgl-cetak').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+        const element = document.getElementById('pdf-template');
         element.style.display = 'block';
-        html2pdf().from(element).set({ margin: 10, filename: 'Proker_RT07.pdf' }).save().then(() => {
-            element.style.display = 'none';
-        });
+        html2pdf().from(element).set({ margin: 10, filename: 'Proker_RT07.pdf', jsPDF: { orientation: 'landscape' } }).save().then(()=> element.style.display='none');
     }
 
     window.onload = loadData;
