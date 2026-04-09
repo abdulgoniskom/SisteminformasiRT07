@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polling Warga RT 07</title>
+    <title>Voting Warga RT 07</title>
     <style>
         :root { --primary: #6c5ce7; --success: #27ae60; --danger: #eb5757; --text: #2c3e50; --warning: #f39c12; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f3f7; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -36,9 +36,9 @@
 <body>
 
 <div class="container">
-    <h1 style="text-align:center; font-size: 1.4rem; color: var(--text); margin-bottom: 25px;">📋 Polling Warga RT 07</h1>
-    <div id="polling-list"><p style="text-align:center; color:#aaa;">Memuat data...</p></div>
-    <button onclick="bukaModal()" style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 11px; margin-top: 20px; width: 100%;">⚙️ Panel Admin</button>
+    <h1 style="text-align:center; font-size: 1.4rem; color: var(--text); margin-bottom: 25px;">🗳️ Pemungutan Suara RT 07</h1>
+    <div id="voting-list"><p style="text-align:center; color:#aaa;">Memuat data suara...</p></div>
+    <button onclick="bukaModal()" style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 11px; margin-top: 20px; width: 100%;">⚙️ Panel Admin Voting</button>
 </div>
 
 <div id="modalAdmin" class="modal">
@@ -49,28 +49,28 @@
             <button onclick="loginAdmin()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold;">Masuk</button>
         </div>
         <div id="admin-panel" style="display:none;">
-            <h3>⚙️ Polling Baru</h3>
-            <textarea id="newTopik" placeholder="Topik polling..." rows="3"></textarea>
+            <h3>⚙️ Buat Voting Baru</h3>
+            <textarea id="newTopik" placeholder="Topik pemungutan suara..." rows="3"></textarea>
             <input type="number" id="durasi" placeholder="Durasi (dalam menit)" min="1">
-            <button id="btnTerbit" onclick="tambahPolling()" style="width:100%; padding:12px; background:var(--success); color:white; border:none; border-radius:8px; font-weight:bold;">🚀 Terbitkan Polling</button>
+            <button id="btnTerbit" onclick="tambahVoting()" style="width:100%; padding:12px; background:var(--success); color:white; border:none; border-radius:8px; font-weight:bold;">🚀 Terbitkan Voting</button>
             <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-            <button onclick="resetData()" style="width:100%; padding:10px; background:var(--danger); color:white; border:none; border-radius:8px; font-size:12px;">⚠️ Hapus Semua</button>
+            <button onclick="resetData()" style="width:100%; padding:10px; background:var(--danger); color:white; border:none; border-radius:8px; font-size:12px;">⚠️ Hapus Semua Data</button>
         </div>
         <button onclick="tutupModal()" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer;">Tutup</button>
     </div>
 </div>
 
 <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbzVvGgcv5_5k3PUjCckqNfkdRxB8cM1J6cDVywxSSivZcBnofstH5Jq17lESeGVjB4/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbw4sWp0La17KI3_3b1OUCmLIbgbu_1F6uI9kL9rIXHLsBS_T7-WG5n0JxXPpPx3vTg/exec";
 
     window.onload = muatData;
 
     function muatData() {
-        const list = document.getElementById('polling-list');
+        const list = document.getElementById('voting-list');
         fetch(scriptUrl + "?action=read")
             .then(res => res.json())
             .then(data => {
-                list.innerHTML = data.length === 0 ? "<p style='text-align:center; color:#aaa;'>Belum ada polling aktif.</p>" : "";
+                list.innerHTML = data.length === 0 ? "<p style='text-align:center; color:#aaa;'>Belum ada pemungutan suara aktif.</p>" : "";
                 
                 // --- MENGURUTKAN BERDASARKAN SUARA SETUJU TERBANYAK ---
                 data.sort((a, b) => b.v1 - a.v1);
@@ -85,7 +85,6 @@
                     const p1 = total === 0 ? 0 : Math.round((item.v1 / total) * 100);
                     const p2 = total === 0 ? 0 : Math.round((item.v2 / total) * 100);
                     
-                    // Label Prioritas Utama untuk peringkat 1 yang sudah selesai
                     let badgePrioritas = "";
                     if (isExpired && index === 0 && item.v1 > 0) {
                         badgePrioritas = `<div style="background:#ff4757; color:white; padding:5px; border-radius:5px; margin-bottom:10px; font-size:12px; font-weight:bold;">🏆 PRIORITAS UTAMA WARGA</div>`;
@@ -93,9 +92,9 @@
 
                     let teksKeputusan = "";
                     if (isExpired) {
-                        if (item.v1 > item.v2) teksKeputusan = "📢 HASIL: SETUJU (Dikerjakan)";
+                        if (item.v1 > item.v2) teksKeputusan = "📢 HASIL: SETUJU (Segera Dikerjakan)";
                         else if (item.v2 > item.v1) teksKeputusan = "📢 HASIL: TIDAK SETUJU (Dibatalkan)";
-                        else teksKeputusan = "📢 HASIL: SERI";
+                        else teksKeputusan = "📢 HASIL: SERI / SEIMBANG";
                     }
 
                     const card = document.createElement('div');
@@ -104,7 +103,7 @@
 
                     card.innerHTML = `
                         ${badgePrioritas}
-                        <span class="status-badge ${isExpired ? 'badge-end' : 'badge-live'}">${isExpired ? 'BERAKHIR' : 'LIVE'}</span>
+                        <span class="status-badge ${isExpired ? 'badge-end' : 'badge-live'}">${isExpired ? 'WAKTU HABIS' : 'PEMILIHAN BERJALAN'}</span>
                         <span class="timer" id="timer-${item.id}">${isExpired ? '' : 'Menghitung waktu...'}</span>
                         <h2>${item.topik}</h2>
                         <div id="btn-area-${item.id}" style="display: ${(!sudahVote && !isExpired) ? 'block' : 'none'}">
@@ -122,7 +121,7 @@
                                 <span>${p2}%</span>
                             </div>
                             <div class="bar-bg"><div class="bar-fill" style="width:${p2}%; background:var(--danger)"></div></div>
-                            ${isExpired ? `<div class="keputusan">${teksKeputusan}</div>` : `<center><span style="font-size:11px; color:#aaa;">✅ Suara anda sudah masuk</span></center>`}
+                            ${isExpired ? `<div class="keputusan">${teksKeputusan}</div>` : `<center><span style="font-size:11px; color:#aaa;">✅ Pilihan Anda telah tercatat</span></center>`}
                         </div>
                     `;
                     list.appendChild(card);
@@ -140,7 +139,7 @@
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            if (timerElem) timerElem.innerHTML = "Sisa Waktu: " + hours + "j " + minutes + "m " + seconds + "d ";
+            if (timerElem) timerElem.innerHTML = "Sisa Waktu Memilih: " + hours + "j " + minutes + "m " + seconds + "d ";
             if (distance < 0) {
                 clearInterval(x);
                 muatData(); 
@@ -149,7 +148,7 @@
     }
 
     function vote(id, pilihan) {
-        if (confirm(`Pilih ${pilihan.toUpperCase()}?`)) {
+        if (confirm(`Konfirmasi pilihan: ${pilihan.toUpperCase()}?`)) {
             fetch(`${scriptUrl}?action=vote&id=${id}&pilihan=${pilihan}`)
                 .then(res => res.json())
                 .then(res => {
@@ -166,13 +165,13 @@
         if (document.getElementById('passAdmin').value === "Bumiindah07") {
             document.getElementById('admin-login').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
-        } else alert("Password Salah!");
+        } else alert("Kata Sandi Salah!");
     }
 
-    function tambahPolling() {
+    function tambahVoting() {
         const topik = document.getElementById('newTopik').value;
         const durasi = document.getElementById('durasi').value;
-        if (!topik || !durasi) return alert("Isi topik & durasi!");
+        if (!topik || !durasi) return alert("Harap isi topik dan durasi voting!");
 
         const btn = document.getElementById('btnTerbit');
         btn.innerText = "⏳ Sedang Menerbitkan...";
@@ -184,33 +183,30 @@
         })
         .then(res => res.json())
         .then(res => {
-            alert("Berhasil Terbit!");
+            alert("Voting Berhasil Diterbitkan!");
             document.getElementById('newTopik').value = "";
             document.getElementById('durasi').value = "";
-            btn.innerText = "🚀 Terbitkan Polling";
+            btn.innerText = "🚀 Terbitkan Voting";
             btn.disabled = false;
-            muatData(); // Update data di belakang tanpa logout
+            muatData(); 
         })
         .catch(err => {
-            alert("Terjadi kesalahan!");
+            alert("Terjadi kesalahan teknis!");
             btn.disabled = false;
         });
     }
 
     function resetData() {
-        if (confirm("Hapus semua polling?")) {
+        if (confirm("Hapus seluruh riwayat pemungutan suara?")) {
             fetch(scriptUrl + "?action=reset").then(() => {
                 muatData();
-                alert("Data dikosongkan.");
+                alert("Seluruh data telah dihapus.");
             });
         }
     }
 
     function bukaModal() { document.getElementById('modalAdmin').style.display = 'block'; }
-    function tutupModal() { 
-        document.getElementById('modalAdmin').style.display = 'none'; 
-        // Jangan reset panel admin agar tetap di admin-panel jika sudah login
-    }
+    function tutupModal() { document.getElementById('modalAdmin').style.display = 'none'; }
 </script>
 </body>
 </html>
