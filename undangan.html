@@ -28,7 +28,6 @@
 
         .isi-surat { line-height: 1.6; text-align: justify; font-size: 16px; }
         
-        /* Detail Tabel Agar Tidak Terpotong */
         .detail-tabel { 
             margin: 25px 0; 
             padding: 15px; 
@@ -49,28 +48,14 @@
         .btn { padding:14px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px; font-size: 15px; text-decoration: none; display: inline-block; }
         .btn-blue { background:#2f80ed; color:white; }
         .btn-green { background:#27ae60; color:white; }
-        
-        /* Style Tombol Kembali Khusus */
         .btn-outline { background: white; color: #666; border: 1px solid #ccc; margin-top: 15px; }
 
-        /* ==========================================
-           PENGATURAN KHUSUS CETAK PDF (PRINT)
-           ========================================== */
         @media print {
-            @page {
-                size: A4;
-                margin: 1.5cm; 
-            }
+            @page { size: A4; margin: 1.5cm; }
             body { background: white; padding: 0; margin: 0; }
             .no-print { display: none !important; }
             .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
-            .surat-box { 
-                box-shadow: none !important; 
-                border: none !important; 
-                padding: 0 !important; 
-                min-height: auto !important; 
-                width: 100% !important;
-            }
+            .surat-box { box-shadow: none !important; border: none !important; padding: 0 !important; min-height: auto !important; width: 100% !important; }
             .kop { border-bottom: 3pt double #000 !important; }
             .detail-tabel, .ttd { page-break-inside: avoid; }
         }
@@ -118,7 +103,6 @@
     <div class="no-print" style="margin-top:20px; text-align:center; padding-bottom: 50px; display: flex; flex-direction: column; align-items: center;">
         <button class="btn btn-green" style="max-width: 300px;" onclick="window.print()">🖨️ Cetak PDF / Kertas</button>
         <a href="fitur.html" class="btn btn-outline" style="max-width: 300px;">⬅️ Kembali ke Menu Fitur</a>
-        
         <button onclick="bukaLogin()" style="background:none; border:none; color:#bbb; cursor:pointer; margin-top:25px; font-size: 11px;">⚙️ Akses Admin RT</button>
     </div>
 </div>
@@ -132,3 +116,70 @@
         <button onclick="tutupModal('modalLogin')" style="background:none; border:none; color:red; margin-top:10px; cursor:pointer; width:100%;">Batal</button>
     </div>
 </div>
+
+<script>
+    // URL Web App dari Google Apps Script
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxzDTWVlwbacD5o-cuHWIuyN3KqIIronZJoto29jHx8rUMg4XFh3dnVqDHlIeubsaA/exec";
+
+    window.onload = function() {
+        document.getElementById('tglSurat').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+        muatDataTerbaru();
+    };
+
+    function muatDataTerbaru() {
+        fetch(scriptUrl + "?action=read")
+            .then(res => res.json())
+            .then(data => { 
+                if(data) updateTampilanSurat(data); 
+            })
+            .catch(err => {
+                console.error("Gagal memuat data:", err);
+                document.getElementById('vPerihal').innerText = "Gagal memuat data dari server.";
+            });
+    }
+
+    function updateTampilanSurat(data) {
+        document.getElementById('vPerihal').innerText = data.perihal;
+        
+        let tanggalTampil = data.tanggal;
+        if (tanggalTampil && tanggalTampil.includes('T')) {
+            const dateObj = new Date(tanggalTampil);
+            tanggalTampil = dateObj.toLocaleDateString('id-ID', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+        }
+        
+        document.getElementById('vTgl').innerText = tanggalTampil || "...";
+        document.getElementById('vJam').innerText = data.waktu || "...";
+        document.getElementById('vLok').innerText = data.tempat || "...";
+        document.getElementById('vAge').innerText = data.agenda || "...";
+
+        let teks = "Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara ";
+        if(data.jenis === "Rapat Warga") teks += "Musyawarah Rapat Warga yang akan dilaksanakan pada:";
+        else if(data.jenis === "Kerja Bakti") teks += "Kegiatan Kerja Bakti lingkungan yang akan dilaksanakan pada:";
+        else if(data.jenis === "Pengajian") teks += "Acara Pengajian Rutin warga yang akan dilaksanakan pada:";
+        else if(data.jenis === "Tasyakuran") teks += "Acara Ramah Tamah / Tasyakuran yang akan dilaksanakan pada:";
+        else teks += "pertemuan warga yang akan dilaksanakan pada:";
+        
+        document.getElementById('vPembuka').innerText = teks;
+    }
+
+    function bukaLogin() { document.getElementById('modalLogin').style.display = 'block'; }
+    function tutupModal(id) { document.getElementById(id).style.display = 'none'; }
+    
+    function doLogin() {
+        const u = document.getElementById('userInput').value;
+        const p = document.getElementById('passInput').value;
+        fetch(`${scriptUrl}?action=login&u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`)
+            .then(res => res.json())
+            .then(res => {
+                if(res.status === "success") {
+                    tutupModal('modalLogin');
+                    alert("Login Berhasil!");
+                } else { alert("Akses Ditolak!"); }
+            });
+    }
+</script>
+
+</body>
+</html>
