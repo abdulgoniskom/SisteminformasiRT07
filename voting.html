@@ -31,6 +31,10 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
         .modal-content { background: white; width: 85%; max-width: 350px; margin: 50px auto; padding: 25px; border-radius: 15px; text-align: center; }
         input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+
+        /* Style untuk tombol navigasi bawah */
+        .nav-footer { margin-top: 25px; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+        .btn-back { background: #fff; color: var(--text); border: 1px solid #dfe6e9; padding: 10px 20px; border-radius: 50px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -38,7 +42,11 @@
 <div class="container">
     <h1 style="text-align:center; font-size: 1.4rem; color: var(--text); margin-bottom: 25px;">🗳️ Voting Suara Warga RT 07</h1>
     <div id="voting-list"><p style="text-align:center; color:#aaa;">Memuat data suara...</p></div>
-    <button onclick="bukaModal()" style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 11px; margin-top: 20px; width: 100%;">⚙️ Panel Admin Voting</button>
+    
+    <div class="nav-footer">
+        <button onclick="bukaModal()" style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 11px; width: 100%;">⚙️ Panel Admin Voting</button>
+        <a href="fitur.html" class="btn-back">⬅️ Kembali ke Menu Fitur</a>
+    </div>
 </div>
 
 <div id="modalAdmin" class="modal">
@@ -61,6 +69,7 @@
 </div>
 
 <script>
+    // URL Script Bapak
     const scriptUrl = "https://script.google.com/macros/s/AKfycbw4sWp0La17KI3_3b1OUCmLIbgbu_1F6uI9kL9rIXHLsBS_T7-WG5n0JxXPpPx3vTg/exec";
 
     window.onload = muatData;
@@ -71,8 +80,6 @@
             .then(res => res.json())
             .then(data => {
                 list.innerHTML = data.length === 0 ? "<p style='text-align:center; color:#aaa;'>Belum ada pemungutan suara aktif.</p>" : "";
-                
-                // --- MENGURUTKAN BERDASARKAN SUARA SETUJU TERBANYAK ---
                 data.sort((a, b) => b.v1 - a.v1);
 
                 data.forEach((item, index) => {
