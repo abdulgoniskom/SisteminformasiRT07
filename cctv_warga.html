@@ -7,16 +7,39 @@
     <style>
         body { background: #121212; color: white; padding: 15px; }
         .cctv-card { background: #1e1e1e; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid #333; }
+        
+        /* Style tambahan untuk tombol kembali */
+        .nav-footer { margin-top: 30px; margin-bottom: 30px; display: flex; justify-content: center; }
+        .btn-back { 
+            background: #2c2c2c; 
+            color: #ffffff; 
+            border: 1px solid #444; 
+            padding: 10px 25px; 
+            border-radius: 50px; 
+            font-size: 14px; 
+            text-decoration: none; 
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-back:hover { background: #444; color: #00d2ff; }
     </style>
 </head>
 <body>
     <h5 class="text-center">📹 MONITORING CCTV RT 07</h5>
     <hr>
+    
     <div id="loading" class="text-center mt-5">
         <div class="spinner-border text-primary"></div>
         <p>Mengambil data dari Google Sheets...</p>
     </div>
+
     <div id="cctv-container" class="row"></div>
+
+    <div class="nav-footer">
+        <a href="fitur.html" class="btn-back">⬅️ Kembali ke Menu Fitur</a>
+    </div>
 
     <script>
         // MASUKKAN LINK /exec DARI APPS SCRIPT TADI DI SINI
