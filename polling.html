@@ -170,11 +170,51 @@
     function tambahPolling() {
         const topik = document.getElementById('newTopik').value;
         const durasi = document.getElementById('durasi').value;
-        if (!topik || !durasi) return alert("Isi topik & durasi!");
-        fetch(scriptUrl, { method: "POST", body: JSON.stringify({ topik: topik, durasi: parseInt(durasi) }) })
-            .then(() => { alert("Berhasil!"); location.reload(); });
+        
+        if (!topik || !durasi) return alert("Isi topik & durasi dulu, Pak!");
+        
+        // Ganti teks tombol agar Admin tahu proses sedang berjalan
+        const btn = document.querySelector("button[onclick='tambahPolling()']");
+        const teksAsli = btn.innerText;
+        btn.innerText = "⏳ Sedang Menerbitkan...";
+        btn.disabled = true;
+
+        fetch(scriptUrl, { 
+            method: "POST", 
+            body: JSON.stringify({ topik: topik, durasi: parseInt(durasi) }) 
+        })
+        .then(res => res.json())
+        .then(res => {
+            alert(res.msg);
+            
+            // KUNCI PERBAIKAN: Kosongkan input tapi JANGAN reload halaman
+            document.getElementById('newTopik').value = "";
+            document.getElementById('durasi').value = "";
+            
+            // Kembalikan tombol
+            btn.innerText = teksAsli;
+            btn.disabled = false;
+
+            // Perbarui daftar polling di belakang modal secara otomatis
+            muatData(); 
+        })
+        .catch(err => {
+            alert("Gagal: " + err);
+            btn.innerText = teksAsli;
+            btn.disabled = false;
+        });
     }
 
+    function resetData() {
+        if (confirm("Hapus semua polling? Data yang sudah ada akan hilang.")) {
+            fetch(scriptUrl + "?action=reset")
+                .then(res => res.json())
+                .then(res => {
+                    alert(res.msg);
+                    muatData(); // Update tampilan tanpa logout
+                });
+        }
+    }
     function resetData() { if (confirm("Hapus semua?")) fetch(scriptUrl + "?action=reset").then(() => location.reload()); }
     function bukaModal() { document.getElementById('modalAdmin').style.display = 'block'; }
     function tutupModal() { document.getElementById('modalAdmin').style.display = 'none'; }
