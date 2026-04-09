@@ -66,13 +66,16 @@
     window.onload = muatData;
 
     function muatData() {
+        const list = document.getElementById('polling-list');
         fetch(scriptUrl + "?action=read")
             .then(res => res.json())
             .then(data => {
-                const list = document.getElementById('polling-list');
                 list.innerHTML = data.length === 0 ? "<p style='text-align:center; color:#aaa;'>Belum ada polling aktif.</p>" : "";
                 
-                data.forEach(item => {
+                // --- LOGIKA BARU: MENGURUTKAN BERDASARKAN SUARA SETUJU TERBANYAK ---
+                data.sort((a, b) => b.v1 - a.v1);
+
+                data.forEach((item, index) => {
                     const now = new Date().getTime();
                     const end = new Date(item.deadline).getTime();
                     const isExpired = now > end;
@@ -82,30 +85,41 @@
                     const p1 = total === 0 ? 0 : Math.round((item.v1 / total) * 100);
                     const p2 = total === 0 ? 0 : Math.round((item.v2 / total) * 100);
                     
-                    // Logika Keputusan
+                    // Menentukan Label Prioritas
+                    let badgePrioritas = "";
+                    if (isExpired && index === 0 && item.v1 > 0) {
+                        badgePrioritas = `<div style="background:#ff4757; color:white; padding:5px; border-radius:5px; margin-bottom:10px; font-size:12px; font-weight:bold;">🏆 PRIORITAS UTAMA WARGA</div>`;
+                    }
+
                     let teksKeputusan = "";
                     if (isExpired) {
-                        if (item.v1 > item.v2) teksKeputusan = "📢 KEPUTUSAN: SETUJU";
-                        else if (item.v2 > item.v1) teksKeputusan = "📢 KEPUTUSAN: TIDAK SETUJU";
-                        else teksKeputusan = "📢 KEPUTUSAN: SERI / DITUNDA";
+                        if (item.v1 > item.v2) teksKeputusan = "📢 HASIL: SETUJU (Dikerjakan)";
+                        else if (item.v2 > item.v1) teksKeputusan = "📢 HASIL: TIDAK SETUJU (Dibatalkan)";
+                        else teksKeputusan = "📢 HASIL: SERI";
                     }
 
                     const card = document.createElement('div');
                     card.className = 'card';
+                    // Menambahkan highlight tipis jika dia peringkat 1
+                    if(isExpired && index === 0) card.style.border = "2px solid #ff4757";
+
                     card.innerHTML = `
+                        ${badgePrioritas}
                         <span class="status-badge ${isExpired ? 'badge-end' : 'badge-live'}">${isExpired ? 'BERAKHIR' : 'LIVE'}</span>
                         <span class="timer" id="timer-${item.id}">${isExpired ? '' : 'Menghitung waktu...'}</span>
                         <h2>${item.topik}</h2>
-                        <div id="btn-area-${item.id}" style="display: ${(!sudahVote && !isExpired) ? 'block' : 'none'}">
-                            <button class="btn-vote btn-setuju" onclick="vote('${item.id}', 'setuju')">👍 SETUJU</button>
-                            <button class="btn-vote btn-tidak" onclick="vote('${item.id}', 'tidak')">👎 TIDAK SETUJU</button>
-                        </div>
-                        <div class="result-box" style="display: ${(sudahVote || isExpired) ? 'block' : 'none'}">
-                            <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Setuju</span><span>${item.v1} Suara (${p1}%)</span></div>
+                        <div class="result-box" style="display: block">
+                            <div style="display:flex; justify-content:space-between; font-size:13px;">
+                                <span><b>Total Setuju: ${item.v1} Suara</b></span>
+                                <span>${p1}%</span>
+                            </div>
                             <div class="bar-bg"><div class="bar-fill" style="width:${p1}%; background:var(--success)"></div></div>
-                            <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Tidak Setuju</span><span>${item.v2} Suara (${p2}%)</span></div>
+                            <div style="display:flex; justify-content:space-between; font-size:13px;">
+                                <span>Tidak Setuju: ${item.v2}</span>
+                                <span>${p2}%</span>
+                            </div>
                             <div class="bar-bg"><div class="bar-fill" style="width:${p2}%; background:var(--danger)"></div></div>
-                            ${isExpired ? `<div class="keputusan">${teksKeputusan}</div>` : `<center><span style="font-size:11px; color:#aaa;">✅ Suara anda sudah masuk</span></center>`}
+                            ${isExpired ? `<div class="keputusan">${teksKeputusan}</div>` : ''}
                         </div>
                     `;
                     list.appendChild(card);
@@ -113,7 +127,6 @@
                 });
             });
     }
-
     function startTimer(id, deadline) {
         const timerElem = document.getElementById(`timer-${id}`);
         const end = new Date(deadline).getTime();
