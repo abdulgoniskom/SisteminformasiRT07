@@ -8,56 +8,37 @@
         /* CSS UMUM */
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; margin: 0; }
-        
         .container { max-width: 800px; margin: auto; }
         
         /* Desain Surat */
         .surat-box { 
-            background: white; 
-            padding: 50px; 
-            border: 1px solid #ccc; 
-            box-shadow: 0 0 15px rgba(0,0,0,0.1); 
-            min-height: 29.7cm; /* Standar tinggi A4 */
-            position: relative;
-            width: 100%;
+            background: white; padding: 50px; border: 1px solid #ccc; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.1); min-height: 29.7cm; 
+            position: relative; width: 100%;
         }
-
         .kop { text-align: center; border-bottom: 4px double #000; margin-bottom: 25px; padding-bottom: 10px; }
         .kop h2 { margin: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 22px; color: #000; }
         .kop p { margin: 5px 0; font-size: 14px; }
-
         .isi-surat { line-height: 1.6; text-align: justify; font-size: 16px; }
-        
-        .detail-tabel { 
-            margin: 25px 0; 
-            padding: 15px; 
-            background: #fdfdfd; 
-            border: 1px dashed #bbb; 
-            border-radius: 5px; 
-        }
+        .detail-tabel { margin: 25px 0; padding: 15px; background: #fdfdfd; border: 1px dashed #bbb; border-radius: 5px; }
         .detail-tabel table { width: 100%; border-collapse: collapse; }
         .detail-tabel td { padding: 8px 5px; vertical-align: top; font-size: 16px; }
         .detail-tabel td:first-child { width: 130px; font-weight: bold; }
-
         .ttd { margin-top: 50px; text-align: right; padding-right: 50px; }
 
         /* Modals & UI */
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; overflow-y: auto; }
         .admin-card { background:white; width:90%; max-width:480px; margin:40px auto; padding:25px; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         input, select, textarea { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
-        .btn { padding:14px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px; font-size: 15px; text-decoration: none; display: inline-block; }
+        .btn { padding:14px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px; font-size: 15px; text-decoration: none; display: inline-block; text-align: center; }
         .btn-blue { background:#2f80ed; color:white; }
         .btn-green { background:#27ae60; color:white; }
         .btn-outline { background: white; color: #666; border: 1px solid #ccc; margin-top: 15px; }
 
         @media print {
-            @page { size: A4; margin: 1.5cm; }
-            body { background: white; padding: 0; margin: 0; }
             .no-print { display: none !important; }
-            .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
-            .surat-box { box-shadow: none !important; border: none !important; padding: 0 !important; min-height: auto !important; width: 100% !important; }
-            .kop { border-bottom: 3pt double #000 !important; }
-            .detail-tabel, .ttd { page-break-inside: avoid; }
+            body { background: white; padding: 0; }
+            .surat-box { box-shadow: none; border: none; padding: 0; min-height: auto; }
         }
     </style>
 </head>
@@ -117,9 +98,29 @@
     </div>
 </div>
 
+<div id="modalEdit" class="modal">
+    <div class="admin-card">
+        <h3 style="text-align:center">📝 Edit Undangan</h3>
+        <label>Jenis Acara:</label>
+        <select id="editJenis">
+            <option value="Rapat Warga">Rapat Warga</option>
+            <option value="Kerja Bakti">Kerja Bakti</option>
+            <option value="Pengajian">Pengajian</option>
+            <option value="Tasyakuran">Tasyakuran</option>
+        </select>
+        <input type="text" id="editPerihal" placeholder="Perihal Undangan">
+        <input type="date" id="editTgl">
+        <input type="text" id="editWaktu" placeholder="Contoh: 19.30 WIB s/d Selesai">
+        <input type="text" id="editTempat" placeholder="Lokasi Acara">
+        <textarea id="editAgenda" placeholder="Agenda / Pembahasan"></textarea>
+        
+        <button id="btnSimpan" class="btn btn-green" onclick="simpanPerubahan()">💾 Simpan & Update Undangan</button>
+        <button onclick="tutupModal('modalEdit')" style="background:none; border:none; color:red; margin-top:10px; cursor:pointer; width:100%;">Batal</button>
+    </div>
+</div>
+
 <script>
-    // URL Web App dari Google Apps Script
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxzDTWVlwbacD5o-cuHWIuyN3KqIIronZJoto29jHx8rUMg4XFh3dnVqDHlIeubsaA/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxXJZIo6iCareGYS1wNMkB6PlVyP7n4CnfOMflreOvnPpG_j9Y18hC8qDEIofOdhdQ/exec";
 
     window.onload = function() {
         document.getElementById('tglSurat').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
@@ -129,39 +130,36 @@
     function muatDataTerbaru() {
         fetch(scriptUrl + "?action=read")
             .then(res => res.json())
-            .then(data => { 
-                if(data) updateTampilanSurat(data); 
-            })
-            .catch(err => {
-                console.error("Gagal memuat data:", err);
-                document.getElementById('vPerihal').innerText = "Gagal memuat data dari server.";
-            });
+            .then(data => { if(data) updateTampilanSurat(data); })
+            .catch(err => console.error("Gagal muat:", err));
     }
 
     function updateTampilanSurat(data) {
         document.getElementById('vPerihal').innerText = data.perihal;
-        
-        let tanggalTampil = data.tanggal;
-        if (tanggalTampil && tanggalTampil.includes('T')) {
-            const dateObj = new Date(tanggalTampil);
-            tanggalTampil = dateObj.toLocaleDateString('id-ID', {
-                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-            });
+        let tgl = data.tanggal;
+        if (tgl && tgl.includes('T')) {
+            tgl = new Date(tgl).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
         }
-        
-        document.getElementById('vTgl').innerText = tanggalTampil || "...";
+        document.getElementById('vTgl').innerText = tgl || "...";
         document.getElementById('vJam').innerText = data.waktu || "...";
         document.getElementById('vLok').innerText = data.tempat || "...";
         document.getElementById('vAge').innerText = data.agenda || "...";
 
         let teks = "Mengharap kehadiran Bapak/Ibu warga RT 07 pada acara ";
-        if(data.jenis === "Rapat Warga") teks += "Musyawarah Rapat Warga yang akan dilaksanakan pada:";
-        else if(data.jenis === "Kerja Bakti") teks += "Kegiatan Kerja Bakti lingkungan yang akan dilaksanakan pada:";
-        else if(data.jenis === "Pengajian") teks += "Acara Pengajian Rutin warga yang akan dilaksanakan pada:";
-        else if(data.jenis === "Tasyakuran") teks += "Acara Ramah Tamah / Tasyakuran yang akan dilaksanakan pada:";
-        else teks += "pertemuan warga yang akan dilaksanakan pada:";
+        const map = {
+            "Rapat Warga": "Musyawarah Rapat Warga",
+            "Kerja Bakti": "Kegiatan Kerja Bakti lingkungan",
+            "Pengajian": "Acara Pengajian Rutin warga",
+            "Tasyakuran": "Acara Ramah Tamah / Tasyakuran"
+        };
+        document.getElementById('vPembuka').innerText = teks + (map[data.jenis] || "pertemuan warga") + " yang akan dilaksanakan pada:";
         
-        document.getElementById('vPembuka').innerText = teks;
+        // Isi otomatis form edit dengan data yang ada
+        document.getElementById('editJenis').value = data.jenis;
+        document.getElementById('editPerihal').value = data.perihal;
+        document.getElementById('editWaktu').value = data.waktu;
+        document.getElementById('editTempat').value = data.tempat;
+        document.getElementById('editAgenda').value = data.agenda;
     }
 
     function bukaLogin() { document.getElementById('modalLogin').style.display = 'block'; }
@@ -175,9 +173,40 @@
             .then(res => {
                 if(res.status === "success") {
                     tutupModal('modalLogin');
-                    alert("Login Berhasil!");
+                    document.getElementById('modalEdit').style.display = 'block'; // Buka form edit
                 } else { alert("Akses Ditolak!"); }
             });
+    }
+
+    function simpanPerubahan() {
+        const btn = document.getElementById('btnSimpan');
+        btn.innerText = "⏳ Menyimpan...";
+        btn.disabled = true;
+
+        const data = {
+            action: "updateUndangan",
+            jenis: document.getElementById('editJenis').value,
+            perihal: document.getElementById('editPerihal').value,
+            tanggal: document.getElementById('editTgl').value,
+            waktu: document.getElementById('editWaktu').value,
+            tempat: document.getElementById('editTempat').value,
+            agenda: document.getElementById('editAgenda').value
+        };
+
+        // Kirim ke Google Apps Script
+        fetch(scriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(data)
+        }).then(() => {
+            alert("Data Berhasil Diperbarui!");
+            location.reload();
+        }).catch(err => {
+            alert("Gagal menyimpan data!");
+            console.error(err);
+            btn.innerText = "💾 Simpan & Update Undangan";
+            btn.disabled = false;
+        });
     }
 </script>
 
