@@ -329,7 +329,7 @@
         fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete_kas", sheet: "Kas_Ibu_Ibu", row_id: document.getElementById("editRowId").value }) }).then(() => { tutupModal(); loadData(); });
     }
 
-    function cetakPDF() {
+   function cetakPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     
@@ -340,41 +340,40 @@
     const namaBulan = fB.options[fB.selectedIndex].text;
     const namaTahun = fT.options[fT.selectedIndex].text;
 
-    // --- LOGIKA SALDO PINDAHAN & TOTAL ---
     let saldoPindahan = 0;
     let totalMasukBulanIni = 0;
     let totalKeluarBulanIni = 0;
     let rows = [];
 
-    // Urutkan data berdasarkan tanggal agar perhitungan saldo jalan akurat
+    // Urutkan data berdasarkan tanggal
     const sortedData = [...masterData].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
+    // 1. Hitung Saldo Pindahan dari transaksi sebelum periode yang dipilih
     sortedData.forEach(d => {
         const m = Number(d.masuk) || 0;
         const k = Number(d.keluar) || 0;
-        
-        // Tentukan periode data
-        const dataBulan = String(d.bulan_laporan);
-        const dataTahun = String(d.tahun_laporan);
+        const dataBulan = parseInt(d.bulan_laporan);
+        const dataTahun = parseInt(d.tahun_laporan);
 
-        // Jika data terjadi SEBELUM periode yang difilter, masukkan ke Saldo Pindahan
         if (valB !== "all" && valT !== "all") {
-            if (dataTahun < valT || (dataTahun === valT && parseInt(dataBulan) < parseInt(valB))) {
+            if (dataTahun < parseInt(valT) || (dataTahun === parseInt(valT) && dataBulan < parseInt(valB))) {
                 saldoPindahan += (m - k);
             }
         }
-
-        // Jika data berada dalam periode yang difilter, masukkan ke Tabel
-        if ((valT === "all" || dataTahun === valT) && (valB === "all" || dataBulan === valB)) {
-            totalMasukBulanIni += m;
-            totalKeluarBulanIni += k;
-            
-            // Saldo baris ini adalah (Saldo sebelumnya + Saldo Pindahan) + (Masuk - Keluar)
-            // Namun untuk tampilan tabel, kita kalkulasi saldo berjalan secara internal
-        }
     });
 
-    // Kalkulasi ulang untuk baris tabel agar menyertakan saldo pindahan
+    // 2. Tambahkan baris Saldo Pindahan sebagai baris pertama di tabel (jika filter aktif)
+    if (valB !== "all" && valT !== "all") {
+        rows.push([
+            "-", // Tanggal dikosongkan atau bisa diisi "-"
+            "Saldo Pindahan / Saldo Awal",
+            "-",
+            "-",
+            `Rp ${saldoPindahan.toLocaleString()}`
+        ]);
+    }
+
+    // 3. Masukkan transaksi periode berjalan ke dalam tabel
     let saldoRunning = saldoPindahan;
     sortedData.forEach(d => {
         const m = Number(d.masuk) || 0;
@@ -383,7 +382,10 @@
         const dataTahun = String(d.tahun_laporan);
 
         if ((valT === "all" || dataTahun === valT) && (valB === "all" || dataBulan === valB)) {
+            totalMasukBulanIni += m;
+            totalKeluarBulanIni += k;
             saldoRunning += (m - k);
+            
             rows.push([
                 new Date(d.tanggal).toLocaleDateString("id-ID"),
                 d.keterangan,
@@ -401,17 +403,27 @@
     
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    doc.text(`Periode: ${namaBulan} ${namaTahun}`, 15, 30);
-    doc.text(`Saldo Pindahan Bulan Lalu: Rp ${saldoPindahan.toLocaleString()}`, 15, 35);
+    doc.text(`Periode: ${namaBulan} ${namaTahun}`, 15, 25);
 
     // --- TABEL ---
     doc.autoTable({
         head: [['Tanggal', 'Keterangan', 'Masuk', 'Keluar', 'Saldo']],
         body: rows,
-        startY: 40,
+        startY: 30,
         theme: 'grid',
         headStyles: { fillColor: [233, 30, 99], halign: 'center' },
-        columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' } }
+        columnStyles: { 
+            0: { halign: 'center' },
+            2: { halign: 'right' }, 
+            3: { halign: 'right' }, 
+            4: { halign: 'right', fontStyle: 'bold' } 
+        },
+        // Memberikan warna khusus pada baris Saldo Pindahan agar terlihat beda
+        didParseCell: function(data) {
+            if (data.row.index === 0 && data.cell.text[0] === "Saldo Pindahan / Saldo Awal") {
+                data.cell.styles.fillColor = [245, 245, 245];
+            }
+        }
     });
 
     // --- RINGKASAN TOTAL ---
