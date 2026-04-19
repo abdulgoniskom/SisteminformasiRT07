@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Kas Ibu Ibu RT 07</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
+        body { background:#f4f7fa; display:flex; min-height: 100vh; }
+        
+        /* SIDEBAR */
+        .sidebar { width:220px; background:#2c3e50; height:100vh; color:white; position:fixed; transition: 0.3s; z-index: 1000; left: 0; }
+        .sidebar.closed { left: -220px; }
+        .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid #3e4f5f; font-size:16px; }
+        .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
+        .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
+
+        /* MAIN */
+        .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
+        .main.expanded { margin-left: 0; }
+        header { background:#e91e63; color:white; padding:15px; display:flex; justify-content:space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
+        
+        .container { padding:15px; max-width:1150px; margin:auto; }
+        .card { background:white; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        
+        .flex-box { display: flex; gap: 10px; flex-wrap: wrap; }
+        .flex-box > div { flex: 1; min-width: 120px; }
+        label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #666; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; font-size: 13px; }
+        button { border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; color:white; }
+        .btn-green { background:#27ae60; } .btn-blue { background:#2f80ed; } .btn-orange { background:#f39c12; } .btn-red { background:#e74c3c; } .btn-gray { background:#95a5a6; }
+
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+        table { width:100%; border-collapse:collapse; background: white; min-width: 650px; }
+        th { background:#e91e63; color: white; padding:12px 8px; font-size: 12px; text-align:center; position: sticky; top: 0; }
+        td { padding:12px 8px; border-bottom:1px solid #eee; text-align:center; font-size: 12px; white-space: nowrap; }
+        td.ket-cell { white-space: normal; text-align: left; min-width: 180px; }
+
+        #modalForm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center; padding: 20px; }
+
+        @media (max-width: 768px) {
+            .sidebar { left:-220px; } 
+            .sidebar.open { left:0; } 
+            .main { margin-left:0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar" id="mySidebar">
+    <h2>RT 07 RW 09</h2>
+    <a href="index.html">Dashboard</a>
+    <a href="program-kerja.html">Program Kerja</a>
+    <a href="kas.html" class="active">Kas Ibu Ibu</a>
+    <a href="warga.html">Data Warga</a>
+    <a href="pengumuman.html">Pengumuman</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="arsip.html">Arsip</a>
+    <a href="struktur.html">Struktur</a>
+</div>
+
+<div class="main" id="mainContent">
+    <header>
+        <div style="display:flex; align-items:center;">
+            <div onclick="toggleSidebar()" style="font-size:24px; cursor:pointer; margin-right:15px;">☰</div>
+            <h2 style="font-size:15px;">Laporan Kas Ibu Ibu</h2>
+        </div>
+        <button id="loginBtn" class="btn-blue" style="font-size: 12px;" onclick="adminLogin()">Login Admin</button>
+    </header>
+
+    <div class="container">
+        <div class="card" style="border-left: 5px solid #e91e63;">
+            <label>Saldo Akhir Kas Ibu Ibu</label>
+            <h2 id="saldoDisplay">Rp 0</h2>
+        </div>
+
+        <div class="card">
+            <input type="hidden" id="sheet" value="Kas_Ibu_Ibu">
+            <div class="flex-box">
+                <div>
+                    <label>Tahun:</label>
+                    <select id="filterTahun" onchange="loadData()">
+                        <option value="all">Semua Tahun</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Bulan:</label>
+                    <select id="filterBulan" onchange="loadData()">
+                        <option value="all">Semua Bulan</option>
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3">Maret</option>
+                        <option value="4">April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:10px;">🧾 Cetak Laporan Kas</button>
+        </div>
+
+        <div class="card" style="padding: 5px;">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TANGGAL</th>
+                            <th>KETERANGAN</th>
+                            <th>MASUK</th>
+                            <th>KELUAR</th>
+                            <th>BUKTI</th>
+                            <th>SALDO</th>
+                            <th id="thAksi" style="display:none">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodiTabel"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4 style="text-align:center; font-size:13px; margin-bottom:10px;">Grafik Kas Ibu Ibu</h4>
+            <div style="max-height: 250px;">
+                <canvas id="kasChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalForm">
+    <div class="card" style="width:100%; max-width:400px; border-top: 5px solid #27ae60;">
+        <h3 id="modalTitle" style="margin-bottom:15px; text-align:center; font-size:16px;">TAMBAH TRANSAKSI</h3>
+        <input type="hidden" id="editRowId">
+        <input type="hidden" id="formSheet" value="Kas_Ibu_Ibu">
+        
+        <label>Tgl Input:</label>
+        <input type="date" id="formTanggal">
+        <div class="flex-box">
+            <div>
+                <label>Bulan Lap:</label>
+                <select id="formBulan">
+                    <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option>
+                    <option value="4">Apr</option><option value="5">Mei</option><option value="6">Jun</option>
+                    <option value="7">Jul</option><option value="8">Agu</option><option value="9">Sep</option>
+                    <option value="10">Okt</option><option value="11">Nov</option><option value="12">Des</option>
+                </select>
+            </div>
+            <div>
+                <label>Tahun:</label>
+                <select id="formTahun">
+                    <option value="2025">2025</option><option value="2026">2026</option>
+                    <option value="2027">2027</option><option value="2028">2028</option>
+                    <option value="2029">2029</option><option value="2030">2030</option>
+                </select>
+            </div>
+        </div>
+        <label>Keterangan:</label>
+        <input type="text" id="formKet">
+        <div class="flex-box">
+            <div><label>Masuk:</label><input type="number" id="formMasuk" value="0"></div>
+            <div><label>Keluar:</label><input type="number" id="formKeluar" value="0"></div>
+        </div>
+        <label>Link Bukti:</label>
+        <input type="text" id="formBukti">
+        <button onclick="simpanData()" class="btn-green" style="width:100%; margin-top:10px;">SIMPAN DATA</button>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button id="btnHapus" onclick="hapusData()" class="btn-red" style="flex:1; display:none;">HAPUS</button>
+            <button onclick="tutupModal()" class="btn-gray" style="flex:1">BATAL</button>
+        </div>
+    </div>
+</div>
+
+<button id="btnAdd" onclick="bukaModal()" class="btn-blue" style="display:none; position:fixed; bottom:20px; right:20px; border-radius:50%; width:50px; height:50px; font-size:24px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1001;">+</button>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwts9gROVoKeiHm4ueGFsFLvZ-Qk4aE3QZBz9UfhYj116lSDSrDfh_PPbBh07_SpbE9/exec"; 
+    let masterData = [];
+    let isAdmin = false;
+    let myChart = null;
+
+    function toggleSidebar() {
+        const s = document.getElementById("mySidebar");
+        const m = document.getElementById("mainContent");
+        if (window.innerWidth > 768) { s.classList.toggle("closed"); m.classList.toggle("expanded"); } 
+        else { s.classList.toggle("open"); }
+    }
+
+    function loadData() {
+        const s = document.getElementById("sheet").value;
+        const fB = document.getElementById("filterBulan").value;
+        const fT = document.getElementById("filterTahun").value;
+        const bodi = document.getElementById("bodiTabel");
+        bodi.innerHTML = '<tr><td colspan="7">Memuat data Kas Ibu Ibu...</td></tr>';
+
+        fetch(`${API_URL}?sheet=${s}`).then(r => r.json()).then(data => {
+            masterData = data;
+            let html = ""; let sJalan = 0; let tM = 0; let tK = 0;
+
+            data.forEach(d => {
+                let m = Number(d.masuk) || 0;
+                let k = Number(d.keluar) || 0;
+                sJalan += (m - k);
+                
+                if ((fT === "all" || String(d.tahun_laporan) === fT) && (fB === "all" || String(d.bulan_laporan) === fB)) {
+                    tM += m; tK += k;
+                    html += `<tr>
+                        <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+                        <td class="ket-cell">${d.keterangan}</td>
+                        <td style="color:#27ae60; font-weight:bold">${m > 0 ? 'Rp '+m.toLocaleString() : '-'}</td>
+                        <td style="color:#e74c3c; font-weight:bold">${k > 0 ? 'Rp '+k.toLocaleString() : '-'}</td>
+                        <td>${d.bukti ? `<a href="${d.bukti}" target="_blank" style="color:#e91e63">Lihat</a>` : '-'}</td>
+                        <td style="font-weight:bold">Rp ${sJalan.toLocaleString()}</td>
+                        <td style="${isAdmin ? '' : 'display:none'}">
+                            <button onclick="editData(${d.row_id})" class="btn-orange" style="padding:4px 8px; font-size:10px;">EDIT</button>
+                        </td>
+                    </tr>`;
+                }
+            });
+            bodi.innerHTML = html || '<tr><td colspan="7">Data Kosong</td></tr>';
+            document.getElementById("saldoDisplay").innerText = "Rp " + sJalan.toLocaleString();
+            updateChart(tM, tK);
+        });
+    }
+
+    function updateChart(m, k) {
+        const ctx = document.getElementById('kasChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Masuk', 'Keluar'],
+                datasets: [{ data: [m, k], backgroundColor: ['#27ae60', '#e74c3c'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    function adminLogin() {
+        const user = prompt("User Admin Ibu Ibu:");
+        const pass = prompt("Password Admin Ibu Ibu:");
+        if (!user || !pass) return;
+
+        document.getElementById("loginBtn").innerText = "Checking...";
+        fetch(API_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "login_admin", username: user, password: pass, sheet: "Kas_Ibu_Ibu" }) 
+        })
+        .then(r => r.json()).then(res => {
+            if (res.status === "success") {
+                isAdmin = true;
+                document.getElementById("thAksi").style.display = "";
+                document.getElementById("btnAdd").style.display = "block";
+                const btn = document.getElementById("loginBtn");
+                btn.innerText = "Logout"; btn.style.background = "#e74c3c";
+                btn.onclick = () => location.reload();
+                loadData();
+                alert("Login Admin Berhasil!");
+            } else { 
+                alert("Gagal! Username/Password salah."); 
+                document.getElementById("loginBtn").innerText = "Login Admin";
+            }
+        });
+    }
+
+    function bukaModal(id = null) {
+        document.getElementById("modalForm").style.display = "flex";
+        if(id) {
+            const d = masterData.find(x => x.row_id == id);
+            document.getElementById("modalTitle").innerText = "EDIT TRANSAKSI";
+            document.getElementById("editRowId").value = id;
+            document.getElementById("formTanggal").value = new Date(d.tanggal).toISOString().split('T')[0];
+            document.getElementById("formBulan").value = d.bulan_laporan;
+            document.getElementById("formTahun").value = d.tahun_laporan;
+            document.getElementById("formKet").value = d.keterangan;
+            document.getElementById("formMasuk").value = d.masuk;
+            document.getElementById("formKeluar").value = d.keluar;
+            document.getElementById("formBukti").value = d.bukti || "";
+            document.getElementById("btnHapus").style.display = "block";
+        } else {
+            document.getElementById("modalTitle").innerText = "TAMBAH TRANSAKSI";
+            document.getElementById("editRowId").value = "";
+            document.getElementById("formTanggal").value = new Date().toISOString().split('T')[0];
+            document.getElementById("formKet").value = ""; 
+            document.getElementById("formMasuk").value = 0; 
+            document.getElementById("formKeluar").value = 0;
+            document.getElementById("btnHapus").style.display = "none";
+        }
+    }
+    
+    function tutupModal() { document.getElementById("modalForm").style.display = "none"; }
+    function editData(id) { bukaModal(id); }
+    
+    function simpanData() {
+        const rowId = document.getElementById("editRowId").value;
+        const payload = {
+            action: rowId ? "update_kas" : "insert_kas",
+            sheet: "Kas_Ibu_Ibu",
+            row_id: rowId,
+            tanggal: document.getElementById("formTanggal").value,
+            keterangan: document.getElementById("formKet").value,
+            masuk: document.getElementById("formMasuk").value,
+            keluar: document.getElementById("formKeluar").value,
+            bukti: document.getElementById("formBukti").value,
+            bulan_laporan: document.getElementById("formBulan").value,
+            tahun_laporan: document.getElementById("formTahun").value
+        };
+        fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(() => { tutupModal(); loadData(); });
+    }
+
+    function hapusData() {
+        if(!confirm("Hapus data ini?")) return;
+        fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete_kas", sheet: "Kas_Ibu_Ibu", row_id: document.getElementById("editRowId").value }) }).then(() => { tutupModal(); loadData(); });
+    }
+
+    function cetakPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    const fB = document.getElementById("filterBulan");
+    const fT = document.getElementById("filterTahun");
+    const namaBulan = fB.options[fB.selectedIndex].text;
+    const namaTahun = fT.options[fT.selectedIndex].text;
+
+    // --- HEADER ---
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text("LAPORAN KAS IBU IBU RT 07 RW 09", 105, 15, { align: "center" });
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    doc.text("Perumahan Bumi Indah Citty", 105, 22, { align: "center" });
+    
+    doc.text(`Periode  : ${namaBulan} ${namaTahun}`, 15, 35);
+    doc.text(`Tanggal Cetak : ${new Date().toLocaleDateString("id-ID")}`, 15, 41);
+
+    let rows = [];
+    let saldoJalan = 0;
+    masterData.forEach(d => {
+        if ((fT.value === "all" || d.tahun_laporan == fT.value) && (fB.value === "all" || d.bulan_laporan == fB.value)) {
+            const m = Number(d.masuk) || 0;
+            const k = Number(d.keluar) || 0;
+            saldoJalan += (m - k);
+            rows.push([
+                new Date(d.tanggal).toLocaleDateString("id-ID"),
+                d.keterangan,
+                m > 0 ? `Rp ${m.toLocaleString()}` : "-",
+                k > 0 ? `Rp ${k.toLocaleString()}` : "-",
+                `Rp ${saldoJalan.toLocaleString()}`
+            ]);
+        }
+    });
+
+    // --- TABEL ---
+    doc.autoTable({
+        head: [['Tanggal', 'Keterangan', 'Masuk', 'Keluar', 'Saldo']],
+        body: rows,
+        startY: 50,
+        theme: 'grid',
+        headStyles: { fillColor: [233, 30, 99], halign: 'center' },
+        columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' } }
+    });
+
+    // --- TANDA TANGAN ---
+    let finalY = doc.lastAutoTable.finalY + 15;
+    if (finalY > 250) { doc.addPage(); finalY = 20; } // Cek jika halaman tidak cukup
+
+    doc.setFontSize(10);
+    doc.text(`Tangerang, ${new Date().toLocaleDateString("id-ID")}`, 150, finalY);
+    
+    doc.text("Mengetahui,", 15, finalY + 10);
+    doc.text("Ibu RT 07", 15, finalY + 16);
+    doc.text("Bendahara", 150, finalY + 16);
+    
+    doc.setFont(undefined, 'bold');
+    doc.text("( Emil Jamilah )", 15, finalY + 40);
+    doc.text("( Dian Maya Sari )", 150, finalY + 40);
+
+    doc.save(`Laporan_Kas_IbuIbu_${namaBulan}_${namaTahun}.pdf`);
+}
+    loadData();
+</script>
+</body>
+</html>
