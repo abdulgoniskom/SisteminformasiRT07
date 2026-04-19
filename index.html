@@ -53,8 +53,8 @@
         /* --- CARDS & CHART --- */
         .cards-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Ini akan otomatis menyesuaikan jumlah kolom */
-    gap: 12px; 
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+    gap: 10px; 
     margin-bottom: 25px; 
 }
         .card { padding: 18px 15px; border-radius: 12px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
@@ -96,7 +96,9 @@
 
             .running-box { height: 30px !important; font-size: 10px !important; }
 
-            .cards-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; padding: 10px 0 !important; }
+            .cards-grid { 
+        grid-template-columns: 1fr 1fr !important; 
+    }
             .card { padding: 12px 10px !important; }
             .card h3 { font-size: 8px !important; }
             .card p { font-size: 11px !important; }
@@ -172,7 +174,14 @@
             <div class="card bg-orange" style="background: #f39c12;"><h3>Pengeluaran Agustusan</h3><p id="pengeluaranAgustusan">Rp 0</p></div>
             <div class="card bg-purple"><h3>Total Warga</h3><p id="jumlahWargaDisplay">0 Orang</p></div>
         </div>
-        
+        <div class="card" style="background: #e91e63;">
+    <h3>Saldo Kas Ibu-Ibu</h3>
+    <p id="kasIbuIbu">Rp 0</p>
+</div>
+<div class="card" style="background: #ad1457;">
+    <h3>Pengeluaran Ibu-Ibu</h3>
+    <p id="pengeluaranIbuIbu">Rp 0</p>
+</div>
         <div class="white-box">
             <h4>Grafik Keuangan</h4>
             <div style="height: 250px;"><canvas id="kasChart"></canvas></div>
@@ -203,6 +212,7 @@ const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IV
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
 const API_KALENDER = "https://script.google.com/macros/s/AKfycbxiwmlbJ7p4wHenHASRY1--ef1RO0r5dVzVXaBAgm_pjy-rUgeLOuv_LhlGlbzlUrA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwts9gROVoKeiHm4ueGFsFLvZ-Qk4aE3QZBz9UfhYj116lSDSrDfh_PPbBh07_SpbE9/exec";
 
 let chart;
 const formatRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
@@ -248,6 +258,28 @@ async function fetchData() {
     
     // Update kartu Pengeluaran Agustusan (KARTU BARU)
     document.getElementById("pengeluaranAgustusan").innerText = formatRp(totalKeluarAgustus);
+});
+    // Mengambil data dari sheet Kas_Ibu_Ibu
+fetch(API_URL + "?sheet=Kas_Ibu_Ibu").then(r => r.json()).then(data => {
+    let saldoJalan = 0;
+    let totalKeluarIbu = 0;
+
+    data.forEach(d => {
+        let m = Number(d.masuk) || 0;
+        let k = Number(d.keluar) || 0;
+        
+        // Saldo akhir adalah akumulasi Masuk - Keluar dari seluruh baris
+        saldoJalan += (m - k);
+        
+        // Total pengeluaran (bisa difilter per bulan atau total seluruhnya)
+        totalKeluarIbu += k;
+    });
+
+    // Menampilkan ke kartu dashboard
+    document.getElementById("kasIbuIbu").innerText = formatRp(saldoJalan);
+    document.getElementById("pengeluaranIbuIbu").innerText = formatRp(totalKeluarIbu);
+}).catch(err => {
+    console.error("Gagal memuat data Kas Ibu:", err);
 });
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
         if(d && d.length > 0) {
