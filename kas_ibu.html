@@ -17,7 +17,7 @@
         .sidebar.closed { left: -220px; }
         .sidebar h2 { text-align:center; padding:20px; border-bottom:1px solid #3e4f5f; font-size:16px; }
         .sidebar a { display:block; color:white; padding:15px; text-decoration:none; font-size:14px; }
-        .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #1abc9c; }
+        .sidebar a:hover, .sidebar a.active { background:#34495e; border-left: 4px solid #e91e63; }
 
         /* MAIN */
         .main { margin-left:220px; width:100%; transition: 0.3s; min-height: 100vh; }
@@ -55,7 +55,8 @@
     <h2>RT 07 RW 09</h2>
     <a href="index.html">Dashboard</a>
     <a href="program-kerja.html">Program Kerja</a>
-    <a href="kas.html" class="active">Kas Ibu Ibu</a>
+    <a href="kas.html">Kas RT</a>
+    <a href="kas_ibu.html" class="active">Kas Ibu Ibu</a>
     <a href="warga.html">Data Warga</a>
     <a href="pengumuman.html">Pengumuman</a>
     <a href="kalender.html">Kalender</a>
@@ -75,7 +76,7 @@
     <div class="container">
         <div class="card" style="border-left: 5px solid #e91e63;">
             <label>Saldo Akhir Kas Ibu Ibu</label>
-            <h2 id="saldoDisplay">Rp 0</h2>
+            <h2 id="saldoDisplay" style="color: #e91e63;">Rp 0</h2>
         </div>
 
         <div class="card">
@@ -112,7 +113,7 @@
                     </select>
                 </div>
             </div>
-            <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:10px;">🧾 Cetak Laporan Kas</button>
+            <button onclick="cetakPDF()" class="btn-green" style="width:100%; margin-top:10px; background: #e91e63;">🧾 Cetak Laporan Kas Ibu Ibu</button>
         </div>
 
         <div class="card" style="padding: 5px;">
@@ -144,7 +145,7 @@
 </div>
 
 <div id="modalForm">
-    <div class="card" style="width:100%; max-width:400px; border-top: 5px solid #27ae60;">
+    <div class="card" style="width:100%; max-width:400px; border-top: 5px solid #e91e63;">
         <h3 id="modalTitle" style="margin-bottom:15px; text-align:center; font-size:16px;">TAMBAH TRANSAKSI</h3>
         <input type="hidden" id="editRowId">
         <input type="hidden" id="formSheet" value="Kas_Ibu_Ibu">
@@ -178,7 +179,7 @@
         </div>
         <label>Link Bukti:</label>
         <input type="text" id="formBukti">
-        <button onclick="simpanData()" class="btn-green" style="width:100%; margin-top:10px;">SIMPAN DATA</button>
+        <button onclick="simpanData()" class="btn-green" style="width:100%; margin-top:10px; background: #e91e63;">SIMPAN DATA</button>
         <div style="display:flex; gap:10px; margin-top:10px;">
             <button id="btnHapus" onclick="hapusData()" class="btn-red" style="flex:1; display:none;">HAPUS</button>
             <button onclick="tutupModal()" class="btn-gray" style="flex:1">BATAL</button>
@@ -186,7 +187,7 @@
     </div>
 </div>
 
-<button id="btnAdd" onclick="bukaModal()" class="btn-blue" style="display:none; position:fixed; bottom:20px; right:20px; border-radius:50%; width:50px; height:50px; font-size:24px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1001;">+</button>
+<button id="btnAdd" onclick="bukaModal()" class="btn-blue" style="display:none; position:fixed; bottom:20px; right:20px; border-radius:50%; width:50px; height:50px; font-size:24px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1001; background: #e91e63;">+</button>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwts9gROVoKeiHm4ueGFsFLvZ-Qk4aE3QZBz9UfhYj116lSDSrDfh_PPbBh07_SpbE9/exec"; 
@@ -270,7 +271,7 @@
                 btn.innerText = "Logout"; btn.style.background = "#e74c3c";
                 btn.onclick = () => location.reload();
                 loadData();
-                alert("Login Admin Berhasil!");
+                alert("Login Admin Kas Ibu Ibu Berhasil!");
             } else { 
                 alert("Gagal! Username/Password salah."); 
                 document.getElementById("loginBtn").innerText = "Login Admin";
@@ -343,7 +344,7 @@
     doc.text("LAPORAN KAS IBU IBU RT 07 RW 09", 105, 15, { align: "center" });
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
-    doc.text("Perumahan Bumi Indah Citty", 105, 22, { align: "center" });
+    doc.text("Perumahan Bumi Indah City", 105, 22, { align: "center" });
     
     doc.text(`Periode  : ${namaBulan} ${namaTahun}`, 15, 35);
     doc.text(`Tanggal Cetak : ${new Date().toLocaleDateString("id-ID")}`, 15, 41);
@@ -377,7 +378,7 @@
 
     // --- TANDA TANGAN ---
     let finalY = doc.lastAutoTable.finalY + 15;
-    if (finalY > 250) { doc.addPage(); finalY = 20; } // Cek jika halaman tidak cukup
+    if (finalY > 250) { doc.addPage(); finalY = 20; }
 
     doc.setFontSize(10);
     doc.text(`Tangerang, ${new Date().toLocaleDateString("id-ID")}`, 150, finalY);
