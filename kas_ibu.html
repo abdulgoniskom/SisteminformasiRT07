@@ -335,54 +335,98 @@
     
     const fB = document.getElementById("filterBulan");
     const fT = document.getElementById("filterTahun");
+    const valB = fB.value;
+    const valT = fT.value;
     const namaBulan = fB.options[fB.selectedIndex].text;
     const namaTahun = fT.options[fT.selectedIndex].text;
 
-    // --- HEADER ---
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text("LAPORAN KAS IBU IBU RT 07 RW 09", 105, 15, { align: "center" });
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-    doc.text("Perumahan Bumi Indah City", 105, 22, { align: "center" });
-    
-    doc.text(`Periode  : ${namaBulan} ${namaTahun}`, 15, 35);
-    doc.text(`Tanggal Cetak : ${new Date().toLocaleDateString("id-ID")}`, 15, 41);
-
+    // --- LOGIKA SALDO PINDAHAN & TOTAL ---
+    let saldoPindahan = 0;
+    let totalMasukBulanIni = 0;
+    let totalKeluarBulanIni = 0;
     let rows = [];
-    let saldoJalan = 0;
-    masterData.forEach(d => {
-        if ((fT.value === "all" || d.tahun_laporan == fT.value) && (fB.value === "all" || d.bulan_laporan == fB.value)) {
-            const m = Number(d.masuk) || 0;
-            const k = Number(d.keluar) || 0;
-            saldoJalan += (m - k);
+
+    // Urutkan data berdasarkan tanggal agar perhitungan saldo jalan akurat
+    const sortedData = [...masterData].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+    sortedData.forEach(d => {
+        const m = Number(d.masuk) || 0;
+        const k = Number(d.keluar) || 0;
+        
+        // Tentukan periode data
+        const dataBulan = String(d.bulan_laporan);
+        const dataTahun = String(d.tahun_laporan);
+
+        // Jika data terjadi SEBELUM periode yang difilter, masukkan ke Saldo Pindahan
+        if (valB !== "all" && valT !== "all") {
+            if (dataTahun < valT || (dataTahun === valT && parseInt(dataBulan) < parseInt(valB))) {
+                saldoPindahan += (m - k);
+            }
+        }
+
+        // Jika data berada dalam periode yang difilter, masukkan ke Tabel
+        if ((valT === "all" || dataTahun === valT) && (valB === "all" || dataBulan === valB)) {
+            totalMasukBulanIni += m;
+            totalKeluarBulanIni += k;
+            
+            // Saldo baris ini adalah (Saldo sebelumnya + Saldo Pindahan) + (Masuk - Keluar)
+            // Namun untuk tampilan tabel, kita kalkulasi saldo berjalan secara internal
+        }
+    });
+
+    // Kalkulasi ulang untuk baris tabel agar menyertakan saldo pindahan
+    let saldoRunning = saldoPindahan;
+    sortedData.forEach(d => {
+        const m = Number(d.masuk) || 0;
+        const k = Number(d.keluar) || 0;
+        const dataBulan = String(d.bulan_laporan);
+        const dataTahun = String(d.tahun_laporan);
+
+        if ((valT === "all" || dataTahun === valT) && (valB === "all" || dataBulan === valB)) {
+            saldoRunning += (m - k);
             rows.push([
                 new Date(d.tanggal).toLocaleDateString("id-ID"),
                 d.keterangan,
                 m > 0 ? `Rp ${m.toLocaleString()}` : "-",
                 k > 0 ? `Rp ${k.toLocaleString()}` : "-",
-                `Rp ${saldoJalan.toLocaleString()}`
+                `Rp ${saldoRunning.toLocaleString()}`
             ]);
         }
     });
+
+    // --- RENDER PDF ---
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text("LAPORAN KAS IBU IBU RT 07 RW 09", 105, 15, { align: "center" });
+    
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Periode: ${namaBulan} ${namaTahun}`, 15, 30);
+    doc.text(`Saldo Pindahan Bulan Lalu: Rp ${saldoPindahan.toLocaleString()}`, 15, 35);
 
     // --- TABEL ---
     doc.autoTable({
         head: [['Tanggal', 'Keterangan', 'Masuk', 'Keluar', 'Saldo']],
         body: rows,
-        startY: 50,
+        startY: 40,
         theme: 'grid',
         headStyles: { fillColor: [233, 30, 99], halign: 'center' },
         columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' } }
     });
 
+    // --- RINGKASAN TOTAL ---
+    let finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFont(undefined, 'bold');
+    doc.text(`Total Pemasukan: Rp ${totalMasukBulanIni.toLocaleString()}`, 15, finalY);
+    doc.text(`Total Pengeluaran: Rp ${totalKeluarBulanIni.toLocaleString()}`, 15, finalY + 5);
+    doc.text(`Saldo Akhir: Rp ${saldoRunning.toLocaleString()}`, 15, finalY + 10);
+
     // --- TANDA TANGAN ---
-    let finalY = doc.lastAutoTable.finalY + 15;
+    finalY += 25;
     if (finalY > 250) { doc.addPage(); finalY = 20; }
 
-    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
     doc.text(`Tangerang, ${new Date().toLocaleDateString("id-ID")}`, 150, finalY);
-    
     doc.text("Mengetahui,", 15, finalY + 10);
     doc.text("Ibu RT 07", 15, finalY + 16);
     doc.text("Bendahara", 150, finalY + 16);
@@ -391,7 +435,7 @@
     doc.text("( Emil Jamilah )", 15, finalY + 40);
     doc.text("( Dian Maya Sari )", 150, finalY + 40);
 
-    doc.save(`Laporan_Kas_IbuIbu_${namaBulan}_${namaTahun}.pdf`);
+    doc.save(`Kas_Ibu_RT07_${namaBulan}_${namaTahun}.pdf`);
 }
     loadData();
 </script>
