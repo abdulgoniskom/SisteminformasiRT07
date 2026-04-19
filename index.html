@@ -51,7 +51,12 @@
         .content-section.active { display: block; }
 
         /* --- CARDS & CHART --- */
-        .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
+        .cards-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Ini akan otomatis menyesuaikan jumlah kolom */
+    gap: 12px; 
+    margin-bottom: 25px; 
+}
         .card { padding: 18px 15px; border-radius: 12px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
         .card h3 { font-size: 10px; text-transform: uppercase; margin-bottom: 5px; opacity: 0.9; }
         .card p { font-size: 15px; font-weight: 800; }
@@ -164,6 +169,7 @@
             <div class="card bg-blue"><h3>Total Kas RT</h3><p id="totalKasRT">Rp 0</p></div>
             <div class="card bg-green"><h3>Kas Agustusan</h3><p id="kasAgustusan">Rp 0</p></div>
             <div class="card bg-red"><h3>Total Pengeluaran Kas RT</h3><p id="pengeluaranBulan">Rp 0</p></div>
+            <div class="card bg-orange" style="background: #f39c12;"><h3>Pengeluaran Agustusan</h3><p id="pengeluaranAgustusan">Rp 0</p></div>
             <div class="card bg-purple"><h3>Total Warga</h3><p id="jumlahWargaDisplay">0 Orang</p></div>
         </div>
         
@@ -229,10 +235,20 @@ async function fetchData() {
     updateChart(d);
 });
     fetch(API + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
-        let total = 0; d.forEach(i => total += (Number(i.masuk||0) - Number(i.keluar||0)));
-        document.getElementById("kasAgustusan").innerText = formatRp(total);
+    let totalMasukAgustus = 0;
+    let totalKeluarAgustus = 0;
+
+    d.forEach(i => {
+        totalMasukAgustus += Number(i.masuk || 0);
+        totalKeluarAgustus += Number(i.keluar || 0);
     });
 
+    // Update kartu Saldo/Masuk Agustusan
+    document.getElementById("kasAgustusan").innerText = formatRp(totalMasukAgustus - totalKeluarAgustus);
+    
+    // Update kartu Pengeluaran Agustusan (KARTU BARU)
+    document.getElementById("pengeluaranAgustusan").innerText = formatRp(totalKeluarAgustus);
+});
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
         if(d && d.length > 0) {
             let txt = d.reverse().map(x => x.konten || x.judul).join(" &nbsp;&nbsp;&nbsp; ★ &nbsp;&nbsp;&nbsp; ");
