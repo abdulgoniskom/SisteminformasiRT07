@@ -6,61 +6,40 @@
     <title>Sistem Informasi RT 07 RW 09</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* CSS ASLI ANDA TETAP DI SINI */
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background:#f4f7f6; display:flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* --- SIDEBAR DESKTOP --- */
         .sidebar { width: 200px; background: #2c3e50; color: white; position: fixed; height: 100vh; z-index: 1000; }
         .sidebar h2 { text-align: center; padding: 20px 10px; font-size: 16px; background: #1a252f; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-menu a { display: block; color: #ffffff; padding: 12px 20px; text-decoration: none; font-size: 14px; transition: 0.3s; border-left: 4px solid transparent; cursor: pointer; }
         .sidebar-menu a:hover, .sidebar-menu a.active { background: #34495e; border-left: 4px solid #3498db; }
 
-        /* --- MAIN AREA --- */
         .main { margin-left:200px; width:calc(100% - 200px); display: flex; flex-direction: column; min-height: 100vh; transition: 0.3s; }
         
-        /* --- HEADER --- */
         header { background:white; padding:15px 25px; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; z-index: 10; }
         header h2 { font-size: 14px; color: #333; font-weight: 700; }
         .ketua { font-size: 10px; color: #2f80ed; font-weight: bold; background: #eef5ff; padding: 5px 12px; border-radius: 20px; }
 
-        /* --- RUNNING TEXT FIXED --- */
-        .running-box { 
-            background: #f2994a; 
-            color: white; 
-            height: 35px; 
-            overflow: hidden; 
-            display: flex; 
-            align-items: center; 
-            position: relative;
-        }
-
-        #marquee { 
-            display: inline-block; 
-            white-space: nowrap; 
-            padding-left: 100%; 
-            animation: jln linear infinite; 
-        }
-
-        @keyframes jln { 
-            0% { transform: translateX(0); } 
-            100% { transform: translateX(-100%); } 
-        }
+        .running-box { background: #f2994a; color: white; height: 35px; overflow: hidden; display: flex; align-items: center; position: relative; }
+        #marquee { display: inline-block; white-space: nowrap; padding-left: 100%; animation: jln linear infinite; }
+        @keyframes jln { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         
-        /* --- SECTION CONTROL --- */
         .content-section { display: none; padding: 20px; flex-grow: 1; }
         .content-section.active { display: block; }
 
-        /* --- CARDS & CHART --- */
-        .cards-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
-    gap: 10px; 
-    margin-bottom: 25px; 
-}
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
         .card { padding: 18px 15px; border-radius: 12px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
         .card h3 { font-size: 10px; text-transform: uppercase; margin-bottom: 5px; opacity: 0.9; }
         .card p { font-size: 15px; font-weight: 800; }
-        .bg-blue { background: #3498db; } .bg-green { background: #2ecc71; } .bg-red { background: #e74c3c; } .bg-purple { background: #9b59b6; }
+        
+        /* Warna-warna kartu */
+        .bg-blue { background: #3498db; } 
+        .bg-green { background: #2ecc71; } 
+        .bg-red { background: #e74c3c; } 
+        .bg-purple { background: #9b59b6; }
+        .bg-ibu-saldo { background: #e91e63; } /* Pink Terang */
+        .bg-ibu-keluar { background: #ad1457; } /* Pink Gelap */
 
         .white-box { background:white; padding:20px; border-radius:12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .white-box h4 { margin-bottom: 15px; font-size: 13px; color: #7f8c8d; text-transform: uppercase; }
@@ -72,81 +51,32 @@
         .agenda-date .day { font-size: 14px; font-weight: 800; color: #2c3e50; display: block; }
         .agenda-date .month { font-size: 9px; color: #eb5757; text-transform: uppercase; font-weight: bold; }
 
-        /* --- MEDIA QUERY HP (FIXED JUDUL) --- */
         @media (max-width: 768px) {
             .sidebar { width: 65px !important; } 
-            .sidebar h2 { display: none; } /* Tetap sembunyi di sidebar agar tidak berantakan */
+            .sidebar h2.desktop-title { display: none; }
             .sidebar-menu a { padding: 15px 5px; text-align: center; font-size: 9px; border-left: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
             .main { margin-left: 65px !important; width: calc(100% - 65px) !important; }
-
-            header { 
-                padding: 10px !important; 
-                flex-direction: column !important; 
-                height: auto !important;
-                text-align: center;
-                gap: 5px;
-            }
-            /* Memastikan judul RT tetap muncul di header HP */
-            header h2 { 
-                font-size: 12px !important; 
-                display: block !important; 
-            }
+            header { padding: 10px !important; flex-direction: column !important; height: auto !important; text-align: center; gap: 5px; }
+            header h2 { font-size: 12px !important; display: block !important; }
             .ketua { font-size: 8px !important; padding: 3px 10px !important; }
-
             .running-box { height: 30px !important; font-size: 10px !important; }
-
-            .cards-grid { 
-        grid-template-columns: 1fr 1fr !important; 
-    }
+            .cards-grid { grid-template-columns: 1fr 1fr !important; }
             .card { padding: 12px 10px !important; }
             .card h3 { font-size: 8px !important; }
             .card p { font-size: 11px !important; }
-
-            .white-box { padding: 15px !important; }
-            canvas { height: 180px !important; }
+            .mobile-title { display: block; text-align: center; padding: 10px 0; font-size: 11px; font-weight: bold; background: #1a252f; color: #1abc9c; border-bottom: 1px solid rgba(255,255,255,0.1); }
         }
-        /* Sembunyikan judul HP di Desktop */
-.mobile-title { display: none; }
-
-/* Styling judul desktop */
-.sidebar h2 { 
-    text-align: center; 
-    padding: 20px 10px; 
-    font-size: 16px; 
-    background: #1a252f; 
-}
-
-/* --- Pengaturan Khusus HP --- */
-@media (max-width: 768px) {
-    .sidebar h2.desktop-title { display: none; } /* Sembunyikan judul panjang */
-    
-    .mobile-title { 
-        display: block; 
-        text-align: center;
-        padding: 10px 0;
-        font-size: 11px; /* Ukuran pas untuk lebar 65px */
-        font-weight: bold;
-        background: #1a252f;
-        color: #1abc9c; /* Warna hijau toska agar mencolok */
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .sidebar { width: 65px !important; }
-    .main { margin-left: 65px !important; }
-}
+        .mobile-title { display: none; }
     </style>
 </head>
 <body>
     
 <div class="sidebar" id="mySidebar">
     <h2 class="desktop-title">RT 07 RW 09</h2>
-    
-    <div class="mobile-title">RT 07 RW 09</div>
-
+    <div class="mobile-title">RT 07</div>
     <div class="sidebar-menu">
         <a onclick="showSection('dashboard')" class="active">Dashboard</a>
-        <a href="program-kerja.html" class="active">Program Kerja</a>
+        <a href="program-kerja.html">Program Kerja</a>
         <a href="kas.html">Kas RT</a>
         <a href="warga.html">Data Warga</a>
         <a href="pengumuman.html">Pengumuman</a>
@@ -156,6 +86,7 @@
         <a href="fitur.html" style="background: #1abc9c; color: white; border-left: 4px solid #fff;">🌟 Fitur Warga</a>
     </div>
 </div>    
+
 <div class="main">
     <header>
         <h2>Sistem Informasi RT 07 RW 09 Bumi Indah City</h2>
@@ -171,17 +102,12 @@
             <div class="card bg-blue"><h3>Total Kas RT</h3><p id="totalKasRT">Rp 0</p></div>
             <div class="card bg-green"><h3>Kas Agustusan</h3><p id="kasAgustusan">Rp 0</p></div>
             <div class="card bg-red"><h3>Total Pengeluaran Kas RT</h3><p id="pengeluaranBulan">Rp 0</p></div>
-            <div class="card bg-orange" style="background: #f39c12;"><h3>Pengeluaran Agustusan</h3><p id="pengeluaranAgustusan">Rp 0</p></div>
+            <div class="card" style="background: #f39c12;"><h3>Pengeluaran Agustusan</h3><p id="pengeluaranAgustusan">Rp 0</p></div>
+            <div class="card bg-ibu-saldo"><h3>Saldo Kas Ibu-Ibu</h3><p id="kasIbuIbu">Rp 0</p></div>
+            <div class="card bg-ibu-keluar"><h3>Pengeluaran Ibu-Ibu</h3><p id="pengeluaranIbuIbu">Rp 0</p></div>
             <div class="card bg-purple"><h3>Total Warga</h3><p id="jumlahWargaDisplay">0 Orang</p></div>
         </div>
-        <div class="card" style="background: #e91e63;">
-    <h3>Saldo Kas Ibu-Ibu</h3>
-    <p id="kasIbuIbu">Rp 0</p>
-</div>
-<div class="card" style="background: #ad1457;">
-    <h3>Pengeluaran Ibu-Ibu</h3>
-    <p id="pengeluaranIbuIbu">Rp 0</p>
-</div>
+
         <div class="white-box">
             <h4>Grafik Keuangan</h4>
             <div style="height: 250px;"><canvas id="kasChart"></canvas></div>
@@ -207,7 +133,7 @@ function showSection(id) {
     event.currentTarget.classList.add('active');
 }
 
-// API URLs (Tetap sesuai kodingan asli Anda)
+// API URLs Tetap Sesuai Aslinya
 const API = "https://script.google.com/macros/s/AKfycbxA1WFwM45lBSZMnEx87w53x8IVv-nOYUNRfaHZSuGLsuDgfIUlxhxq5UOqz7XafXk/exec";
 const API_WARGA = "https://script.google.com/macros/s/AKfycbzxvpCt5-1f_9X-xxQYTt4XF7UutTvfVwhKOe89I4Iowb4BX5RZRqos1WMIXURSx1WR/exec";
 const API_PENGUMUMAN = "https://script.google.com/macros/s/AKfycbx2PbPk0D5v2VBX0LsrFr8hKC-H2wz2IdqsQAQV5be5XMXVzLjcUNl1kg7lEXBq7XI/exec";
@@ -218,69 +144,48 @@ let chart;
 const formatRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
 async function fetchData() {
+    // Data Warga
     fetch(API_WARGA + "?sheet=Data_Warga").then(r => r.json()).then(d => {
         document.getElementById("jumlahWargaDisplay").innerText = (d.length || 0) + " Orang";
     });
 
+    // Kas RT
     fetch(API + "?sheet=Kas_RT").then(r => r.json()).then(d => {
-    let totalMasuk = 0;
-    let totalKeluar = 0;
-
-    d.forEach(i => {
-        // Ambil semua data masuk dan keluar tanpa filter tanggal
-        let m = Number(i.masuk || 0);
-        let k = Number(i.keluar || 0);
-        
-        totalMasuk += m; 
-        totalKeluar += k;
+        let totalMasuk = 0, totalKeluar = 0;
+        d.forEach(i => {
+            totalMasuk += Number(i.masuk || 0);
+            totalKeluar += Number(i.keluar || 0);
+        });
+        document.getElementById("totalKasRT").innerText = formatRp(totalMasuk - totalKeluar);
+        document.getElementById("pengeluaranBulan").innerText = formatRp(totalKeluar);
+        updateChart(d);
     });
 
-    // 1. Kartu Biru: Saldo Saat Ini (Uang yang pegang Bendahara)
-    document.getElementById("totalKasRT").innerText = formatRp(totalMasuk - totalKeluar);
-    
-    // 2. Kartu Merah: Total Seluruh Pengeluaran (Akumulasi semua bulan)
-    document.getElementById("pengeluaranBulan").innerText = formatRp(totalKeluar);
-    
-    // Update Grafik (Tetap per bulan agar visualnya bagus)
-    updateChart(d);
-});
+    // Kas Agustusan
     fetch(API + "?sheet=Kas_Agustusan").then(r => r.json()).then(d => {
-    let totalMasukAgustus = 0;
-    let totalKeluarAgustus = 0;
-
-    d.forEach(i => {
-        totalMasukAgustus += Number(i.masuk || 0);
-        totalKeluarAgustus += Number(i.keluar || 0);
+        let totalMasukAgustus = 0, totalKeluarAgustus = 0;
+        d.forEach(i => {
+            totalMasukAgustus += Number(i.masuk || 0);
+            totalKeluarAgustus += Number(i.keluar || 0);
+        });
+        document.getElementById("kasAgustusan").innerText = formatRp(totalMasukAgustus - totalKeluarAgustus);
+        document.getElementById("pengeluaranAgustusan").innerText = formatRp(totalKeluarAgustus);
     });
 
-    // Update kartu Saldo/Masuk Agustusan
-    document.getElementById("kasAgustusan").innerText = formatRp(totalMasukAgustus - totalKeluarAgustus);
-    
-    // Update kartu Pengeluaran Agustusan (KARTU BARU)
-    document.getElementById("pengeluaranAgustusan").innerText = formatRp(totalKeluarAgustus);
-});
-    // Mengambil data dari sheet Kas_Ibu_Ibu
-fetch(API_URL + "?sheet=Kas_Ibu_Ibu").then(r => r.json()).then(data => {
-    let saldoJalan = 0;
-    let totalKeluarIbu = 0;
-
-    data.forEach(d => {
-        let m = Number(d.masuk) || 0;
-        let k = Number(d.keluar) || 0;
-        
-        // Saldo akhir adalah akumulasi Masuk - Keluar dari seluruh baris
-        saldoJalan += (m - k);
-        
-        // Total pengeluaran (bisa difilter per bulan atau total seluruhnya)
-        totalKeluarIbu += k;
+    // Kas Ibu Ibu
+    fetch(API_URL + "?sheet=Kas_Ibu_Ibu").then(r => r.json()).then(data => {
+        let saldoJalan = 0, totalKeluarIbu = 0;
+        data.forEach(d => {
+            let m = Number(d.masuk) || 0;
+            let k = Number(d.keluar) || 0;
+            saldoJalan += (m - k);
+            totalKeluarIbu += k;
+        });
+        document.getElementById("kasIbuIbu").innerText = formatRp(saldoJalan);
+        document.getElementById("pengeluaranIbuIbu").innerText = formatRp(totalKeluarIbu);
     });
 
-    // Menampilkan ke kartu dashboard
-    document.getElementById("kasIbuIbu").innerText = formatRp(saldoJalan);
-    document.getElementById("pengeluaranIbuIbu").innerText = formatRp(totalKeluarIbu);
-}).catch(err => {
-    console.error("Gagal memuat data Kas Ibu:", err);
-});
+    // Pengumuman
     fetch(API_PENGUMUMAN + "?sheet=Pengumuman").then(r => r.json()).then(d => {
         if(d && d.length > 0) {
             let txt = d.reverse().map(x => x.konten || x.judul).join(" &nbsp;&nbsp;&nbsp; ★ &nbsp;&nbsp;&nbsp; ");
@@ -291,6 +196,7 @@ fetch(API_URL + "?sheet=Kas_Ibu_Ibu").then(r => r.json()).then(data => {
         }
     });
 
+    // Kalender Agenda
     fetch(API_KALENDER).then(r => r.json()).then(d => {
         const container = document.getElementById("list-agenda-index");
         if(d && d.length > 0) {
@@ -316,8 +222,6 @@ fetch(API_URL + "?sheet=Kas_Ibu_Ibu").then(r => r.json()).then(data => {
         } else {
             container.innerHTML = "<p style='color:#999; font-size:12px;'>Tidak ada agenda terdekat.</p>";
         }
-    }).catch(e => {
-        document.getElementById("list-agenda-index").innerHTML = "<p style='color:red; font-size:11px;'>Gagal memuat kalender.</p>";
     });
 }
 
